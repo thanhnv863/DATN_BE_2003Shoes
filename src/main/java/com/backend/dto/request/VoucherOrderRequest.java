@@ -40,7 +40,7 @@ public class VoucherOrderRequest {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateAt;
 
-    private String reduceForm;
+    private Integer reduceForm;
 
     private Integer status;
 }
