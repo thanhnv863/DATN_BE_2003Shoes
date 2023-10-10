@@ -40,4 +40,22 @@ public class VoucherOrderController {
                                                           @RequestParam(defaultValue = "2") Integer size){
         return ResponseEntity.ok(voucherOrderService.getAllVoucherOrder(page,size));
     }
+
+    @GetMapping("/getAllVoucherOrderStatus0")
+    public ResponseEntity<?> getAllVoucherOrderStatus0(@RequestParam(defaultValue = "0") Integer page,
+                                                       @RequestParam(defaultValue = "2") Integer size){
+        return ResponseEntity.ok(voucherOrderService.getAllVoucherOrderStatus0(page,size));
+    }
+
+    @GetMapping("/getAllVoucherOrderStatus1")
+    public ResponseEntity<?> getAllVoucherOrderStatus1(@RequestParam(defaultValue = "0") Integer page,
+                                                       @RequestParam(defaultValue = "2") Integer size){
+        return ResponseEntity.ok(voucherOrderService.getAllVoucherOrderStatus1(page,size));
+    }
+
+    @GetMapping("/getAllVoucherOrderStatus2")
+    public ResponseEntity<?> getAllVoucherOrderStatus2(@RequestParam(defaultValue = "0") Integer page,
+                                                       @RequestParam(defaultValue = "2") Integer size){
+        return ResponseEntity.ok(voucherOrderService.getAllVoucherOrderStatus2(page,size));
+    }
 }
