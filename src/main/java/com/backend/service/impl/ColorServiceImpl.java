@@ -42,7 +42,7 @@ public class ColorServiceImpl implements IColorService {
             Calendar calendar = Calendar.getInstance();
             Date date = calendar.getTime();
             color.setName(colorRequest.getName());
-            color.setStatus(0);
+            color.setStatus(1);
             color.setCreatedAt(date);
             color.setUpdatedAt(date);
             return new ServiceResult(AppConstant.SUCCESS, "Category", colorRepository.save(color));
