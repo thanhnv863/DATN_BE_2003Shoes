@@ -133,7 +133,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
     }
 
     @Override
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 1800000)
     public void updateVoucherStatus() {
         List<VoucherOrder> vouchers = voucherOrderRepository.findAll();
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -143,14 +143,14 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 // Bỏ qua voucher này nếu có startDate hoặc endDate là null
                 continue;
             }
-            if (voucher.getStatus() != 3) {
-                // Chỉ cập nhật status nếu status hiện tại không phải là 4
+            if (voucher.getStatus() != 3) { //status=3: khi xoá đổi trạng thái thành ẩn
+                // Chỉ cập nhật status nếu status hiện tại không phải là 3
                 if (currentDateTime.isAfter(voucher.getStartDate()) && currentDateTime.isBefore(voucher.getEndDate())) {
                     voucher.setStatus(1); // Cập nhật thành "đã kích hoạt"
                 } else if (currentDateTime.isAfter(voucher.getEndDate())) {
                     voucher.setStatus(2); // Cập nhật thành "hết hạn"
                 } else {
-                    voucher.setStatus(0);
+                    voucher.setStatus(0); // Cập nhật thành chờ kích hoạt
                 }
                 voucherOrderRepository.save(voucher);
             }
@@ -414,6 +414,52 @@ public class VoucherServiceImpl implements IVoucherOrderService {
     @Override
     public ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus2(int page, int size) {
         Page<VoucherOrder> voucherOrders = voucherOrderRepository.getAllVoucherStatus2(PageRequest.of(page, size));
+
+        int current = voucherOrders.getNumber();
+        int pageSize = voucherOrders.getSize();
+        int pages = voucherOrders.getTotalPages();
+        long total = voucherOrders.getTotalElements();
+
+        Meta meta = new Meta();
+        meta.setCurrent(current);
+        meta.setPageSize(pageSize);
+        meta.setPages(pages);
+        meta.setTotal(total);
+
+        List<VoucherOrderResponse> voucherOrderResponses = new ArrayList<>();
+
+        for (VoucherOrder voucherOrder : voucherOrders) {
+            VoucherOrderResponse voucherOrderResponse = new VoucherOrderResponse();
+            voucherOrderResponse.setId(voucherOrder.getId());
+            voucherOrderResponse.setCode(voucherOrder.getCode());
+            voucherOrderResponse.setName(voucherOrder.getName());
+            voucherOrderResponse.setQuantity(voucherOrder.getQuantity());
+            voucherOrderResponse.setDiscountAmount(voucherOrder.getDiscountAmount());
+            voucherOrderResponse.setMinBillValue(voucherOrder.getMinBillValue());
+            voucherOrderResponse.setStartDate(voucherOrder.getStartDate());
+            voucherOrderResponse.setEndDate(voucherOrder.getEndDate());
+            voucherOrderResponse.setCreateDate(voucherOrder.getCreateDate());
+            voucherOrderResponse.setUpdateAt(voucherOrder.getUpdateAt());
+            voucherOrderResponse.setReduceForm(voucherOrder.getReduceForm());
+            voucherOrderResponse.setStatus(voucherOrder.getStatus());
+
+            voucherOrderResponses.add(voucherOrderResponse);
+        }
+
+        DataPaginate dataPaginate = new DataPaginate();
+        dataPaginate.setMeta(meta);
+        dataPaginate.setVoucherOrderResponses(voucherOrderResponses);
+
+        return new ServiceResult(AppConstant.SUCCESS,
+                "Successfully retrieved",
+                dataPaginate
+        );
+    }
+
+    @Override
+    public ServiceResult<List<DataPaginate>> searchAllVoucher(String name, int page, int size) {
+        Pageable pageable=PageRequest.of(page, size);
+        Page<VoucherOrder> voucherOrders = voucherOrderRepository.findByNameIgnoreCaseContaining(name,pageable);
 
         int current = voucherOrders.getNumber();
         int pageSize = voucherOrders.getSize();

@@ -32,4 +32,6 @@ public interface IVoucherOrderService {
     ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus1(int page, int size);
 
     ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus2(int page, int size);
+
+    ServiceResult<List<DataPaginate>> searchAllVoucher(String name, int page, int size);
 }
