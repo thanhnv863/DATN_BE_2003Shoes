@@ -1,4 +1,4 @@
-package com.backend.dto.response;
+package com.backend.dto.request;
 
 import com.backend.util.DateTimeSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -10,21 +10,20 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class OrderReponse {
+public class OrderRequetUpdate {
 
     private Long id;
 
-    private String nameVoucher;
+    private Long idVoucher;
+
+    private Long idAccount;
 
     private String code;
-
-    private String type;
 
     private String customerName;
 
@@ -39,9 +38,6 @@ public class OrderReponse {
     private BigDecimal totalMoney;
 
     @JsonSerialize(using = DateTimeSerializer.class)
-    private Date createdDate;
-
-    @JsonSerialize(using = DateTimeSerializer.class)
     private Date payDate;
 
     @JsonSerialize(using = DateTimeSerializer.class)
@@ -53,12 +49,9 @@ public class OrderReponse {
     @JsonSerialize(using = DateTimeSerializer.class)
     private Date receiveDate;
 
-    private String createdBy;
-
     private String updatedBy;
 
     private String note;
 
     private Integer status;
-
 }

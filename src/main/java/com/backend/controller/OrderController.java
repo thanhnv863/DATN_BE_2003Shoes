@@ -3,6 +3,7 @@ package com.backend.controller;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.OrderRequest;
+import com.backend.dto.request.OrderRequetUpdate;
 import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.response.OrderReponse;
 import com.backend.entity.Order;
@@ -28,19 +29,25 @@ public class OrderController {
     @PostMapping("/get-all")
     public ResponseEntity<?> getAllOrder(@RequestBody SearchOrderRequest searchOrderRequest) {
         Page<OrderReponse> page = iOrderService.searchOrder(searchOrderRequest);
-//        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
-        return ResponseEntity.ok().body(page);
+        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
+//        return ResponseEntity.ok().body(page);
     }
 
     @GetMapping("/get-one/{code}")
     public ResponseEntity<?> getOne(@PathVariable("code") String code) {
-        Order order = iOrderService.getOne(code);
-        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, order, "Đã tìm thấy Order "));
+        return ResponseEntity.ok().body(iOrderService.getOne(code));
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody OrderRequest orderRequest) {
         return ResponseEntity.ok().body(iOrderService.add(orderRequest));
     }
+
+    @PostMapping("/update")
+    public ResponseEntity<?> updtate(@RequestBody OrderRequetUpdate orderRequetUpdate) {
+        return ResponseEntity.ok().body(iOrderService.update(orderRequetUpdate));
+    }
+
+
 
 }

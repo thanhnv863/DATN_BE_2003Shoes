@@ -31,7 +31,7 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
@@ -60,7 +60,7 @@ public class Account {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public Account(Integer id, String name, String email, String password, Role role, Collection<? extends GrantedAuthority> authorities) {
+    public Account(Long id, String name, String email, String password, Role role, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
         this.email = email;

@@ -89,6 +89,9 @@ public class Order {
     @Column(name = "updated_by")
     private String updatedBy;
 
+    @Column(name = "note")
+    private String note;
+
     @Column(name = "status")
     private Integer status;
 }
