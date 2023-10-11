@@ -58,4 +58,10 @@ public class VoucherOrderController {
                                                        @RequestParam(defaultValue = "2") Integer size){
         return ResponseEntity.ok(voucherOrderService.getAllVoucherOrderStatus2(page,size));
     }
+
+    @GetMapping("/searchNameVoucherOrder")
+    public ResponseEntity<?> searchNameVoucherOrderStatus2(@RequestParam("name") String name,@RequestParam(defaultValue = "0") Integer page,
+                                                       @RequestParam(defaultValue = "2") Integer size){
+        return ResponseEntity.ok(voucherOrderService.searchAllVoucher(name,page,size));
+    }
 }
