@@ -28,7 +28,7 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
         sql.append("SELECT a.id, b.name, a.code, a.type, a.customer_name, a.phone_number,");
         sql.append(" a.address, a.ship_fee, a.money_reduce, a.total_money, a.create_date,");
         sql.append(" a.pay_date, a.ship_date, a.desired_date, a.receive_date, a.created_by,");
-        sql.append(" a.updated_by, a.status FROM my_order as a ");
+        sql.append(" a.updated_by,a.note, a.status FROM my_order as a ");
         sql.append(" LEFT JOIN voucher b on a.voucher_id = b.id");
         sql.append(" LEFT JOIN account c on a.account_id = c.id");
         sql.append(" LEFT JOIN address d on c.id = d.account_id");

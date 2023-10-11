@@ -3,11 +3,16 @@ package com.backend.service.impl;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.OrderRequest;
+import com.backend.dto.request.OrderRequetUpdate;
 import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.response.OrderReponse;
+import com.backend.entity.Account;
 import com.backend.entity.Order;
+import com.backend.entity.VoucherOrder;
+import com.backend.repository.AccountRepository;
 import com.backend.repository.OrderCustomRepository;
 import com.backend.repository.OrderRepository;
+import com.backend.repository.VoucherOrderRepository;
 import com.backend.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +26,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements IOrderService {
@@ -29,6 +35,13 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private VoucherOrderRepository voucherOrderRepository;
+
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     public OrderReponse convertPage(Object[] object) {
         OrderReponse orderReponse = new OrderReponse();
@@ -49,7 +62,8 @@ public class OrderServiceImpl implements IOrderService {
         orderReponse.setReceiveDate((Date) object[14]);
         orderReponse.setCreatedBy((String) object[15]);
         orderReponse.setUpdatedBy((String) object[16]);
-        orderReponse.setStatus((Integer) object[17]);
+        orderReponse.setNote((String) object[17]);
+        orderReponse.setStatus((Integer) object[18]);
         return orderReponse;
     }
 
@@ -84,8 +98,15 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public Order getOne(String code) {
-        return orderRepository.findOrderByCode(code);
+    public ServiceResultReponse<Order> getOne(String code) {
+        Optional<Order> order = orderRepository.findOrderByCode(code);
+        if(order.isPresent()){
+            Order orderGet = order.get();
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderGet, "Đã tìm thấy order");
+        }else {
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã order không tồn tại");
+
+        }
     }
 
     // gen mã tự động
@@ -107,10 +128,55 @@ public class OrderServiceImpl implements IOrderService {
             order.setCreatedDate(date);
             order.setStatus(1);
             Order orderAdd = orderRepository.save(order);
-            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAdd, "Tạo Order thành công");
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAdd, "Tạo hóa đơn thành công");
         } catch (Exception e) {
             e.printStackTrace();
-            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo order thất bại");
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo hoá đơn thất bại");
         }
+    }
+
+    @Override
+    public ServiceResultReponse<Order> update(OrderRequetUpdate orderRequetUpdate) {
+        Optional<Order> order = orderRepository.findOrderByCode(orderRequetUpdate.getCode());
+        if(order.isPresent()){
+            Order orderGet = order.get();
+            orderGet.setId(orderGet.getId());
+            orderGet.setCode(orderGet.getCode());
+            // voucher
+            VoucherOrder voucherOrder = voucherOrderRepository.findById(orderRequetUpdate.getIdVoucher()).get();
+            orderGet.setVoucherOrder(voucherOrder);
+            //
+            Account account = accountRepository.findById(orderRequetUpdate.getIdAccount()).get();
+            orderGet.setAccount(account);
+            //
+            orderGet.setType(orderGet.getType());
+            orderGet.setId(orderGet.getId());
+            orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
+            orderGet.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
+            orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
+            orderGet.setAddress(orderRequetUpdate.getAddress());
+            orderGet.setShipFee(orderRequetUpdate.getShipFee());
+            orderGet.setMoneyReduce(orderRequetUpdate.getMoneyReduce());
+            orderGet.setTotalMoney(orderRequetUpdate.getTotalMoney());
+            orderGet.setCreatedDate(orderGet.getCreatedDate());
+            orderGet.setPayDate(orderRequetUpdate.getPayDate());
+            orderGet.setShipDate(orderRequetUpdate.getShipDate());
+            orderGet.setDesiredDate(orderRequetUpdate.getDesiredDate());
+            orderGet.setReceiveDate(orderRequetUpdate.getReceiveDate());
+            orderGet.setCreatedBy(orderGet.getCreatedBy());
+            orderGet.setUpdatedBy(orderRequetUpdate.getUpdatedBy());
+            orderGet.setNote(orderRequetUpdate.getNote());
+            orderGet.setStatus(orderRequetUpdate.getStatus());
+            Order orderUpdate = orderRepository.save(orderGet);
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
+        }
+        else {
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã hóa đơn không tồn tại!");
+        }
+    }
+
+    @Override
+    public ServiceResultReponse<Order> delete(OrderRequetUpdate orderRequetUpdate) {
+        return null;
     }
 }
