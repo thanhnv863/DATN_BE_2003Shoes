@@ -39,7 +39,7 @@ public class CategoryServiceImpl implements ICategoryService {
             Calendar calendar = Calendar.getInstance();
             Date date = calendar.getTime();
             category.setName(categoryRequest.getName());
-            category.setStatus(0);
+            category.setStatus(1);
             category.setCreatedAt(date);
             category.setUpdatedAt(date);
             return new ServiceResult(AppConstant.SUCCESS,"Category",categoryRepository.save(category));

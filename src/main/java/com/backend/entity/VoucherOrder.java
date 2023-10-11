@@ -57,7 +57,13 @@ public class VoucherOrder {
 
     @Column(name = "reduce_form")
     private Integer reduceForm;
+    // Reduce form=0: Giảm tiền
+    // Reduce form=1: Giảm %
 
     @Column(name = "status")
     private Integer status;
+    // Status=0: Chờ kích hoạt
+    // Status=1: Đã kích hoạt
+    // Status=2: Hết hạn
+    // Status=3: Khi xoá đổi sang trạng thái ẩn
 }
