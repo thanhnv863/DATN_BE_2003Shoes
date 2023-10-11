@@ -188,7 +188,7 @@ public class ShoeServiceImpl implements IShoeService {
             Calendar calendar = Calendar.getInstance();
             Date date = calendar.getTime();
             shoe.setName(shoeRequest.getName());
-            shoe.setStatus(0);
+            shoe.setStatus(1);
             shoe.setCreatedAt(date);
             shoe.setUpdatedAt(date);
             return new ServiceResult(AppConstant.SUCCESS, "Success", shoeRepository.save(shoe));
