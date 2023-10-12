@@ -1,7 +1,8 @@
 package com.backend.controller;
 
-import com.backend.dto.request.CategoryRequest;
-import com.backend.dto.request.ShoeRequest;
+import com.backend.dto.request.brand.BrandRequestUpdate;
+import com.backend.dto.request.category.CategoryRequest;
+import com.backend.dto.request.category.CategoryRequestUpdate;
 import com.backend.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,5 +26,10 @@ public class CategoryController {
     @PostMapping("/addNewCategory")
     public ResponseEntity<?> addNewCategory(@RequestBody CategoryRequest categoryRequest){
         return ResponseEntity.ok(iCategoryService.addNewCategory(categoryRequest));
+    }
+
+    @PostMapping("/updateCategory")
+    public ResponseEntity<?> updateCategory(@RequestBody CategoryRequestUpdate categoryRequestUpdate){
+        return ResponseEntity.ok(iCategoryService.updateCategory(categoryRequestUpdate));
     }
 }

@@ -2,8 +2,8 @@ package com.backend.service.impl;
 
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
-import com.backend.dto.request.ColorRequest;
-import com.backend.dto.response.CategoryResponse;
+import com.backend.dto.request.color.ColorRequest;
+import com.backend.dto.request.color.ColorRequestUpdate;
 import com.backend.dto.response.ColorResponse;
 import com.backend.entity.Category;
 import com.backend.entity.Color;
@@ -34,18 +34,45 @@ public class ColorServiceImpl implements IColorService {
 
     @Override
     public ServiceResult<ColorResponse> addNewColor(ColorRequest colorRequest) {
-        Optional<Color> categoryOptional = colorRepository.findByNameColor(colorRequest.getName());
-        if (categoryOptional.isPresent()) {
-            return new ServiceResult(AppConstant.FAIL, "Category already exits!", null);
+        Optional<Color> colorOptional = colorRepository.findByNameColor(colorRequest.getName());
+        if (colorOptional.isPresent()) {
+            if (colorOptional.get().getStatus() == 0) {
+                Color color = colorOptional.get();
+                color.setStatus(1);
+                Color colorUpdate = colorRepository.save(color);
+                return new ServiceResult(AppConstant.SUCCESS, "Color updated succesfully!", colorUpdate);
+            } else {
+                return new ServiceResult(AppConstant.FAIL, "Color already exits!", null);
+            }
         } else {
             Color color = new Color();
             Calendar calendar = Calendar.getInstance();
             Date date = calendar.getTime();
             color.setName(colorRequest.getName());
-            color.setStatus(0);
+            color.setStatus(1);
             color.setCreatedAt(date);
             color.setUpdatedAt(date);
             return new ServiceResult(AppConstant.SUCCESS, "Category", colorRepository.save(color));
+        }
+    }
+
+    @Override
+    public ServiceResult<Color> updateColor(ColorRequestUpdate colorRequestUpdate) {
+        Optional<Color> colorOptional = colorRepository.findById(colorRequestUpdate.getId());
+        if (colorOptional.isPresent()){
+            Color colorExits = colorOptional.get();
+            colorExits.setId(colorExits.getId());
+            colorExits.setName(colorRequestUpdate.getName());
+            colorExits.setCreatedAt(colorExits.getCreatedAt());
+
+            Calendar calendar = Calendar.getInstance();
+            colorExits.setUpdatedAt(calendar.getTime());
+
+            colorExits.setStatus(colorRequestUpdate.getStatus());
+            Color colorUpdate = colorRepository.save(colorExits);
+            return new ServiceResult<>(AppConstant.SUCCESS,"The color update succesfully!", colorUpdate);
+        }else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The color not found!", null);
         }
     }
 
