@@ -2,8 +2,10 @@ package com.backend.service.impl;
 
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
-import com.backend.dto.request.CategoryRequest;
+import com.backend.dto.request.category.CategoryRequest;
+import com.backend.dto.request.category.CategoryRequestUpdate;
 import com.backend.dto.response.CategoryResponse;
+import com.backend.entity.Brand;
 import com.backend.entity.Category;
 import com.backend.repository.CategoryRepository;
 import com.backend.service.ICategoryService;
@@ -26,15 +28,22 @@ public class CategoryServiceImpl implements ICategoryService {
     public ServiceResult<List<CategoryResponse>> getAll() {
         List<Category> categoryList = categoryRepository.findAll();
         List<CategoryResponse> categoryResponses = convertToRes(categoryList);
-        return new ServiceResult<>(AppConstant.SUCCESS, "Category",categoryResponses);
+        return new ServiceResult<>(AppConstant.SUCCESS, "Category", categoryResponses);
     }
 
     @Override
     public ServiceResult<CategoryResponse> addNewCategory(CategoryRequest categoryRequest) {
         Optional<Category> categoryOptional = categoryRepository.findByNameCategory(categoryRequest.getName());
-        if (categoryOptional.isPresent()){
-            return new ServiceResult(AppConstant.FAIL,"Category already exits!",null);
-        }else {
+        if (categoryOptional.isPresent()) {
+            if (categoryOptional.get().getStatus() == 0) {
+                Category category = categoryOptional.get();
+                category.setStatus(1);
+                Category categoryUpdate = categoryRepository.save(category);
+                return new ServiceResult(AppConstant.SUCCESS, "Category updated succesfully!", categoryUpdate);
+            } else {
+                return new ServiceResult(AppConstant.FAIL, "Category already exits!", null);
+            }
+        } else {
             Category category = new Category();
             Calendar calendar = Calendar.getInstance();
             Date date = calendar.getTime();
@@ -42,7 +51,28 @@ public class CategoryServiceImpl implements ICategoryService {
             category.setStatus(1);
             category.setCreatedAt(date);
             category.setUpdatedAt(date);
-            return new ServiceResult(AppConstant.SUCCESS,"Category",categoryRepository.save(category));
+            return new ServiceResult(AppConstant.SUCCESS, "Category", categoryRepository.save(category));
+        }
+
+    }
+
+    @Override
+    public ServiceResult<Category> updateCategory(CategoryRequestUpdate categoryRequestUpdate) {
+        Optional<Category> categoryOptional = categoryRepository.findById(categoryRequestUpdate.getId());
+        if (categoryOptional.isPresent()) {
+            Category categoryExits = categoryOptional.get();
+            categoryExits.setId(categoryExits.getId());
+            categoryExits.setName(categoryRequestUpdate.getName());
+            categoryExits.setCreatedAt(categoryExits.getCreatedAt());
+
+            Calendar calendar = Calendar.getInstance();
+            categoryExits.setUpdatedAt(calendar.getTime());
+
+            categoryExits.setStatus(categoryRequestUpdate.getStatus());
+            Category categoryUpdate = categoryRepository.save(categoryExits);
+            return new ServiceResult<>(AppConstant.SUCCESS, "The category update succesfully!", categoryUpdate);
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The category not found!", null);
         }
 
     }
@@ -52,6 +82,7 @@ public class CategoryServiceImpl implements ICategoryService {
                 CategoryResponse.builder()
                         .id(category.getId())
                         .name(category.getName())
+                        .status(category.getStatus())
                         .build()).collect(Collectors.toList());
     }
 }

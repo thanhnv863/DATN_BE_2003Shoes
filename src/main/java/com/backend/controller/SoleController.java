@@ -1,8 +1,8 @@
 package com.backend.controller;
 
-import com.backend.dto.request.BrandRequest;
-import com.backend.dto.request.SoleRequest;
-import com.backend.service.IBrandService;
+import com.backend.dto.request.size.SizeRequestUpdate;
+import com.backend.dto.request.sole.SoleRequest;
+import com.backend.dto.request.sole.SoleRequestUpdate;
 import com.backend.service.ISoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +26,10 @@ public class SoleController {
     @PostMapping("/addNewSole")
     public ResponseEntity<?> addNewSole(@RequestBody SoleRequest soleRequest){
         return ResponseEntity.ok(iSoleService.addNewSole(soleRequest));
+    }
+
+    @PostMapping("/updateSole")
+    public ResponseEntity<?> updateSole(@RequestBody SoleRequestUpdate soleRequestUpdate){
+        return ResponseEntity.ok(iSoleService.updateSole(soleRequestUpdate));
     }
 }

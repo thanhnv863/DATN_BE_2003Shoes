@@ -1,8 +1,9 @@
 package com.backend.controller;
 
-import com.backend.dto.request.CategoryRequest;
-import com.backend.dto.request.ColorRequest;
-import com.backend.service.ICategoryService;
+import com.backend.dto.request.brand.BrandRequestUpdate;
+import com.backend.dto.request.category.CategoryRequestUpdate;
+import com.backend.dto.request.color.ColorRequest;
+import com.backend.dto.request.color.ColorRequestUpdate;
 import com.backend.service.IColorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,4 +29,10 @@ public class ColorController {
     public ResponseEntity<?> addNewCategory(@RequestBody ColorRequest colorRequest){
         return ResponseEntity.ok(iColorService.addNewColor(colorRequest));
     }
+
+    @PostMapping("/updateColor")
+    public ResponseEntity<?> updateColor(@RequestBody ColorRequestUpdate colorRequestUpdate){
+        return ResponseEntity.ok(iColorService.updateColor(colorRequestUpdate));
+    }
+
 }

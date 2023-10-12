@@ -2,11 +2,13 @@ package com.backend.service.impl;
 
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
-import com.backend.dto.request.ShoeRequest;
+import com.backend.dto.request.shoe.ShoeRequest;
+import com.backend.dto.request.shoe.ShoeRequestUpdate;
 import com.backend.dto.response.ShoeResponse;
 import com.backend.dto.response.shoedetail.DataPaginate;
 import com.backend.dto.response.shoedetail.Meta;
 import com.backend.dto.response.shoedetail.ResultItem;
+import com.backend.entity.Color;
 import com.backend.entity.Image;
 import com.backend.entity.Shoe;
 import com.backend.entity.ShoeDetail;
@@ -102,6 +104,26 @@ public class ShoeServiceImpl implements IShoeService {
 //    }
 
     @Override
+    public ServiceResult<Shoe> updateShoe(ShoeRequestUpdate shoeRequestUpdate) {
+        Optional<Shoe> shoeOptional = shoeRepository.findById(shoeRequestUpdate.getId());
+        if (shoeOptional.isPresent()){
+            Shoe shoeExits = shoeOptional.get();
+            shoeExits.setId(shoeExits.getId());
+            shoeExits.setName(shoeRequestUpdate.getName());
+            shoeExits.setCreatedAt(shoeExits.getCreatedAt());
+
+            Calendar calendar = Calendar.getInstance();
+            shoeExits.setUpdatedAt(calendar.getTime());
+
+            shoeExits.setStatus(shoeRequestUpdate.getStatus());
+            Shoe shoeUpdate = shoeRepository.save(shoeExits);
+            return new ServiceResult<>(AppConstant.SUCCESS,"The shoe update succesfully!", shoeUpdate);
+        }else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The shoe not found!", null);
+        }
+    }
+
+    @Override
     public ServiceResult<List<DataPaginate>> getAllShoeItemstest(int page, int size, String nameShoe, Float sizeShoe, String brandShoe) {
 
         Sort sort = Sort.by(Sort.Direction.DESC, "updatedAt");
@@ -154,8 +176,12 @@ public class ShoeServiceImpl implements IShoeService {
             resultItem.setQty(shoeDetail.getQuantity());
             resultItem.setCreatedAt(shoeDetail.getCreatedAt());
             resultItem.setUpdatedAt(shoeDetail.getUpdatedAt());
-            resultItem.setThumbnail(shoeDetail.getThumbnails().get(0).getImgUrl());
-
+//            resultItem.setThumbnail(shoeDetail.getThumbnails().get(0).getImgUrl());
+            if (!shoeDetail.getThumbnails().isEmpty()) {
+                resultItem.setThumbnail(shoeDetail.getThumbnails().get(0).getImgUrl());
+            } else {
+                resultItem.setThumbnail("");
+            }
             List<String> images = getImagesForShoeDetail(shoeDetail.getId());
             resultItem.setImages(images);
 
@@ -182,7 +208,14 @@ public class ShoeServiceImpl implements IShoeService {
     public ServiceResult<ShoeResponse> addNewShoeName(ShoeRequest shoeRequest) {
         Optional<Shoe> optionalShoe = shoeRepository.findByNameShoe(shoeRequest.getName());
         if (optionalShoe.isPresent()) {
-            return new ServiceResult(AppConstant.FAIL, "Giày không tồn tại!", null);
+            if (optionalShoe.get().getStatus() == 0) {
+                Shoe shoe = optionalShoe.get();
+                shoe.setStatus(1);
+                Shoe shoeUpdate = shoeRepository.save(shoe);
+                return new ServiceResult(AppConstant.SUCCESS, "Shoe updated succesfully!", shoeUpdate);
+            } else {
+                return new ServiceResult(AppConstant.FAIL, "Shoe already exits!", null);
+            }
         } else {
             Shoe shoe = new Shoe();
             Calendar calendar = Calendar.getInstance();
@@ -217,187 +250,5 @@ public class ShoeServiceImpl implements IShoeService {
 
         return imageUrls;
     }
-
-//    private Shoe createShoe(ShoeRequest shoeRequest) {
-//        Shoe shoe = new Shoe();
-//        Calendar calendar = Calendar.getInstance();
-//        Date date = calendar.getTime();
-//        shoe.setName(shoeRequest.getName());
-//        shoe.setCreatedAt(date);
-//        shoe.setUpdatedAt(date);
-//        shoe.setStatus(shoeRequest.getStatusShoe());
-//        return shoeRepository.save(shoe);
-//    }
-
-//    @Override
-//    public String validateNhanVien(ShoeRequest shoeRequest) {
-//        List<String> errorMessages = new ArrayList<>();
-//        if (shoeRequest.getName() == null || shoeRequest.getStatusShoe() == null) {
-//            errorMessages.add("Thông tin giày không được để trống");
-//        }
-//        for (ShoeDetail requestShoeDetail : shoeRequest.getShoeDetailList()) {
-//            if (requestShoeDetail.getPriceInput() == null) {
-//                errorMessages.add("Thuộc tính không được để trống");
-//            }
-//        }
-//        if (errorMessages.size() > 0) {
-//            return String.join(", ", errorMessages);
-//        } else {
-//            return null;
-//        }
-//
-//    }
-//
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public ServiceResult<Shoe> addNewShoe(ShoeRequest shoeRequest) {
-//        String result = validateNhanVien(shoeRequest);
-//        if (result != null) {
-//            return resultValidate(result);
-//        } else {
-//            try {
-//                for (ShoeDetail requestShoeDetail : shoeRequest.getShoeDetailList()) {
-//                    ShoeDetail shoeDetail = createShoeDetail(requestShoeDetail);
-//                    saveThumbnails(shoeDetail, requestShoeDetail.getThumbnails());
-//                    saveImages(shoeDetail, requestShoeDetail.getImages());
-//                    String qrCode = generateQrCode(ShoeDetail.builder().id(shoeDetail.getId()).build());
-//                    saveQrCode(shoeDetail, qrCode);
-//                }
-//                return new ServiceResult<>(AppConstant.SUCCESS, "Shoe added successfully", null);
-//            } catch (Exception e) {
-//                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-//                return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null);
-//            }
-//        }
-//
-//    }
-//
-//    private void saveQrCode(ShoeDetail shoeDetail, String qrCode) {
-//        shoeDetail.setQrCode(qrCode);
-//        shoeDetailRepository.save(shoeDetail);
-//    }
-//
-//    private String generateQrCode(ShoeDetail shoeDetail) {
-//        String prettyData = prettyObj(shoeDetail);
-//        String qrCode = processingGenerateQrCode(prettyData, 300, 300);
-//        return qrCode;
-//    }
-//
-//    private String prettyObj(Object obj) {
-//        try {
-//            ObjectMapper mapper = new ObjectMapper();
-//            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
-//        return "";
-//    }
-//
-//    private String processingGenerateQrCode(String data, int width, int height) {
-//        StringBuilder result = new StringBuilder();
-//        if (!data.isEmpty()) {
-//            ByteArrayOutputStream os = new ByteArrayOutputStream();
-//            try {
-//                QRCodeWriter writer = new QRCodeWriter();
-//                BitMatrix bitMatrix = writer.encode(data, BarcodeFormat.QR_CODE, width, height);
-//
-//                BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
-//                ImageIO.write(bufferedImage, "png", os);
-//
-//                result.append("data:image/png;base64,");
-//                result.append(new String(Base64.getEncoder().encode(os.toByteArray())));
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        return result.toString();
-//    }
-//
-//    private ShoeDetail createShoeDetail(ShoeDetail requestShoeDetail) {
-//        Optional<Shoe> optionalShoe = shoeRepository.findById(requestShoeDetail.getShoe().getId());
-//        Optional<Color> optionalColor = colorRepository.findById(requestShoeDetail.getColor().getId());
-//        Optional<Category> optionalCategory = categoryRepository.findById(requestShoeDetail.getCategory().getId());
-//        Optional<Brand> optionalBrand = brandCategory.findById(requestShoeDetail.getBrand().getId());
-//        Optional<Size> optionalSize = sizeRepository.findById(requestShoeDetail.getSize().getId());
-//        Optional<Sole> optionalSole = soleRepository.findById(requestShoeDetail.getSole().getId());
-//
-//        List<String> errors = new ArrayList<>();
-//
-//        if (!optionalShoe.isPresent()) {
-//            errors.add("Shoe không tồn tại");
-//        }
-//
-//        if (!optionalSize.isPresent()) {
-//            errors.add("Size không tồn tại");
-//        }
-//
-//        if (!optionalSole.isPresent()) {
-//            errors.add("Sole không tồn tại");
-//        }
-//
-//        if (!optionalBrand.isPresent()) {
-//            errors.add("Brand không tồn tại");
-//        }
-//
-//        if (!optionalCategory.isPresent()) {
-//            errors.add("Loại giày không tồn tại");
-//        }
-//
-//        if (!optionalColor.isPresent()) {
-//            errors.add("Màu sắc không tồn tại");
-//        }
-//
-//        if (!errors.isEmpty()) {
-//            throw new RuntimeException(String.join(", ", errors));
-//        }
-//
-//        ShoeDetail shoeDetail = new ShoeDetail();
-//        shoeDetail.setShoe(optionalShoe.get());
-//        shoeDetail.setColor(optionalColor.get());
-//        shoeDetail.setCategory(optionalCategory.get());
-//        shoeDetail.setBrand(optionalBrand.get());
-//        shoeDetail.setSize(optionalSize.get());
-//        shoeDetail.setSole(optionalSole.get());
-//        shoeDetail.setPriceInput(requestShoeDetail.getPriceInput());
-//        shoeDetail.setQuantity(requestShoeDetail.getQuantity());
-//        shoeDetail.setCreatedAt(new Date());
-//        shoeDetail.setUpdatedAt(new Date());
-//        shoeDetail.setStatus(0);
-//        Float sizeName = optionalSize.get().getName();
-//        String shoeName = optionalShoe.get().getName();
-//        String colorName = optionalColor.get().getName();
-//        shoeDetail.setCode(shoeName.toLowerCase() + " - " + colorName.toLowerCase() + " - " + sizeName);
-//        return shoeDetailRepository.save(shoeDetail);
-//    }
-//
-//    private void saveThumbnails(ShoeDetail shoeDetail, List<Thumbnail> thumbnails) {
-//        for (Thumbnail thumbnail : thumbnails) {
-//            try {
-//                String thumbnailUrl = imageUploadService.uploadImageByName(String.valueOf(thumbnail.getImgName()));
-//                thumbnail.setImgName(thumbnail.getImgName());
-//                thumbnail.setImgUrl(thumbnailUrl);
-//                thumbnail.setShoeDetail(shoeDetail);
-//                thumbnailRepository.save(thumbnail);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Error uploading thumbnail");
-//            }
-//        }
-//    }
-//
-//    private void saveImages(ShoeDetail shoeDetail, List<Image> images) {
-//        for (Image image : images) {
-//            try {
-//                String thumbnailUrl = imageUploadService.uploadImageByName(String.valueOf(image.getImgName()));
-//                image.setImgName(image.getImgName());
-//                image.setImgUrl(thumbnailUrl);
-//                image.setShoeDetail(shoeDetail);
-//                imageRepository.save(image);
-//            } catch (IOException e) {
-//                throw new RuntimeException("Error uploading image");
-//            }
-//        }
-//    }
-
 
 }

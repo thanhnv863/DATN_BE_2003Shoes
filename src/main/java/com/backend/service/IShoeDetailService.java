@@ -2,7 +2,6 @@ package com.backend.service;
 
 import com.backend.ServiceResult;
 import com.backend.dto.request.ShoeDetailRequest;
-import com.backend.dto.request.ShoeRequest;
 import com.backend.entity.Shoe;
 
 public interface IShoeDetailService {

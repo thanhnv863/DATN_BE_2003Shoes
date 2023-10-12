@@ -1,9 +1,9 @@
 package com.backend.controller;
 
-import com.backend.dto.request.SizeRequest;
-import com.backend.dto.request.SoleRequest;
+import com.backend.dto.request.shoe.ShoeRequestUpdate;
+import com.backend.dto.request.size.SizeRequest;
+import com.backend.dto.request.size.SizeRequestUpdate;
 import com.backend.service.ISizeService;
-import com.backend.service.ISoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,5 +26,10 @@ public class SizeController {
     @PostMapping("/addNewSize")
     public ResponseEntity<?> addNewSize(@RequestBody SizeRequest sizeRequest){
         return ResponseEntity.ok(iSizeService.addNewSize(sizeRequest));
+    }
+
+    @PostMapping("/updateSize")
+    public ResponseEntity<?> updateSize(@RequestBody SizeRequestUpdate sizeRequestUpdate){
+        return ResponseEntity.ok(iSizeService.updateSize(sizeRequestUpdate));
     }
 }

@@ -1,4 +1,4 @@
-package com.backend.dto.request;
+package com.backend.dto.request.category;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,8 +13,9 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SizeRequest {
-    private Float name;
+public class CategoryRequest {
+
+    private String name;
 
     private Date createdAt;
 

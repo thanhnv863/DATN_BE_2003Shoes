@@ -1,4 +1,4 @@
-package com.backend.dto.request;
+package com.backend.dto.request.color;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
