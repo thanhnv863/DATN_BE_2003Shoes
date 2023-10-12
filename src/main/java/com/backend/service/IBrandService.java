@@ -16,4 +16,6 @@ public interface IBrandService {
 
     ServiceResult<Brand> updateBrand(BrandRequestUpdate brandRequestUpdate);
 
+    ServiceResult<Brand> deleteBrand(BrandRequestUpdate brandRequestUpdate);
+
 }

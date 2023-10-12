@@ -75,6 +75,19 @@ public class SoleServiceImpl implements ISoleService {
         }
     }
 
+    @Override
+    public ServiceResult<Sole> deleteSole(SoleRequestUpdate soleRequestUpdate) {
+        Optional<Sole> soleOptional = soleRepository.findById(soleRequestUpdate.getId());
+        if (soleOptional.isPresent()){
+            Sole soleExits = soleOptional.get();
+            soleExits.setStatus(0);
+            soleRepository.save(soleExits);
+            return new ServiceResult<>(AppConstant.SUCCESS,"The sole delete succesfully!", null);
+        }else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The sole not found!", null);
+        }
+    }
+
     private List<SoleResponse> convertToRes(List<Sole> soleList) {
         return soleList.stream().map(sole ->
                 SoleResponse.builder()

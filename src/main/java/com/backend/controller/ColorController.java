@@ -35,4 +35,8 @@ public class ColorController {
         return ResponseEntity.ok(iColorService.updateColor(colorRequestUpdate));
     }
 
+    @PostMapping("/deleteColor")
+    public ResponseEntity<?> deleteColor(@RequestBody ColorRequestUpdate colorRequestUpdate){
+        return ResponseEntity.ok(iColorService.deleteColor(colorRequestUpdate));
+    }
 }

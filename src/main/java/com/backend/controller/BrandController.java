@@ -33,4 +33,9 @@ public class BrandController {
         return ResponseEntity.ok(iBrandService.updateBrand(brandRequestUpdate));
     }
 
+    @PostMapping("/deleteBrand")
+    public ResponseEntity<?> deleteBrand(@RequestBody BrandRequestUpdate brandRequestUpdate){
+        return ResponseEntity.ok(iBrandService.deleteBrand(brandRequestUpdate));
+    }
+
 }

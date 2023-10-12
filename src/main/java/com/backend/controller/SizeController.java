@@ -32,4 +32,9 @@ public class SizeController {
     public ResponseEntity<?> updateSize(@RequestBody SizeRequestUpdate sizeRequestUpdate){
         return ResponseEntity.ok(iSizeService.updateSize(sizeRequestUpdate));
     }
+
+    @PostMapping("/deleteSize")
+    public ResponseEntity<?> deleteSize(@RequestBody SizeRequestUpdate sizeRequestUpdate){
+        return ResponseEntity.ok(iSizeService.deleteSize(sizeRequestUpdate));
+    }
 }

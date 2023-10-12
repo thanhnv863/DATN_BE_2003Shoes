@@ -32,4 +32,9 @@ public class SoleController {
     public ResponseEntity<?> updateSole(@RequestBody SoleRequestUpdate soleRequestUpdate){
         return ResponseEntity.ok(iSoleService.updateSole(soleRequestUpdate));
     }
+
+    @PostMapping("/deleteSole")
+    public ResponseEntity<?> deleteSole(@RequestBody SoleRequestUpdate soleRequestUpdate){
+        return ResponseEntity.ok(iSoleService.deleteSole(soleRequestUpdate));
+    }
 }

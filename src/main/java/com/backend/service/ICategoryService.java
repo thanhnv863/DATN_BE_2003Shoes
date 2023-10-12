@@ -16,4 +16,6 @@ public interface ICategoryService {
     ServiceResult<CategoryResponse> addNewCategory(CategoryRequest categoryRequest);
 
     ServiceResult<Category> updateCategory(CategoryRequestUpdate categoryRequestUpdate);
+
+    ServiceResult<Category> deleteCategory(CategoryRequestUpdate categoryRequestUpdate);
 }

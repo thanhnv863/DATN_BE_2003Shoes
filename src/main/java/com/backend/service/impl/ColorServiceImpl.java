@@ -76,6 +76,19 @@ public class ColorServiceImpl implements IColorService {
         }
     }
 
+    @Override
+    public ServiceResult<Color> deleteColor(ColorRequestUpdate colorRequestUpdate) {
+        Optional<Color> colorOptional = colorRepository.findById(colorRequestUpdate.getId());
+        if (colorOptional.isPresent()){
+            Color colorExits = colorOptional.get();
+            colorExits.setStatus(0);
+            colorRepository.save(colorExits);
+            return new ServiceResult<>(AppConstant.SUCCESS,"The color delete succesfully!", null);
+        }else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The color not found!", null);
+        }
+    }
+
 
     private List<ColorResponse> convertToRes(List<Color> colorList) {
         return colorList.stream().map(color ->
