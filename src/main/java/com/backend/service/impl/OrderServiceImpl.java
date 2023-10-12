@@ -177,6 +177,17 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public ServiceResultReponse<Order> delete(OrderRequetUpdate orderRequetUpdate) {
-        return null;
+        Optional<Order> order = orderRepository.findOrderByCode(orderRequetUpdate.getCode());
+        if(order.isPresent()) {
+            Order orderGet = order.get();
+            orderGet.setUpdatedBy(orderRequetUpdate.getUpdatedBy());
+            orderGet.setNote(orderRequetUpdate.getNote());
+            orderGet.setStatus(orderRequetUpdate.getStatus());
+            Order orderUpdate = orderRepository.save(orderGet);
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 0L, orderUpdate, "Hủy hóa đơn thành công");
+        }
+        else{
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 0L, null, "Mã không tồn tại");
+        }
     }
 }
