@@ -1,9 +1,8 @@
 package com.backend.controller;
 
-import com.backend.dto.request.BrandRequest;
-import com.backend.dto.request.CategoryRequest;
+import com.backend.dto.request.brand.BrandRequest;
+import com.backend.dto.request.brand.BrandRequestUpdate;
 import com.backend.service.IBrandService;
-import com.backend.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +26,11 @@ public class BrandController {
     @PostMapping("/addNewBrand")
     public ResponseEntity<?> addNewBrand(@RequestBody BrandRequest brandRequest){
         return ResponseEntity.ok(iBrandService.addNewBrand(brandRequest));
+    }
+
+    @PostMapping("/updateBrand")
+    public ResponseEntity<?> updateBrand(@RequestBody BrandRequestUpdate brandRequestUpdate){
+        return ResponseEntity.ok(iBrandService.updateBrand(brandRequestUpdate));
     }
 
 }

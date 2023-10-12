@@ -1,4 +1,4 @@
-package com.backend.dto.request;
+package com.backend.dto.request.shoe;
 
 import com.backend.entity.ShoeDetail;
 import com.fasterxml.jackson.annotation.JsonFormat;

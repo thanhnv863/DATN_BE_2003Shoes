@@ -1,5 +1,6 @@
 package com.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +44,7 @@ public class Brand {
     @Column(name = "status")
     private Integer status;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "brand")
     private List<ShoeDetail> shoeDetails;
 }

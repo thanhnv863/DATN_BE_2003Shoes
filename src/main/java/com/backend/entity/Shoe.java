@@ -47,6 +47,7 @@ public class Shoe {
     @Column(name = "status")
     private Integer status;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "shoe")
     private List<ShoeDetail> shoeDetails;
 

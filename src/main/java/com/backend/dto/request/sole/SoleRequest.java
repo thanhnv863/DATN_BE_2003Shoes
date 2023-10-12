@@ -1,4 +1,4 @@
-package com.backend.dto.request;
+package com.backend.dto.request.sole;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BrandRequest {
+public class SoleRequest {
     private String name;
 
     private Date createdAt;

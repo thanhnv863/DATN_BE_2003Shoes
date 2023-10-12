@@ -15,4 +15,6 @@ public class SizeResponse {
     private Long id;
 
     private Float name;
+
+    private Integer status;
 }
