@@ -124,6 +124,19 @@ public class ShoeServiceImpl implements IShoeService {
     }
 
     @Override
+    public ServiceResult<Shoe> deleteShoe(ShoeRequestUpdate shoeRequestUpdate) {
+        Optional<Shoe> shoeOptional = shoeRepository.findById(shoeRequestUpdate.getId());
+        if (shoeOptional.isPresent()){
+            Shoe shoeExits = shoeOptional.get();
+            shoeExits.setStatus(0);
+            shoeRepository.save(shoeExits);
+            return new ServiceResult<>(AppConstant.SUCCESS,"The shoe delete succesfully!", null);
+        }else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The shoe not found!", null);
+        }
+    }
+
+    @Override
     public ServiceResult<List<DataPaginate>> getAllShoeItemstest(int page, int size, String nameShoe, Float sizeShoe, String brandShoe) {
 
         Sort sort = Sort.by(Sort.Direction.DESC, "updatedAt");

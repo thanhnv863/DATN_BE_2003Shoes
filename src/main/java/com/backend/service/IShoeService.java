@@ -15,6 +15,8 @@ public interface IShoeService {
 
     ServiceResult<Shoe> updateShoe(ShoeRequestUpdate shoeRequestUpdate);
 
+    ServiceResult<Shoe> deleteShoe(ShoeRequestUpdate shoeRequestUpdate);
+
     ServiceResult<List<DataPaginate>> getAllShoeItemstest(int page, int pageSize, String nameShoe, Float sizeShoe, String brandShoe);
 
     ServiceResult<List<ShoeResponse>> getAllShoeName();

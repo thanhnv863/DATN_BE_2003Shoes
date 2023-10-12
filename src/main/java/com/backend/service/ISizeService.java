@@ -17,4 +17,6 @@ public interface ISizeService {
 
     ServiceResult<Size> updateSize(SizeRequestUpdate sizeRequestUpdate);
 
+    ServiceResult<Size> deleteSize(SizeRequestUpdate sizeRequestUpdate);
+
 }

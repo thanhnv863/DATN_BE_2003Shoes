@@ -14,4 +14,6 @@ public interface ISoleService {
     ServiceResult<SoleResponse> addNewSole(SoleRequest soleRequest);
 
     ServiceResult<Sole> updateSole(SoleRequestUpdate soleRequestUpdate);
+
+    ServiceResult<Sole> deleteSole(SoleRequestUpdate soleRequestUpdate);
 }

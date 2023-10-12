@@ -17,4 +17,6 @@ public interface IColorService {
 
     ServiceResult<Color> updateColor(ColorRequestUpdate colorRequestUpdate);
 
+    ServiceResult<Color> deleteColor(ColorRequestUpdate colorRequestUpdate);
+
 }
