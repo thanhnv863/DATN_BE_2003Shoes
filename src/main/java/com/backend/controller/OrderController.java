@@ -6,7 +6,6 @@ import com.backend.dto.request.OrderRequest;
 import com.backend.dto.request.OrderRequetUpdate;
 import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.response.OrderReponse;
-import com.backend.entity.Order;
 import com.backend.service.IOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -48,6 +47,9 @@ public class OrderController {
         return ResponseEntity.ok().body(iOrderService.update(orderRequetUpdate));
     }
 
-
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody OrderRequetUpdate orderRequetUpdate) {
+        return ResponseEntity.ok().body(iOrderService.delete(orderRequetUpdate));
+    }
 
 }

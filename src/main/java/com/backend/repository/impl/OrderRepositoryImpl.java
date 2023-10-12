@@ -42,7 +42,7 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
             sql.append(" AND (a.customer_name like CONCAT('%', :customer, '%') OR a.phone_number like CONCAT('%', :customer, '%')) ");
         }
         if (dateFirst != null && dateLast != null) {
-            sql.append(" AND (a.dateLast BETWEEN :dateFirst AND :dateLast) ");
+            sql.append(" AND (a.create_date BETWEEN :dateFirst AND :dateLast) ");
         }
         if (status != null) {
             sql.append(" AND (a.status = :status) ");
@@ -110,7 +110,7 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
             countSql.append(" AND (a.customer_name like CONCAT('%', :customer, '%') OR a.phone_number like CONCAT('%', :customer, '%')) ");
         }
         if (dateFirst != null && dateLast != null) {
-            countSql.append(" AND (a.dateLast BETWEEN :dateFirst AND :dateLast) ");
+            countSql.append(" AND (a.create_date BETWEEN :dateFirst AND :dateLast) ");
         }
         if (status != null) {
             countSql.append(" AND (a.status = :status) ");
@@ -143,7 +143,6 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
             countQuery.setParameter("priceMin", priceMin);
             countQuery.setParameter("priceMax", priceMax);
         }
-
         return ((Number) countQuery.getSingleResult()).longValue();
     }
 }
