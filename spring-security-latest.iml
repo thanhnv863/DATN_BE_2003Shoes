@@ -25,7 +25,7 @@
       <configuration />
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_15">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_17">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -85,7 +85,6 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:5.3.29" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.36" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aspects:5.3.29" level="project" />
-    <orderEntry type="library" name="Maven: com.microsoft.sqlserver:mssql-jdbc:9.4.1.jre16" level="project" />
     <orderEntry type="library" name="Maven: com.mysql:mysql-connector-j:8.0.32" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.28" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-test:2.7.14" level="project" />

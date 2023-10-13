@@ -122,7 +122,6 @@ public class OrderServiceImpl implements IOrderService {
             Date date = new Date();
             Order order = new Order();
             order.setCode(generateOrderCode());
-            order.setType("Tại quầy");
             order.setCreatedBy(orderRequest.getCreatedBy());
             order.setUpdatedBy(order.getUpdatedBy());
             order.setCreatedDate(date);
@@ -149,7 +148,7 @@ public class OrderServiceImpl implements IOrderService {
             Account account = accountRepository.findById(orderRequetUpdate.getIdAccount()).get();
             orderGet.setAccount(account);
             //
-            orderGet.setType(orderGet.getType());
+            orderGet.setType(orderRequetUpdate.getType());
             orderGet.setId(orderGet.getId());
             orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
             orderGet.setPhoneNumber(orderRequetUpdate.getPhoneNumber());

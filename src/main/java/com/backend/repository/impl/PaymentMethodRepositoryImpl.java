@@ -26,6 +26,7 @@ public class PaymentMethodRepositoryImpl implements PaymentMethodCustomRepositor
         sql.append("SELECT a.id, b.code, a.method, a.total, a.payment_time, ");
         sql.append(" a.note, a.status FROM payment_method as a ");
         sql.append(" LEFT JOIN my_order b on a.order_id = b.id");
+        sql.append(" where 1 = 1 ");
         if (orderCode != null) {
             sql.append(" AND (b.code = :orderCode) ");
         }
@@ -85,6 +86,7 @@ public class PaymentMethodRepositoryImpl implements PaymentMethodCustomRepositor
         countSql.append("SELECT count(*) from (");
         countSql.append("SELECT DISTINCT a.id  FROM payment_method as a");
         countSql.append(" LEFT JOIN my_order b on a.order_id = b.id");
+        countSql.append(" where 1 = 1 ");
         if (orderCode != null) {
             countSql.append(" AND (b.code = :orderCode) ");
         }

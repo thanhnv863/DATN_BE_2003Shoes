@@ -1,9 +1,16 @@
 package com.backend.service.impl;
 
+import com.backend.ServiceResultReponse;
+import com.backend.config.AppConstant;
 import com.backend.dto.request.SearchPaymentMethod;
+import com.backend.dto.request.paymentMethod.PaymentMethodRequest;
+import com.backend.dto.request.paymentMethod.PaymentMethodRequestUpdate;
 import com.backend.dto.response.PaymentMethodReponse;
+import com.backend.entity.Order;
+import com.backend.entity.PaymentMethod;
 import com.backend.repository.OrderRepository;
 import com.backend.repository.PaymentMethodCustomRepository;
+import com.backend.repository.PaymentMethodRepository;
 import com.backend.service.IPaymentMethodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,6 +24,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PaymentMethodServiceImpl implements IPaymentMethodService {
@@ -25,6 +33,9 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private PaymentMethodRepository paymentMethodRepository;
 
     public PaymentMethodReponse convertPage(Object[] object) {
         PaymentMethodReponse paymentMethodReponse = new PaymentMethodReponse();
@@ -39,7 +50,7 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
     }
 
     @Override
-    public Page<PaymentMethodReponse> searchOrder(SearchPaymentMethod searchPaymentMethod) {
+    public Page<PaymentMethodReponse> searchPaymentMethod(SearchPaymentMethod searchPaymentMethod) {
         Pageable pageable = PageRequest.of(searchPaymentMethod.getPage(), searchPaymentMethod.getSize());
         Page<Object> objects = paymentMethodCustomRepository.doSearch(
                 pageable,
@@ -50,7 +61,6 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
                 searchPaymentMethod.getDateFirst(),
                 searchPaymentMethod.getDateLast(),
                 searchPaymentMethod.getStatus()
-
         );
         List<PaymentMethodReponse> list = new ArrayList<>();
         for (Object object : objects) {
@@ -59,5 +69,62 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
             list.add(paymentMethodReponse);
         }
         return new PageImpl<>(list, pageable, objects.getTotalElements());
+    }
+
+    @Override
+    public ServiceResultReponse<PaymentMethod> add(PaymentMethodRequest paymentMethodRequest) {
+        try {
+            Optional<Order> order = orderRepository.findById(paymentMethodRequest.getOrderId());
+            Date date = new Date();
+            if (order.isPresent()) {
+                Order order1 = order.get();
+                PaymentMethod paymentMethod = new PaymentMethod();
+                paymentMethod.setOrder(order1);
+                paymentMethod.setMethod(paymentMethodRequest.getMethod());
+                paymentMethod.setTotal(paymentMethodRequest.getTotal());
+                paymentMethod.setPaymentTime(date);
+                paymentMethod.setNote(paymentMethodRequest.getNote());
+                paymentMethod.setStatus(paymentMethodRequest.getStatus());
+                PaymentMethod paymentMethodAdd = paymentMethodRepository.save(paymentMethod);
+                return new ServiceResultReponse<>(AppConstant.FAIL, 1L, paymentMethodAdd, "Tạo phương thức thanh toán với mã hóa đơn " + paymentMethodRequest.getOrderId() + " thành công");
+            } else {
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Không tồn tại hóa đơn");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo phương thức thanh toán với mã hóa đơn" + paymentMethodRequest.getOrderId() + " thất bại");
+        }
+    }
+
+    @Override
+    public ServiceResultReponse<PaymentMethod> update(PaymentMethodRequestUpdate paymentMethodRequestUpdate) {
+        try {
+            if (paymentMethodRequestUpdate.getId() != null) {
+                Optional<PaymentMethod> paymentMethod = paymentMethodRepository.findById(paymentMethodRequestUpdate.getId());
+                if (paymentMethod.isPresent()) {
+                    PaymentMethod paymentMethodUpdate = paymentMethod.get();
+                    Optional<Order> order = orderRepository.findById(paymentMethodRequestUpdate.getOrderId());
+                    if (order.isPresent()) {
+                        Order order1 = order.get();
+                        paymentMethodUpdate.setOrder(order1);
+                        paymentMethodUpdate.setMethod(paymentMethodRequestUpdate.getMethod());
+                        paymentMethodUpdate.setTotal(paymentMethodRequestUpdate.getTotal());
+                        paymentMethodUpdate.setNote(paymentMethodRequestUpdate.getNote());
+                        paymentMethodUpdate.setStatus(paymentMethodRequestUpdate.getStatus());
+                        PaymentMethod paymentMethodUpdate1 = paymentMethodRepository.save(paymentMethodUpdate);
+                        return new ServiceResultReponse<>(AppConstant.FAIL, 1L, paymentMethodUpdate1, "Tạo phương thức thanh toán với mã hóa đơn: " + paymentMethodRequestUpdate.getOrderId() + " thành công");
+                    } else {
+                        return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Không tồn tại mã hóa đơn: " + paymentMethodRequestUpdate.getOrderId() + " ");
+                    }
+                } else {
+                    return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Id paymentMethod: " + paymentMethodRequestUpdate.getId() + " không tồn tại");
+                }
+            } else {
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Vui lòng nhập Id của paymentMethod");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Cập nhật phương thức thanh toán thất bại");
+        }
     }
 }

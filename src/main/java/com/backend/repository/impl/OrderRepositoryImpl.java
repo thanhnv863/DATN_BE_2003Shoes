@@ -1,6 +1,5 @@
 package com.backend.repository.impl;
 
-import com.backend.dto.response.OrderReponse;
 import com.backend.repository.OrderCustomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,9 +20,9 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
 
     @Override
     public Page<Object> doSearch(Pageable pageable,
-                                       String type, String voucher, String customer,
-                                       Date dateFirst, Date dateLast, Integer status,
-                                       BigDecimal priceMin, BigDecimal priceMax) {
+                                 String type, String voucher, String customer,
+                                 Date dateFirst, Date dateLast, Integer status,
+                                 BigDecimal priceMin, BigDecimal priceMax) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT a.id, b.name, a.code, a.type, a.customer_name, a.phone_number,");
         sql.append(" a.address, a.ship_fee, a.money_reduce, a.total_money, a.create_date,");
@@ -32,6 +31,7 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
         sql.append(" LEFT JOIN voucher b on a.voucher_id = b.id");
         sql.append(" LEFT JOIN account c on a.account_id = c.id");
         sql.append(" LEFT JOIN address d on c.id = d.account_id");
+        sql.append(" where 1 = 1 ");
         if (type != null) {
             sql.append(" AND (a.type = :type) ");
         }
@@ -100,6 +100,7 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
         countSql.append(" LEFT JOIN voucher b on a.voucher_id = b.id");
         countSql.append(" LEFT JOIN account c on a.account_id = c.id");
         countSql.append(" LEFT JOIN address d on c.id = d.account_id");
+        countSql.append(" where 1 = 1 ");
         if (type != null) {
             countSql.append(" AND (a.type = :type) ");
         }
@@ -125,7 +126,6 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
         if (type != null) {
             countQuery.setParameter("type", type);
         }
-
         if (voucher != null) {
             countQuery.setParameter("voucher", voucher);
         }
