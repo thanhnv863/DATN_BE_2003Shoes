@@ -41,4 +41,9 @@ public class ShoeController {
     public ResponseEntity<?> updateShoe(@RequestBody ShoeRequestUpdate shoeRequestUpdate){
         return ResponseEntity.ok(iShoeService.updateShoe(shoeRequestUpdate));
     }
+
+    @PostMapping("/deleteShoe")
+    public ResponseEntity<?> deleteShoe(@RequestBody ShoeRequestUpdate shoeRequestUpdate){
+        return ResponseEntity.ok(iShoeService.deleteShoe(shoeRequestUpdate));
+    }
 }
