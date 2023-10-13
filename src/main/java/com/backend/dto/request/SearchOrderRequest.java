@@ -15,6 +15,7 @@ import java.util.Date;
 @Setter
 @Builder
 public class SearchOrderRequest {
+
     private String type;
 
     private String voucher;

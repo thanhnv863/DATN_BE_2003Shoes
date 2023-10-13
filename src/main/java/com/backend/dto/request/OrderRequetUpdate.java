@@ -25,6 +25,8 @@ public class OrderRequetUpdate {
 
     private String code;
 
+    private String type;
+
     private String customerName;
 
     private String phoneNumber;

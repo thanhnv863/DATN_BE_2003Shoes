@@ -1,5 +1,7 @@
 package com.backend.entity;
 
+import com.backend.util.DateTimeSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,6 +42,7 @@ public class PaymentMethod {
     @Column(name = "total")
     private BigDecimal total;
 
+    @JsonSerialize(using = DateTimeSerializer.class)
     @Column(name = "payment_time")
     private Date paymentTime;
 
