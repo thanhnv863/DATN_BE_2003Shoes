@@ -34,6 +34,7 @@ public class OrderHistoryServiceImpl implements IOrderHistoryService {
                 .code(orderHistory.getOrder().getCode())
                 .createdTime(orderHistory.getCreatedTime())
                 .createdBy(orderHistory.getCreatedBy())
+                .type(orderHistory.getType())
                 .note(orderHistory.getNote())
                 .build();
     }
