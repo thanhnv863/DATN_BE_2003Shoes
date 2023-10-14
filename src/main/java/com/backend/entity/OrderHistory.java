@@ -42,6 +42,9 @@ public class OrderHistory {
     @Column(name = "created_by")
     private String createdBy;
 
+    @Column(name = "type")
+    private String type;
+
     @Column(name = "note")
     private String note;
 }

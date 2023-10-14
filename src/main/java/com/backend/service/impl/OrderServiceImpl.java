@@ -8,9 +8,11 @@ import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.response.OrderReponse;
 import com.backend.entity.Account;
 import com.backend.entity.Order;
+import com.backend.entity.OrderHistory;
 import com.backend.entity.VoucherOrder;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.OrderCustomRepository;
+import com.backend.repository.OrderHistoryRepository;
 import com.backend.repository.OrderRepository;
 import com.backend.repository.VoucherOrderRepository;
 import com.backend.service.IOrderService;
@@ -39,6 +41,9 @@ public class OrderServiceImpl implements IOrderService {
     @Autowired
     private VoucherOrderRepository voucherOrderRepository;
 
+
+    @Autowired
+    private OrderHistoryRepository orderHistoryRepository;
 
     @Autowired
     private AccountRepository accountRepository;
@@ -100,10 +105,10 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public ServiceResultReponse<Order> getOne(String code) {
         Optional<Order> order = orderRepository.findOrderByCode(code);
-        if(order.isPresent()){
+        if (order.isPresent()) {
             Order orderGet = order.get();
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderGet, "Đã tìm thấy order");
-        }else {
+        } else {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã order không tồn tại");
 
         }
@@ -127,6 +132,15 @@ public class OrderServiceImpl implements IOrderService {
             order.setCreatedDate(date);
             order.setStatus(1);
             Order orderAdd = orderRepository.save(order);
+            //
+            OrderHistory orderHistory = new OrderHistory();
+            orderHistory.setOrder(orderAdd);
+            orderHistory.setCreatedTime(date);
+            orderHistory.setCreatedBy(orderRequest.getCreatedBy());
+            orderHistory.setNote("Nhân viên tạo đơn cho khách");
+            orderHistory.setType("Created");
+            orderHistoryRepository.save(orderHistory);
+            //
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAdd, "Tạo hóa đơn thành công");
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,7 +151,8 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public ServiceResultReponse<Order> update(OrderRequetUpdate orderRequetUpdate) {
         Optional<Order> order = orderRepository.findOrderByCode(orderRequetUpdate.getCode());
-        if(order.isPresent()){
+        Date date = new Date();
+        if (order.isPresent()) {
             Order orderGet = order.get();
             orderGet.setId(orderGet.getId());
             orderGet.setCode(orderGet.getCode());
@@ -167,25 +182,42 @@ public class OrderServiceImpl implements IOrderService {
             orderGet.setNote(orderRequetUpdate.getNote());
             orderGet.setStatus(orderRequetUpdate.getStatus());
             Order orderUpdate = orderRepository.save(orderGet);
+            //
+            OrderHistory orderHistory = new OrderHistory();
+            orderHistory.setOrder(orderUpdate);
+            orderHistory.setCreatedTime(date);
+            orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
+            orderHistory.setNote(orderRequetUpdate.getNote());
+            orderHistory.setType("Updated");
+            orderHistoryRepository.save(orderHistory);
+            //
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
-        }
-        else {
+        } else {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã hóa đơn không tồn tại!");
         }
     }
 
     @Override
     public ServiceResultReponse<Order> delete(OrderRequetUpdate orderRequetUpdate) {
+        Date date = new Date();
         Optional<Order> order = orderRepository.findOrderByCode(orderRequetUpdate.getCode());
-        if(order.isPresent()) {
+        if (order.isPresent()) {
             Order orderGet = order.get();
             orderGet.setUpdatedBy(orderRequetUpdate.getUpdatedBy());
             orderGet.setNote(orderRequetUpdate.getNote());
             orderGet.setStatus(orderRequetUpdate.getStatus());
             Order orderUpdate = orderRepository.save(orderGet);
+            //
+            OrderHistory orderHistory = new OrderHistory();
+            orderHistory.setOrder(orderUpdate);
+            orderHistory.setCreatedTime(date);
+            orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
+            orderHistory.setNote(orderRequetUpdate.getNote());
+            orderHistory.setType("Canceled");
+            orderHistoryRepository.save(orderHistory);
+            //
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 0L, orderUpdate, "Hủy hóa đơn thành công");
-        }
-        else{
+        } else {
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 0L, null, "Mã không tồn tại");
         }
     }

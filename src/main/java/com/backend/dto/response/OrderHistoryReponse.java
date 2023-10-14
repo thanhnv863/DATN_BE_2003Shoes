@@ -26,5 +26,7 @@ public class OrderHistoryReponse {
 
     private String createdBy;
 
+    private String type;
+
     private String note;
 }
