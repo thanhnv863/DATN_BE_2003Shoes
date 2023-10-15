@@ -32,6 +32,7 @@ public class ResultItem {
     private Integer qty;
     private Date createdAt;
     private Date updatedAt;
+    private Integer status;
     private String thumbnail;
     private List<String> images;
 }
