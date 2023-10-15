@@ -152,7 +152,34 @@ public class AddressServiceImpl implements IAddressService {
             errorMessages.add("id_account không được để trông");
         }
         if (addressRequest.getName() == null){
-            errorMessages.add("Name khong duoc de trong");
+            errorMessages.add("tên không được để trống");
+        }
+        if (addressRequest.getPhoneNumber() == null){
+            errorMessages.add("Không được để trống phone number");
+        }
+        if(addressRequest.getSpecificAddress() == null){
+            errorMessages.add("Không được để trống địa chỉ cụ thể");
+        }
+        if(addressRequest.getWard() == null){
+            errorMessages.add("không được để trống ward");
+        }
+        if(addressRequest.getDistrict() == null){
+            errorMessages.add("Không được để trống quận");
+        }
+        if(addressRequest.getProvince() == null){
+            errorMessages.add("Không được để trống tỉnh");
+        }
+        if(addressRequest.getDefaultAddress() == null){
+            errorMessages.add("Không được để trống địa chỉ mặc định");
+        }
+
+        // kiểm tra định dạng
+        String reg = "^(0|\\+84)(\\s|\\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\\d)(\\s|\\.)?(\\d{3})(\\s|\\.)?(\\d{3})$";
+
+        boolean kt = addressRequest.getPhoneNumber().matches(reg);
+
+        if (addressRequest.getPhoneNumber() != null && kt == false){
+            errorMessages.add("Số điện thoại không đúng định dạng");
         }
 
 
