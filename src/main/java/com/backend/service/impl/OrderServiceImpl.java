@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -149,6 +150,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
+    @Transactional
     public ServiceResultReponse<Order> update(OrderRequetUpdate orderRequetUpdate) {
         Optional<Order> order = orderRepository.findOrderByCode(orderRequetUpdate.getCode());
         Date date = new Date();
