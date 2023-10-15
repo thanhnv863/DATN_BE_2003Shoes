@@ -2,7 +2,10 @@ package com.backend.service.impl;
 
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
-import com.backend.dto.request.ShoeDetailRequest;
+import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
+import com.backend.dto.request.shoedetail.ShoeDetailRequest;
+import com.backend.dto.response.OrderReponse;
+import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.entity.Brand;
 import com.backend.entity.Category;
 import com.backend.entity.Color;
@@ -16,6 +19,7 @@ import com.backend.repository.BrandRepository;
 import com.backend.repository.CategoryRepository;
 import com.backend.repository.ColorRepository;
 import com.backend.repository.ImageRepository;
+import com.backend.repository.ShoeDetailCustomRepository;
 import com.backend.repository.ShoeDetailRepository;
 import com.backend.repository.ShoeRepository;
 import com.backend.repository.SizeRepository;
@@ -30,6 +34,10 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
@@ -38,11 +46,15 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ShoeDetailServiceImpl implements IShoeDetailService {
@@ -77,6 +89,9 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
     @Autowired
     private SoleRepository soleRepository;
 
+    @Autowired
+    private ShoeDetailCustomRepository shoeDetailCustomRepository;
+
     @Override
     public ServiceResult<Shoe> resultValidate(String mess) {
         return new ServiceResult<>(AppConstant.FAIL, mess, null);
@@ -85,7 +100,7 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ServiceResult<Shoe> addNewShoe(ShoeDetailRequest shoeDetailRequest) {
-        String result = validateNhanVien(shoeDetailRequest);
+        String result = validateShoeDetail(shoeDetailRequest);
         if (result != null) {
             return resultValidate(result);
         } else {
@@ -103,6 +118,54 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
                 return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null);
             }
         }
+    }
+
+    private ResultItem convertToPage(Object[] objects){
+        ResultItem resultItem = new ResultItem();
+        resultItem.setId(((BigInteger)objects[0]).longValue());
+        resultItem.setNameShoe((String) objects[1]);
+        resultItem.setSize((Float) objects[2]);
+        resultItem.setCategory((String) objects[3]);
+        resultItem.setBrand((String) objects[4]);
+        resultItem.setSole((String) objects[5]);
+        resultItem.setColor((String) objects[6]);
+        resultItem.setCode((String) objects[7]);
+        resultItem.setQrCode((String) objects[8]);
+        resultItem.setPriceInput((BigDecimal) objects[9]);
+        resultItem.setQty((Integer) objects[10]);
+        resultItem.setCreatedAt((Date) objects[11]);
+        resultItem.setUpdatedAt((Date) objects[12]);
+        resultItem.setStatus((Integer) objects[13]);
+        resultItem.setThumbnail((String) objects[14]);
+
+        String inputString = (String) objects[15];
+        List<String> listOfStrings = Arrays.stream(inputString.split(","))
+                .collect(Collectors.toList());
+        resultItem.setImages(listOfStrings);
+
+        return resultItem;
+    }
+
+    @Override
+    public Page<ResultItem> searchShoeDetail(SearchShoeDetailRequest searchShoeDetailRequest) {
+        Pageable pageable = PageRequest.of(searchShoeDetailRequest.getPage() -1 ,searchShoeDetailRequest.getPageSize());
+        Page<Object> objectPage = shoeDetailCustomRepository.doSearch(pageable,
+                searchShoeDetailRequest.getShoe(),
+                searchShoeDetailRequest.getSize(),
+                searchShoeDetailRequest.getCategory(),
+                searchShoeDetailRequest.getBrand(),
+                searchShoeDetailRequest.getSole(),
+                searchShoeDetailRequest.getColor(),
+                searchShoeDetailRequest.getMinPrice(),
+                searchShoeDetailRequest.getMaxPrice()
+                );
+        List<ResultItem> list = new ArrayList<>();
+        for (Object object : objectPage) {
+            Object[] result = (Object[]) object;
+            ResultItem resultItem= convertToPage(result);
+            list.add(resultItem);
+        }
+        return new PageImpl<>(list, pageable, objectPage.getTotalElements());
     }
 
     private void saveQrCode(ShoeDetail shoeDetail, String qrCode) {
@@ -196,7 +259,7 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         shoeDetail.setQuantity(requestShoeDetail.getQuantity());
         shoeDetail.setCreatedAt(new Date());
         shoeDetail.setUpdatedAt(new Date());
-        shoeDetail.setStatus(0);
+        shoeDetail.setStatus(1);
         Float sizeName = optionalSize.get().getName();
         String shoeName = optionalShoe.get().getName();
         String colorName = optionalColor.get().getName();
@@ -232,8 +295,8 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         }
     }
 
-    @Override
-    public String validateNhanVien(ShoeDetailRequest shoeDetailRequest) {
+
+    private String validateShoeDetail(ShoeDetailRequest shoeDetailRequest) {
         List<String> errorMessages = new ArrayList<>();
         for (ShoeDetail requestShoeDetail : shoeDetailRequest.getShoeDetailList()) {
             if (requestShoeDetail.getPriceInput() == null) {
