@@ -1,9 +1,16 @@
 package com.backend.controller;
 
-import com.backend.dto.request.ShoeDetailRequest;
+import com.backend.ServiceResultReponse;
+import com.backend.config.AppConstant;
+import com.backend.dto.request.SearchOrderRequest;
+import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
+import com.backend.dto.request.shoedetail.ShoeDetailRequest;
+import com.backend.dto.response.OrderReponse;
+import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.service.IShoeDetailService;
 import com.backend.service.IShoeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +43,12 @@ public class ShoeDetailController {
 //    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> addNewShoe(@RequestBody ShoeDetailRequest shoeDetailRequest){
         return ResponseEntity.ok(iShoeDetailService.addNewShoe(shoeDetailRequest));
+    }
+
+    @PostMapping("/getAllHomePage")
+    public ResponseEntity<?> getAllShoeDetail(@RequestBody SearchShoeDetailRequest searchShoeDetailRequest) {
+        Page<ResultItem> page = iShoeDetailService.searchShoeDetail(searchShoeDetailRequest);
+        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
     }
 
 }

@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class ServiceResultReponse<T> implements Serializable {
     private int status;
 
-    private Long totalPage;
+    private Long total;
 
     private T data;
 

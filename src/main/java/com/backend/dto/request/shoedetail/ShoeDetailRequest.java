@@ -1,4 +1,4 @@
-package com.backend.dto.request;
+package com.backend.dto.request.shoedetail;
 
 import com.backend.entity.ShoeDetail;
 import lombok.AllArgsConstructor;
