@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Repository
@@ -118,5 +119,24 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
         Query query = entityManager.createNativeQuery(countSql.toString());
 
         return ((Number)query.getSingleResult()).longValue();
+    }
+
+    @Override
+    public Object getOne(BigInteger id) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT a.id, d.name as nameShoe, e.name as size, f.name as category, \n" +
+                "g.name as brand, h.name as sole, i.name as color, a.code, a.qrcode, \n" +
+                "a.price, a.quantity, a.created_time, a.updated_time,a.status,\n" +
+                "c.img_url as thumbnail,GROUP_CONCAT(b.img_url) as images \n" +
+                "FROM shoe_detail a \n" +
+                "JOIN image b ON a.id = b.shoe_detail_id \n" +
+                "JOIN thumbnail c ON a.id = c.shoe_detail_id\n" +
+                "JOIN shoe d ON a.shoe_id = d.id\n" +
+                "JOIN size e ON a.size_id = e.id JOIN category f ON a.category_id = f.id\n" +
+                "JOIN brand g ON a.brand_id = g.id JOIN sole h ON a.sole_id = h.id\n" +
+                "JOIN color i ON a.color_id = i.id WHERE a.id = :id");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("id",id);
+        return query.getSingleResult();
     }
 }
