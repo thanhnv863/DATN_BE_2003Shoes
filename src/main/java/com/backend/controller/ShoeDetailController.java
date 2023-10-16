@@ -1,5 +1,6 @@
 package com.backend.controller;
 
+import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.SearchOrderRequest;
@@ -13,14 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigInteger;
+
 @RestController
-@RequestMapping("/api/v1/admin/shoe-detail")
+@RequestMapping("/api/v1/shoe-detail")
 public class ShoeDetailController {
     @Autowired
     private IShoeService iShoeService;
@@ -48,7 +52,19 @@ public class ShoeDetailController {
     @PostMapping("/getAllHomePage")
     public ResponseEntity<?> getAllShoeDetail(@RequestBody SearchShoeDetailRequest searchShoeDetailRequest) {
         Page<ResultItem> page = iShoeDetailService.searchShoeDetail(searchShoeDetailRequest);
-        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
+        return ResponseEntity.ok().body(
+                new ServiceResultReponse<>(
+                        AppConstant.SUCCESS,
+                        page.getTotalElements(),
+                        page.getContent(), "Lấy danh sách thành công "
+                )
+        );
+    }
+
+    @GetMapping("/getShoeDetailById/{id}")
+    public ResponseEntity<?> getShoeDetailById(@PathVariable(name = "id")BigInteger id){
+        Object response = iShoeDetailService.searchById(id);
+        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",response));
     }
 
 }

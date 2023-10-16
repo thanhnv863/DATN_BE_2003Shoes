@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface ShoeDetailCustomRepository {
                        List<String> sole, List<String> color, BigDecimal minPrice,
                        BigDecimal maxPrice
     );
+
+    Object getOne(BigInteger id);
 }
