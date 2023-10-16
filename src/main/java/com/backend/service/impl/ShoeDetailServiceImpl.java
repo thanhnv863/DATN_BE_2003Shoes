@@ -98,6 +98,14 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
     }
 
     @Override
+    public Object searchById(BigInteger id) {
+        Object result = shoeDetailCustomRepository.getOne(id);
+        Object[] resultArray = (Object[]) result;
+        ResultItem resultItem = convertToPage(resultArray);
+        return resultItem;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public ServiceResult<Shoe> addNewShoe(ShoeDetailRequest shoeDetailRequest) {
         String result = validateShoeDetail(shoeDetailRequest);
@@ -107,8 +115,16 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
             try {
                 for (ShoeDetail requestShoeDetail : shoeDetailRequest.getShoeDetailList()) {
                     ShoeDetail shoeDetail = createShoeDetail(requestShoeDetail);
-                    saveThumbnails(shoeDetail, requestShoeDetail.getThumbnails());
-                    saveImages(shoeDetail, requestShoeDetail.getImages());
+                    if (requestShoeDetail.getThumbnails() == null || requestShoeDetail.getThumbnails().size() <= 0) {
+                       throw new RuntimeException("Thumbnail không được để trống");
+                    }else {
+                        saveThumbnails(shoeDetail, requestShoeDetail.getThumbnails());
+                    }
+                    if (requestShoeDetail.getImages() == null || requestShoeDetail.getImages().size() <= 0) {
+                        throw new RuntimeException("Images không được để trống");
+                    }else {
+                        saveImages(shoeDetail, requestShoeDetail.getImages());
+                    }
                     String qrCode = generateQrCode(ShoeDetail.builder().id(shoeDetail.getId()).build());
                     saveQrCode(shoeDetail, qrCode);
                 }
@@ -149,6 +165,13 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
     @Override
     public Page<ResultItem> searchShoeDetail(SearchShoeDetailRequest searchShoeDetailRequest) {
         Pageable pageable = PageRequest.of(searchShoeDetailRequest.getPage() -1 ,searchShoeDetailRequest.getPageSize());
+        if (searchShoeDetailRequest.getShoe() != null){
+            String shoe = searchShoeDetailRequest.getShoe();
+            shoe = shoe.replaceAll("\\\\","\\\\\\");
+            shoe = shoe.replaceAll("%","\\\\\\%");
+            shoe = shoe.replaceAll("_","\\\\\\_");
+            searchShoeDetailRequest.setShoe(shoe);
+        }
         Page<Object> objectPage = shoeDetailCustomRepository.doSearch(pageable,
                 searchShoeDetailRequest.getShoe(),
                 searchShoeDetailRequest.getSize(),

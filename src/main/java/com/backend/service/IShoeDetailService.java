@@ -7,10 +7,14 @@ import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.entity.Shoe;
 import org.springframework.data.domain.Page;
 
+import java.math.BigInteger;
+
 public interface IShoeDetailService {
     ServiceResult<Shoe> addNewShoe(ShoeDetailRequest shoeDetailRequest);
 
     Page<ResultItem> searchShoeDetail(SearchShoeDetailRequest searchShoeDetailRequest);
 
     ServiceResult<Shoe> resultValidate(String mess);
+
+    Object searchById(BigInteger id);
 }
