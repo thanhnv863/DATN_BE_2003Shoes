@@ -1,6 +1,8 @@
 package com.backend.dto.response;
 
+import com.backend.util.DateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,15 +31,19 @@ public class VoucherOrderResponse {
     private BigDecimal minBillValue;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime startDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime endDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime createDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime updateAt;
 
     private Integer reduceForm;
