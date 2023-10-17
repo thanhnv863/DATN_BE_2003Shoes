@@ -1,18 +1,23 @@
 package com.backend.service.impl;
 
 import com.backend.ServiceResult;
+import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.VoucherOrderRequest;
+import com.backend.dto.response.OrderReponse;
 import com.backend.dto.response.VoucherOrderResponse;
 import com.backend.dto.response.shoedetail.DataPaginate;
 import com.backend.dto.response.shoedetail.Meta;
 import com.backend.dto.response.shoedetail.ResultItem;
+import com.backend.entity.Order;
 import com.backend.entity.ShoeDetail;
 import com.backend.entity.VoucherOrder;
+import com.backend.repository.VoucherOrderCustomRepository;
 import com.backend.repository.VoucherOrderRepository;
 import com.backend.service.IVoucherOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,7 +27,9 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.persistence.Tuple;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +42,12 @@ public class VoucherServiceImpl implements IVoucherOrderService {
     @Autowired
     private VoucherOrderRepository voucherOrderRepository;
 
+    @Autowired
+    private VoucherOrderCustomRepository voucherOrderCustomRepository;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServiceResult<VoucherOrderResponse> addVoucher(VoucherOrderRequest voucherOrderRequest) {
+    public ServiceResult<VoucherOrder> addVoucher(VoucherOrderRequest voucherOrderRequest) {
         LocalDateTime currentDateTime = LocalDateTime.now();
 
         // Tạo một UUID mới
@@ -55,7 +65,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             return result(result);
         } else {
             try {
-                voucherHoaDon.setCode("Code voucher " + cutRandomString);
+                voucherHoaDon.setCode("Voucher" + cutRandomString);
                 voucherHoaDon.setName(voucherOrderRequest.getName());
                 voucherHoaDon.setQuantity(voucherOrderRequest.getQuantity());
                 voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
@@ -68,16 +78,16 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 //voucherHoaDon.setStatus(0);
 
                 // Kiểm tra xem người dùng đã cung cấp giá trị status chưa
-                    if (voucherOrderRequest.getStatus() != null) {
-                        voucherHoaDon.setStatus(voucherOrderRequest.getStatus());
-                    } else {
-                        // Nếu người dùng không cung cấp giá trị status, đặt mặc định là 0
-                        voucherHoaDon.setStatus(0);
-                    }
+                if (voucherOrderRequest.getStatus() != null) {
+                    voucherHoaDon.setStatus(voucherOrderRequest.getStatus());
+                } else {
+                    // Nếu người dùng không cung cấp giá trị status, đặt mặc định là 0
+                    voucherHoaDon.setStatus(0);
+                }
 
                 voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
-                VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
-                return new ServiceResult<>(AppConstant.SUCCESS, "Add thành công", convertVoucherOrderResponse);
+                //VoucherOrderResponse convertVoucherOrderResponse = convertPage(voucherHoaDon);
+                return new ServiceResult<>(AppConstant.SUCCESS, "Add thành công", voucherHoaDon);
             } catch (Exception e) {
                 // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
                 //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
@@ -89,9 +99,9 @@ public class VoucherServiceImpl implements IVoucherOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServiceResult<VoucherOrderResponse> updateVoucher(VoucherOrderRequest voucherOrderRequest, Long id) {
+    public ServiceResult<VoucherOrder> updateVoucher(VoucherOrderRequest voucherOrderRequest) {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        Optional<VoucherOrder> optionalVoucherHoaDon = voucherOrderRepository.findById(id);
+        Optional<VoucherOrder> optionalVoucherHoaDon = voucherOrderRepository.findById(voucherOrderRequest.getId());
         if (optionalVoucherHoaDon.isPresent()) {
             VoucherOrder voucherHoaDon = optionalVoucherHoaDon.get();
             String result = validateVoucher(voucherOrderRequest);
@@ -107,9 +117,9 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     voucherHoaDon.setEndDate(voucherOrderRequest.getEndDate());
                     voucherHoaDon.setUpdateAt(currentDateTime);
                     voucherHoaDon.setReduceForm(voucherOrderRequest.getReduceForm());
-                   // voucherHoaDon.setStatus(0);
+                    // voucherHoaDon.setStatus(0);
 
-                     //Kiểm tra xem người dùng đã cung cấp giá trị status chưa
+                    //Kiểm tra xem người dùng đã cung cấp giá trị status chưa
                     if (voucherOrderRequest.getStatus() != null) {
                         voucherHoaDon.setStatus(voucherOrderRequest.getStatus());
                     } else {
@@ -118,8 +128,8 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     }
 
                     voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
-                    VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
-                    return new ServiceResult<>(AppConstant.SUCCESS, "Update thành công", convertVoucherOrderResponse);
+                    //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
+                    return new ServiceResult<>(AppConstant.SUCCESS, "Update thành công", voucherHoaDon);
                 } catch (Exception e) {
                     // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
                     //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
@@ -158,92 +168,62 @@ public class VoucherServiceImpl implements IVoucherOrderService {
     }
 
     @Override
-    public VoucherOrderResponse convertToResponse(VoucherOrder voucherOrder) {
-        return VoucherOrderResponse.builder()
-                .code(voucherOrder.getCode())
-                .name(voucherOrder.getName())
-                .quantity(voucherOrder.getQuantity())
-                .discountAmount(voucherOrder.getDiscountAmount())
-                .minBillValue(voucherOrder.getMinBillValue())
-                .startDate(voucherOrder.getStartDate())
-                .endDate(voucherOrder.getEndDate())
-                .createDate(voucherOrder.getCreateDate())
-                .updateAt(voucherOrder.getUpdateAt())
-                .reduceForm(voucherOrder.getReduceForm())
-                .status(voucherOrder.getStatus())
-                .build();
+    public VoucherOrderResponse convertPage(Object[] object) {
+        VoucherOrderResponse voucherOrderResponse = new VoucherOrderResponse();
+        voucherOrderResponse.setId(((BigInteger) object[0]).longValue());
+        voucherOrderResponse.setCode((String) object[1]);
+        voucherOrderResponse.setName((String) object[2]);
+        voucherOrderResponse.setQuantity((Integer) object[3]);
+        voucherOrderResponse.setMinBillValue((BigDecimal) object[4]);
+        voucherOrderResponse.setDiscountAmount((BigDecimal) object[5]);
+
+        Timestamp startDateTimestamp = (Timestamp) object[6];
+        voucherOrderResponse.setStartDate(startDateTimestamp.toLocalDateTime());
+
+        // Convert java.sql.Timestamp to java.time.LocalDateTime
+        Timestamp endDateTimestamp = (Timestamp) object[7];
+        voucherOrderResponse.setEndDate(endDateTimestamp.toLocalDateTime());
+
+        // Convert java.sql.Timestamp to java.time.LocalDateTime
+        Timestamp createDateTimestamp = (Timestamp) object[8];
+        voucherOrderResponse.setCreateDate(createDateTimestamp.toLocalDateTime());
+
+        // Convert java.sql.Timestamp to java.time.LocalDateTime
+        Timestamp updateAtTimestamp = (Timestamp) object[9];
+        voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+
+        voucherOrderResponse.setReduceForm((Integer) object[10]);
+        voucherOrderResponse.setStatus((Integer) object[11]);
+        return voucherOrderResponse;
     }
 
     @Override
-    public ServiceResult<List<DataPaginate>> getAllVoucherOrder(int page, int size) {
-        Page<VoucherOrder> voucherOrders = voucherOrderRepository.getAllVoucherOrder(PageRequest.of(page, size));
-
-        int current = voucherOrders.getNumber();
-        int pageSize = voucherOrders.getSize();
-        int pages = voucherOrders.getTotalPages();
-        long total = voucherOrders.getTotalElements();
-
-        Meta meta = new Meta();
-        meta.setCurrent(current);
-        meta.setPageSize(pageSize);
-        meta.setPages(pages);
-        meta.setTotal(total);
-
-        List<VoucherOrderResponse> voucherOrderResponses = new ArrayList<>();
-
-        for (VoucherOrder voucherOrder : voucherOrders) {
-            VoucherOrderResponse voucherOrderResponse = new VoucherOrderResponse();
-            voucherOrderResponse.setId(voucherOrder.getId());
-            voucherOrderResponse.setCode(voucherOrder.getCode());
-            voucherOrderResponse.setName(voucherOrder.getName());
-            voucherOrderResponse.setQuantity(voucherOrder.getQuantity());
-            voucherOrderResponse.setDiscountAmount(voucherOrder.getDiscountAmount());
-            voucherOrderResponse.setMinBillValue(voucherOrder.getMinBillValue());
-            voucherOrderResponse.setStartDate(voucherOrder.getStartDate());
-            voucherOrderResponse.setEndDate(voucherOrder.getEndDate());
-            voucherOrderResponse.setCreateDate(voucherOrder.getCreateDate());
-            voucherOrderResponse.setUpdateAt(voucherOrder.getUpdateAt());
-            voucherOrderResponse.setReduceForm(voucherOrder.getReduceForm());
-            voucherOrderResponse.setStatus(voucherOrder.getStatus());
-
-            voucherOrderResponses.add(voucherOrderResponse);
-        }
-
-        DataPaginate dataPaginate = new DataPaginate();
-        dataPaginate.setMeta(meta);
-        dataPaginate.setVoucherOrderResponses(voucherOrderResponses);
-
-        return new ServiceResult(AppConstant.SUCCESS,
-                "Successfully retrieved",
-                dataPaginate
-        );
-    }
-
-    @Override
-    public ServiceResult<VoucherOrderResponse> deleteVoucher(Long id) {
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceResult<VoucherOrder> deleteVoucher(VoucherOrderRequest voucherOrderRequest) {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        Optional<VoucherOrder> optionalVoucherHoaDon = voucherOrderRepository.findById(id);
+        Optional<VoucherOrder> optionalVoucherHoaDon = voucherOrderRepository.findById(voucherOrderRequest.getId());
         if (optionalVoucherHoaDon.isPresent()) {
             VoucherOrder voucherHoaDon = optionalVoucherHoaDon.get();
             try {
                 voucherHoaDon.setUpdateAt(currentDateTime);
                 voucherHoaDon.setStatus(3);
                 voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
+                //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
+                return new ServiceResult<>(AppConstant.SUCCESS, "Delete thành công", voucherHoaDon);
             } catch (Exception e) {
                 // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
-                VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
+                //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return new ServiceResult<>(AppConstant.FAIL, e.getMessage(), convertVoucherOrderResponse); // hoặc xử lý lỗi một cách thích hợp dựa trên nhu cầu của bạn
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null); // hoặc xử lý lỗi một cách thích hợp dựa trên nhu cầu của bạn
             }
-            VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
-            return new ServiceResult<>(AppConstant.SUCCESS, "Delete thành công", convertVoucherOrderResponse);
+
         } else {
             return new ServiceResult<>(AppConstant.FAIL, "Id không tồn tại", null);
         }
     }
 
     @Override
-    public ServiceResult<VoucherOrderResponse> result(String mess) {
+    public ServiceResult<VoucherOrder> result(String mess) {
         return new ServiceResult<>(AppConstant.FAIL, mess, null);
     }
 
@@ -322,183 +302,39 @@ public class VoucherServiceImpl implements IVoucherOrderService {
     }
 
     @Override
-    public ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus0(int page, int size) {
-        Page<VoucherOrder> voucherOrders = voucherOrderRepository.getAllVoucherStatus0(PageRequest.of(page, size));
-
-        int current = voucherOrders.getNumber();
-        int pageSize = voucherOrders.getSize();
-        int pages = voucherOrders.getTotalPages();
-        long total = voucherOrders.getTotalElements();
-
-        Meta meta = new Meta();
-        meta.setCurrent(current);
-        meta.setPageSize(pageSize);
-        meta.setPages(pages);
-        meta.setTotal(total);
-
-        List<VoucherOrderResponse> voucherOrderResponses = new ArrayList<>();
-
-        for (VoucherOrder voucherOrder : voucherOrders) {
-            VoucherOrderResponse voucherOrderResponse = new VoucherOrderResponse();
-            voucherOrderResponse.setId(voucherOrder.getId());
-            voucherOrderResponse.setCode(voucherOrder.getCode());
-            voucherOrderResponse.setName(voucherOrder.getName());
-            voucherOrderResponse.setQuantity(voucherOrder.getQuantity());
-            voucherOrderResponse.setDiscountAmount(voucherOrder.getDiscountAmount());
-            voucherOrderResponse.setMinBillValue(voucherOrder.getMinBillValue());
-            voucherOrderResponse.setStartDate(voucherOrder.getStartDate());
-            voucherOrderResponse.setEndDate(voucherOrder.getEndDate());
-            voucherOrderResponse.setCreateDate(voucherOrder.getCreateDate());
-            voucherOrderResponse.setUpdateAt(voucherOrder.getUpdateAt());
-            voucherOrderResponse.setReduceForm(voucherOrder.getReduceForm());
-            voucherOrderResponse.setStatus(voucherOrder.getStatus());
-
-            voucherOrderResponses.add(voucherOrderResponse);
+    public Page<VoucherOrderResponse> searchVoucher(VoucherOrderRequest voucherOrderRequest) {
+        Pageable pageable = PageRequest.of(voucherOrderRequest.getPage() - 1, voucherOrderRequest.getSize());
+        if (voucherOrderRequest.getName() != null) {
+            String name = voucherOrderRequest.getName();
+            name = name.replaceAll("\\\\", "\\\\\\");
+            name = name.replaceAll("%", "\\\\\\%");
+            name = name.replaceAll("_", "\\\\\\_");
+            voucherOrderRequest.setName(name);
         }
-
-        DataPaginate dataPaginate = new DataPaginate();
-        dataPaginate.setMeta(meta);
-        dataPaginate.setVoucherOrderResponses(voucherOrderResponses);
-
-        return new ServiceResult(AppConstant.SUCCESS,
-                "Successfully retrieved",
-                dataPaginate
+        Page<Object> objects = voucherOrderCustomRepository.doSearch(
+                pageable,
+                voucherOrderRequest.getName(),
+                voucherOrderRequest.getStatus()
         );
+
+        List<VoucherOrderResponse> list = new ArrayList<>();
+        for (Object object : objects) {
+            Object[] result = (Object[]) object;
+            VoucherOrderResponse voucherOrderResponse = convertPage(result);
+            list.add(voucherOrderResponse);
+        }
+        return new PageImpl<>(list, pageable, objects.getTotalElements());
     }
 
     @Override
-    public ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus1(int page, int size) {
-        Page<VoucherOrder> voucherOrders = voucherOrderRepository.getAllVoucherStatus1(PageRequest.of(page, size));
-
-        int current = voucherOrders.getNumber();
-        int pageSize = voucherOrders.getSize();
-        int pages = voucherOrders.getTotalPages();
-        long total = voucherOrders.getTotalElements();
-
-        Meta meta = new Meta();
-        meta.setCurrent(current);
-        meta.setPageSize(pageSize);
-        meta.setPages(pages);
-        meta.setTotal(total);
-
-        List<VoucherOrderResponse> voucherOrderResponses = new ArrayList<>();
-
-        for (VoucherOrder voucherOrder : voucherOrders) {
-            VoucherOrderResponse voucherOrderResponse = new VoucherOrderResponse();
-            voucherOrderResponse.setId(voucherOrder.getId());
-            voucherOrderResponse.setCode(voucherOrder.getCode());
-            voucherOrderResponse.setName(voucherOrder.getName());
-            voucherOrderResponse.setQuantity(voucherOrder.getQuantity());
-            voucherOrderResponse.setDiscountAmount(voucherOrder.getDiscountAmount());
-            voucherOrderResponse.setMinBillValue(voucherOrder.getMinBillValue());
-            voucherOrderResponse.setStartDate(voucherOrder.getStartDate());
-            voucherOrderResponse.setEndDate(voucherOrder.getEndDate());
-            voucherOrderResponse.setCreateDate(voucherOrder.getCreateDate());
-            voucherOrderResponse.setUpdateAt(voucherOrder.getUpdateAt());
-            voucherOrderResponse.setReduceForm(voucherOrder.getReduceForm());
-            voucherOrderResponse.setStatus(voucherOrder.getStatus());
-
-            voucherOrderResponses.add(voucherOrderResponse);
+    public ServiceResultReponse<VoucherOrder> getOne(String code) {
+        Optional<VoucherOrder> voucherOrder = voucherOrderRepository.findVoucherByCode(code);
+        if (voucherOrder.isPresent()) {
+            VoucherOrder voucherOrderGet = voucherOrder.get();
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, voucherOrderGet, "Đã tìm thấy voucher");
+        } else {
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã voucher không tồn tại");
         }
-
-        DataPaginate dataPaginate = new DataPaginate();
-        dataPaginate.setMeta(meta);
-        dataPaginate.setVoucherOrderResponses(voucherOrderResponses);
-
-        return new ServiceResult(AppConstant.SUCCESS,
-                "Successfully retrieved",
-                dataPaginate
-        );
     }
 
-    @Override
-    public ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus2(int page, int size) {
-        Page<VoucherOrder> voucherOrders = voucherOrderRepository.getAllVoucherStatus2(PageRequest.of(page, size));
-
-        int current = voucherOrders.getNumber();
-        int pageSize = voucherOrders.getSize();
-        int pages = voucherOrders.getTotalPages();
-        long total = voucherOrders.getTotalElements();
-
-        Meta meta = new Meta();
-        meta.setCurrent(current);
-        meta.setPageSize(pageSize);
-        meta.setPages(pages);
-        meta.setTotal(total);
-
-        List<VoucherOrderResponse> voucherOrderResponses = new ArrayList<>();
-
-        for (VoucherOrder voucherOrder : voucherOrders) {
-            VoucherOrderResponse voucherOrderResponse = new VoucherOrderResponse();
-            voucherOrderResponse.setId(voucherOrder.getId());
-            voucherOrderResponse.setCode(voucherOrder.getCode());
-            voucherOrderResponse.setName(voucherOrder.getName());
-            voucherOrderResponse.setQuantity(voucherOrder.getQuantity());
-            voucherOrderResponse.setDiscountAmount(voucherOrder.getDiscountAmount());
-            voucherOrderResponse.setMinBillValue(voucherOrder.getMinBillValue());
-            voucherOrderResponse.setStartDate(voucherOrder.getStartDate());
-            voucherOrderResponse.setEndDate(voucherOrder.getEndDate());
-            voucherOrderResponse.setCreateDate(voucherOrder.getCreateDate());
-            voucherOrderResponse.setUpdateAt(voucherOrder.getUpdateAt());
-            voucherOrderResponse.setReduceForm(voucherOrder.getReduceForm());
-            voucherOrderResponse.setStatus(voucherOrder.getStatus());
-
-            voucherOrderResponses.add(voucherOrderResponse);
-        }
-
-        DataPaginate dataPaginate = new DataPaginate();
-        dataPaginate.setMeta(meta);
-        dataPaginate.setVoucherOrderResponses(voucherOrderResponses);
-
-        return new ServiceResult(AppConstant.SUCCESS,
-                "Successfully retrieved",
-                dataPaginate
-        );
-    }
-
-    @Override
-    public ServiceResult<List<DataPaginate>> searchAllVoucher(String name, int page, int size) {
-        Pageable pageable=PageRequest.of(page, size);
-        Page<VoucherOrder> voucherOrders = voucherOrderRepository.findByNameIgnoreCaseContaining(name,pageable);
-
-        int current = voucherOrders.getNumber();
-        int pageSize = voucherOrders.getSize();
-        int pages = voucherOrders.getTotalPages();
-        long total = voucherOrders.getTotalElements();
-
-        Meta meta = new Meta();
-        meta.setCurrent(current);
-        meta.setPageSize(pageSize);
-        meta.setPages(pages);
-        meta.setTotal(total);
-
-        List<VoucherOrderResponse> voucherOrderResponses = new ArrayList<>();
-
-        for (VoucherOrder voucherOrder : voucherOrders) {
-            VoucherOrderResponse voucherOrderResponse = new VoucherOrderResponse();
-            voucherOrderResponse.setId(voucherOrder.getId());
-            voucherOrderResponse.setCode(voucherOrder.getCode());
-            voucherOrderResponse.setName(voucherOrder.getName());
-            voucherOrderResponse.setQuantity(voucherOrder.getQuantity());
-            voucherOrderResponse.setDiscountAmount(voucherOrder.getDiscountAmount());
-            voucherOrderResponse.setMinBillValue(voucherOrder.getMinBillValue());
-            voucherOrderResponse.setStartDate(voucherOrder.getStartDate());
-            voucherOrderResponse.setEndDate(voucherOrder.getEndDate());
-            voucherOrderResponse.setCreateDate(voucherOrder.getCreateDate());
-            voucherOrderResponse.setUpdateAt(voucherOrder.getUpdateAt());
-            voucherOrderResponse.setReduceForm(voucherOrder.getReduceForm());
-            voucherOrderResponse.setStatus(voucherOrder.getStatus());
-
-            voucherOrderResponses.add(voucherOrderResponse);
-        }
-
-        DataPaginate dataPaginate = new DataPaginate();
-        dataPaginate.setMeta(meta);
-        dataPaginate.setVoucherOrderResponses(voucherOrderResponses);
-
-        return new ServiceResult(AppConstant.SUCCESS,
-                "Successfully retrieved",
-                dataPaginate
-        );
-    }
 }
