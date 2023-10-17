@@ -22,21 +22,11 @@ public interface IVoucherOrderService {
 
     VoucherOrderResponse convertPage(Object[] object);
 
-    //ServiceResult<List<DataPaginate>> getAllVoucherOrder(int page, int size);
-
-    //ServiceResult<VoucherOrderResponse> deleteVoucher(Long id);
+    ServiceResult<VoucherOrder> deleteVoucher(VoucherOrderRequest voucherOrderRequest);
 
     ServiceResult<VoucherOrder> result(String mess);
 
     String validateVoucher(VoucherOrderRequest voucherOrderRequest);
-
-//    ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus0(int page, int size);
-//
-//    ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus1(int page, int size);
-//
-//    ServiceResult<List<DataPaginate>> getAllVoucherOrderStatus2(int page, int size);
-//
-//    ServiceResult<List<DataPaginate>> searchAllVoucher(String name, int page, int size);
 
     Page<VoucherOrderResponse> searchVoucher(VoucherOrderRequest voucherOrderRequest);
 

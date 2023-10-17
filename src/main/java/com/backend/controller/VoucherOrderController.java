@@ -31,7 +31,6 @@ public class VoucherOrderController {
     public ResponseEntity<?> getAllVoucherOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
         Page<VoucherOrderResponse> page = voucherOrderService.searchVoucher(voucherOrderRequest);
         return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
-//        return ResponseEntity.ok().body(page);
     }
 
     @GetMapping("/get-one/{name}")
@@ -49,15 +48,9 @@ public class VoucherOrderController {
         return ResponseEntity.ok(voucherOrderService.updateVoucher(voucherOrderRequest));
     }
 
-//    @GetMapping("/deleteVoucherOrder/{id}")
-//    public ResponseEntity<?> deleteVoucherOrder(@PathVariable(name = "id")Long id) {
-//        return ResponseEntity.ok(voucherOrderService.deleteVoucher(id));
-//    }
+    @PostMapping("/deleteVoucherOrder")
+    public ResponseEntity<?> deleteVoucherOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
+        return ResponseEntity.ok(voucherOrderService.deleteVoucher(voucherOrderRequest));
+    }
 
-//
-//    @GetMapping("/searchNameVoucherOrder")
-//    public ResponseEntity<?> searchNameVoucherOrderStatus2(@RequestParam("name") String name,@RequestParam(defaultValue = "0") Integer page,
-//                                                       @RequestParam(defaultValue = "2") Integer size){
-//        return ResponseEntity.ok(voucherOrderService.searchAllVoucher(name,page,size));
-//    }
 }
