@@ -1,8 +1,15 @@
 package com.backend.controller;
 
+import com.backend.ServiceResultReponse;
+import com.backend.config.AppConstant;
+import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.request.VoucherOrderRequest;
+import com.backend.dto.response.OrderReponse;
+import com.backend.dto.response.VoucherOrderResponse;
+import com.backend.entity.VoucherOrder;
 import com.backend.service.IVoucherOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,48 +27,37 @@ public class VoucherOrderController {
     @Autowired
     private IVoucherOrderService voucherOrderService;
 
+    @PostMapping("/get-all")
+    public ResponseEntity<?> getAllVoucherOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
+        Page<VoucherOrderResponse> page = voucherOrderService.searchVoucher(voucherOrderRequest);
+        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
+//        return ResponseEntity.ok().body(page);
+    }
+
+    @GetMapping("/get-one/{name}")
+    public ResponseEntity<?> getOne(@PathVariable("name") String name) {
+        return ResponseEntity.ok().body(voucherOrderService.getOne(name));
+    }
+
     @PostMapping("/addNewVoucherOrder")
     public ResponseEntity<?> addVoucherOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
         return ResponseEntity.ok(voucherOrderService.addVoucher(voucherOrderRequest));
     }
 
-    @PutMapping("/updateVoucherOrder/{id}")
-    public ResponseEntity<?> updateVoucherOrder(@RequestBody VoucherOrderRequest voucherOrderRequest, @PathVariable(name = "id")Long id) {
-        return ResponseEntity.ok(voucherOrderService.updateVoucher(voucherOrderRequest,id));
+    @PostMapping("/updateVoucherOrder")
+    public ResponseEntity<?> updateVoucherOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
+        return ResponseEntity.ok(voucherOrderService.updateVoucher(voucherOrderRequest));
     }
 
-    @GetMapping("/deleteVoucherOrder/{id}")
-    public ResponseEntity<?> deleteVoucherOrder(@PathVariable(name = "id")Long id) {
-        return ResponseEntity.ok(voucherOrderService.deleteVoucher(id));
-    }
+//    @GetMapping("/deleteVoucherOrder/{id}")
+//    public ResponseEntity<?> deleteVoucherOrder(@PathVariable(name = "id")Long id) {
+//        return ResponseEntity.ok(voucherOrderService.deleteVoucher(id));
+//    }
 
-    @GetMapping("/getAllVoucherOrder")
-    public ResponseEntity<?> getAllVoucherOrder(@RequestParam(defaultValue = "0") Integer page,
-                                                          @RequestParam(defaultValue = "2") Integer size){
-        return ResponseEntity.ok(voucherOrderService.getAllVoucherOrder(page,size));
-    }
-
-    @GetMapping("/getAllVoucherOrderStatus0")
-    public ResponseEntity<?> getAllVoucherOrderStatus0(@RequestParam(defaultValue = "0") Integer page,
-                                                       @RequestParam(defaultValue = "2") Integer size){
-        return ResponseEntity.ok(voucherOrderService.getAllVoucherOrderStatus0(page,size));
-    }
-
-    @GetMapping("/getAllVoucherOrderStatus1")
-    public ResponseEntity<?> getAllVoucherOrderStatus1(@RequestParam(defaultValue = "0") Integer page,
-                                                       @RequestParam(defaultValue = "2") Integer size){
-        return ResponseEntity.ok(voucherOrderService.getAllVoucherOrderStatus1(page,size));
-    }
-
-    @GetMapping("/getAllVoucherOrderStatus2")
-    public ResponseEntity<?> getAllVoucherOrderStatus2(@RequestParam(defaultValue = "0") Integer page,
-                                                       @RequestParam(defaultValue = "2") Integer size){
-        return ResponseEntity.ok(voucherOrderService.getAllVoucherOrderStatus2(page,size));
-    }
-
-    @GetMapping("/searchNameVoucherOrder")
-    public ResponseEntity<?> searchNameVoucherOrderStatus2(@RequestParam("name") String name,@RequestParam(defaultValue = "0") Integer page,
-                                                       @RequestParam(defaultValue = "2") Integer size){
-        return ResponseEntity.ok(voucherOrderService.searchAllVoucher(name,page,size));
-    }
+//
+//    @GetMapping("/searchNameVoucherOrder")
+//    public ResponseEntity<?> searchNameVoucherOrderStatus2(@RequestParam("name") String name,@RequestParam(defaultValue = "0") Integer page,
+//                                                       @RequestParam(defaultValue = "2") Integer size){
+//        return ResponseEntity.ok(voucherOrderService.searchAllVoucher(name,page,size));
+//    }
 }
