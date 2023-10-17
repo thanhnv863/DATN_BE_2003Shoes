@@ -22,7 +22,7 @@ public interface IVoucherOrderService {
 
     VoucherOrderResponse convertPage(Object[] object);
 
-    ServiceResult<VoucherOrderResponse> deleteVoucher(Long id);
+    ServiceResult<VoucherOrder> deleteVoucher(VoucherOrderRequest voucherOrderRequest);
 
     ServiceResult<VoucherOrder> result(String mess);
 

@@ -65,7 +65,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             return result(result);
         } else {
             try {
-                voucherHoaDon.setCode("Code voucher " + cutRandomString);
+                voucherHoaDon.setCode("Voucher" + cutRandomString);
                 voucherHoaDon.setName(voucherOrderRequest.getName());
                 voucherHoaDon.setQuantity(voucherOrderRequest.getQuantity());
                 voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
@@ -176,10 +176,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         voucherOrderResponse.setQuantity((Integer) object[3]);
         voucherOrderResponse.setMinBillValue((BigDecimal) object[4]);
         voucherOrderResponse.setDiscountAmount((BigDecimal) object[5]);
-//        voucherOrderResponse.setStartDate((LocalDateTime) object[6]);
-//        voucherOrderResponse.setEndDate((LocalDateTime) object[7]);
-//        voucherOrderResponse.setCreateDate((LocalDateTime) object[8]);
-//        voucherOrderResponse.setUpdateAt((LocalDateTime) object[9]);
+
         Timestamp startDateTimestamp = (Timestamp) object[6];
         voucherOrderResponse.setStartDate(startDateTimestamp.toLocalDateTime());
 
@@ -194,9 +191,35 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         // Convert java.sql.Timestamp to java.time.LocalDateTime
         Timestamp updateAtTimestamp = (Timestamp) object[9];
         voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+
         voucherOrderResponse.setReduceForm((Integer) object[10]);
         voucherOrderResponse.setStatus((Integer) object[11]);
         return voucherOrderResponse;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceResult<VoucherOrder> deleteVoucher(VoucherOrderRequest voucherOrderRequest) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        Optional<VoucherOrder> optionalVoucherHoaDon = voucherOrderRepository.findById(voucherOrderRequest.getId());
+        if (optionalVoucherHoaDon.isPresent()) {
+            VoucherOrder voucherHoaDon = optionalVoucherHoaDon.get();
+            try {
+                voucherHoaDon.setUpdateAt(currentDateTime);
+                voucherHoaDon.setStatus(3);
+                voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
+                //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
+                return new ServiceResult<>(AppConstant.SUCCESS, "Delete thành công", voucherHoaDon);
+            } catch (Exception e) {
+                // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
+                //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null); // hoặc xử lý lỗi một cách thích hợp dựa trên nhu cầu của bạn
+            }
+
+        } else {
+            return new ServiceResult<>(AppConstant.FAIL, "Id không tồn tại", null);
+        }
     }
 
     @Override
@@ -283,9 +306,9 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         Pageable pageable = PageRequest.of(voucherOrderRequest.getPage() - 1, voucherOrderRequest.getSize());
         if (voucherOrderRequest.getName() != null) {
             String name = voucherOrderRequest.getName();
-            name = name.replaceAll("\\\\", "\\\\\\\\");
-            name = name.replaceAll("%", "\\\\%");
-            name = name.replaceAll("_", "\\\\_");
+            name = name.replaceAll("\\\\", "\\\\\\");
+            name = name.replaceAll("%", "\\\\\\%");
+            name = name.replaceAll("_", "\\\\\\_");
             voucherOrderRequest.setName(name);
         }
         Page<Object> objects = voucherOrderCustomRepository.doSearch(
@@ -305,13 +328,12 @@ public class VoucherServiceImpl implements IVoucherOrderService {
 
     @Override
     public ServiceResultReponse<VoucherOrder> getOne(String code) {
-        Optional<VoucherOrder> voucherOrder = voucherOrderRepository.findVoucherByName(code);
+        Optional<VoucherOrder> voucherOrder = voucherOrderRepository.findVoucherByCode(code);
         if (voucherOrder.isPresent()) {
             VoucherOrder voucherOrderGet = voucherOrder.get();
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, voucherOrderGet, "Đã tìm thấy voucher");
         } else {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã voucher không tồn tại");
-
         }
     }
 

@@ -24,7 +24,7 @@ public class VoucherOrderRepositoryImpl implements VoucherOrderCustomRepository 
         sql.append(" WHERE 1 = 1");
 
         if (voucher != null) {
-            sql.append(" AND (v.name = :voucher)");
+            sql.append(" AND (v.name like CONCAT('%', :voucher, '%'))");
         }
 
         if (status != null) {
@@ -58,7 +58,7 @@ public class VoucherOrderRepositoryImpl implements VoucherOrderCustomRepository 
         sql.append(" WHERE 1 = 1 ");
 
         if (voucher != null) {
-            sql.append(" AND (v.name = :voucher)");
+            sql.append(" AND (v.name like CONCAT('%', :voucher, '%'))");
         }
 
         if (status != null) {

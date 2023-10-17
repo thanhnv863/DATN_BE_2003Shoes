@@ -46,19 +46,19 @@ public class VoucherOrder {
     private BigDecimal minBillValue;
 
     @Column(name = "start_date")
-    @JsonSerialize(using = DateTimeSerializer.class)
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime startDate;
 
     @Column(name = "end_date")
-    @JsonSerialize(using = DateTimeSerializer.class)
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime endDate;
 
     @Column(name = "created_time")
-    @JsonSerialize(using = DateTimeSerializer.class)
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime createDate;
 
     @Column(name = "updated_time")
-    @JsonSerialize(using = DateTimeSerializer.class)
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime updateAt;
 
     @Column(name = "reduce_form")
