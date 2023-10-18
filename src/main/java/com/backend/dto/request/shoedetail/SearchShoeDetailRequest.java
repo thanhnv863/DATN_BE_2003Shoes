@@ -14,11 +14,22 @@ import java.util.List;
 @Setter
 public class SearchShoeDetailRequest {
     private String shoe;
-    private List<Float> size;
-    private List<String> category;
-    private List<String> brand;
-    private List<String> sole;
-    private List<String> color;
+
+    private List<Float> sizeList;
+    private Float size;
+
+    private List<String> categoryList;
+    private String category;
+
+    private List<String> brandList;
+    private String brand;
+
+    private List<String> soleList;
+    private String sole;
+
+    private List<String> colorList;
+    private String color;
+
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private int page;
