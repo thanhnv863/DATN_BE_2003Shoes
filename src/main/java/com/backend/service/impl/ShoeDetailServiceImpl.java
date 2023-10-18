@@ -106,6 +106,34 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
     }
 
     @Override
+    public List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest) {
+        if (searchShoeDetailRequest.getShoe() != null){
+            String shoe = searchShoeDetailRequest.getShoe();
+            shoe = shoe.replaceAll("\\\\","\\\\\\");
+            shoe = shoe.replaceAll("%","\\\\\\%");
+            shoe = shoe.replaceAll("_","\\\\\\_");
+            searchShoeDetailRequest.setShoe(shoe);
+        }
+        List<Object> objectList = shoeDetailCustomRepository.getListByCustom(
+                searchShoeDetailRequest.getShoe(),
+                searchShoeDetailRequest.getSize(),
+                searchShoeDetailRequest.getCategory(),
+                searchShoeDetailRequest.getBrand(),
+                searchShoeDetailRequest.getSole(),
+                searchShoeDetailRequest.getColor(),
+                searchShoeDetailRequest.getMinPrice(),
+                searchShoeDetailRequest.getMaxPrice()
+        );
+        List<ResultItem> list = new ArrayList<>();
+        for (Object object : objectList) {
+            Object[] result = (Object[]) object;
+            ResultItem resultItem= convertToPage(result);
+            list.add(resultItem);
+        }
+        return list;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public ServiceResult<Shoe> addNewShoe(ShoeDetailRequest shoeDetailRequest) {
         String result = validateShoeDetail(shoeDetailRequest);
@@ -174,11 +202,11 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         }
         Page<Object> objectPage = shoeDetailCustomRepository.doSearch(pageable,
                 searchShoeDetailRequest.getShoe(),
-                searchShoeDetailRequest.getSize(),
-                searchShoeDetailRequest.getCategory(),
-                searchShoeDetailRequest.getBrand(),
-                searchShoeDetailRequest.getSole(),
-                searchShoeDetailRequest.getColor(),
+                searchShoeDetailRequest.getSizeList(),
+                searchShoeDetailRequest.getCategoryList(),
+                searchShoeDetailRequest.getBrandList(),
+                searchShoeDetailRequest.getSoleList(),
+                searchShoeDetailRequest.getColorList(),
                 searchShoeDetailRequest.getMinPrice(),
                 searchShoeDetailRequest.getMaxPrice()
                 );

@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface ShoeDetailCustomRepository {
-    Page<Object> doSearch(Pageable pageable,String shoe,
+    Page<Object> doSearch(Pageable pageable, String shoe,
                           List<Float> size, List<String> category, List<String> brand,
                           List<String> sole, List<String> color, BigDecimal minPrice,
                           BigDecimal maxPrice);
@@ -20,4 +20,9 @@ public interface ShoeDetailCustomRepository {
     );
 
     Object getOne(BigInteger id);
+
+    List<Object> getListByCustom(String shoe,
+                                 Float size, String category, String brand,
+                                 String sole, String color, BigDecimal minPrice,
+                                 BigDecimal maxPrice);
 }

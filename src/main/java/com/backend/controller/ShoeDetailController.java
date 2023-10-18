@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/shoe-detail")
@@ -65,6 +67,18 @@ public class ShoeDetailController {
     public ResponseEntity<?> getShoeDetailById(@PathVariable(name = "id")BigInteger id){
         Object response = iShoeDetailService.searchById(id);
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",response));
+    }
+
+    @PostMapping("/getAllCustom")
+    public ResponseEntity<?> getAllCustom(@RequestBody SearchShoeDetailRequest searchShoeDetailRequest) {
+        List<ResultItem> list = iShoeDetailService.getShoeDetailsCustom(searchShoeDetailRequest);
+        return ResponseEntity.ok().body(
+                new ServiceResult<>(
+                        AppConstant.SUCCESS,
+                        "Lấy danh sách thành công ",
+                        list.stream().collect(Collectors.toList())
+                )
+        );
     }
 
 }

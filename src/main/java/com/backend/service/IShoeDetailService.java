@@ -8,6 +8,7 @@ import com.backend.entity.Shoe;
 import org.springframework.data.domain.Page;
 
 import java.math.BigInteger;
+import java.util.List;
 
 public interface IShoeDetailService {
     ServiceResult<Shoe> addNewShoe(ShoeDetailRequest shoeDetailRequest);
@@ -17,4 +18,6 @@ public interface IShoeDetailService {
     ServiceResult<Shoe> resultValidate(String mess);
 
     Object searchById(BigInteger id);
+
+    List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest);
 }
