@@ -30,20 +30,20 @@ public class VoucherOrderRequest {
 
     private BigDecimal minBillValue;
 
-    //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonSerialize(using = DateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime startDate;
 
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonSerialize(using = DateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime endDate;
 
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonSerialize(using = DateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime createDate;
 
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonSerialize(using = DateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime updateAt;
 
     private Integer reduceForm;
