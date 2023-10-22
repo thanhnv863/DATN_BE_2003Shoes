@@ -28,10 +28,9 @@ public class AddressController {
         return ResponseEntity.ok(iAddressService.addAddress(addressRequest));
     }
 
-    @PutMapping("/updateaddress/{id}")
-    public ResponseEntity<?> updateAddress(@RequestBody AddressRequest addressRequest,
-                                           @PathVariable(name = "id") Long id){
-        return ResponseEntity.ok(iAddressService.updateAddress(addressRequest,id));
+    @PostMapping("/updateaddress")
+    public ResponseEntity<?> updateAddress(@RequestBody AddressRequest addressRequest){
+        return ResponseEntity.ok(iAddressService.updateAddress(addressRequest));
     }
 
     @GetMapping("/address")
@@ -39,8 +38,8 @@ public class AddressController {
         return ResponseEntity.ok(iAddressService.getAllAddress());
     }
 
-    @DeleteMapping("/deleteaddress/{id}")
-    public ResponseEntity<?> addressDelete(@PathVariable(name = "id") Long id){
-        return ResponseEntity.ok(iAddressService.deleteAddress(id));
+    @PostMapping("/deleteaddress")
+    public ResponseEntity<?> addressDelete(@RequestBody AddressRequest addressRequest){
+        return ResponseEntity.ok(iAddressService.deleteAddress(addressRequest));
     }
 }

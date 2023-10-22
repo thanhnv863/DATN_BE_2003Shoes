@@ -6,6 +6,7 @@ import com.backend.dto.request.AddressRequest;
 import com.backend.dto.response.AddressResponse;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
+import com.backend.entity.EmailTemplate;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.AddressRepository;
 import com.backend.service.IAddressService;
@@ -31,9 +32,7 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public ServiceResult<AddressResponse> addAddress(AddressRequest addressRequest) {
-
         Address address = new Address();
-
         String result = validateAddress(addressRequest);
 
         if (result != null){
@@ -68,38 +67,29 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
-    public ServiceResult<AddressResponse> updateAddress(AddressRequest addressRequest, Long id) {
-        Optional<Address> addressId = addressRepository.findById(id);
+    public ServiceResult<Address> updateAddress(AddressRequest addressRequest) {
+        Optional<Address> addressId = addressRepository.findById(addressRequest.getId());
         Optional<Account> accountId = accountRepository.findById(addressRequest.getAccountId());
         Account account = accountId.get();
-        if (addressId.isPresent()){
-            Address address = addressId.get();
-            String result = validateAddress(addressRequest);
-            if(result != null){
-                return result(result);
-            }else{
-                try{
-                    address.setAccount(account);
-                    address.setName(addressRequest.getName());
-                    address.setPhoneNumber(addressRequest.getPhoneNumber());
-                    address.setSpecificAddress(addressRequest.getSpecificAddress());
-                    address.setWard(addressRequest.getWard());
-                    address.setDistrict(addressRequest.getDistrict());
-                    address.setProvince(addressRequest.getProvince());
-                    address.setNote(addressRequest.getNote());
-                    address.setDefaultAddress(addressRequest.getDefaultAddress());
+        if (addressId.isPresent()) {
+            Address addressExist = addressId.get();
+            addressExist.setId(addressExist.getId());
+            addressExist.setAccount(account);
+            addressExist.setName(addressRequest.getName());
+            addressExist.setPhoneNumber(addressRequest.getPhoneNumber());
+            addressExist.setSpecificAddress(addressRequest.getSpecificAddress());
+            addressExist.setWard(addressRequest.getWard());
+            addressExist.setDistrict(addressRequest.getDistrict());
+            addressExist.setProvince(addressRequest.getProvince());
+            addressExist.setNote(addressRequest.getNote());
+            addressExist.setDefaultAddress(addressRequest.getDefaultAddress());
 
-                    address = addressRepository.save(address);
-                    AddressResponse convertAddressResponse = convertToResponse(address);
-                    return new ServiceResult<>(AppConstant.SUCCESS,"Update success",convertAddressResponse);
+            Address address = addressRepository.save(addressExist);
 
-                }catch (Exception e){
-                    e.printStackTrace();
-                    return new ServiceResult<>(AppConstant.BAD_REQUEST,e.getMessage(),null);
-                }
-            }
+            return new ServiceResult<>(AppConstant.SUCCESS, "Update success", address);
+
         }else{
-            return new ServiceResult<>(AppConstant.FAIL,"Id not exist",null);
+            return new ServiceResult<>(AppConstant.BAD_REQUEST,"Update success",null);
         }
     }
 
@@ -132,11 +122,11 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
-    public ServiceResult<AddressResponse> deleteAddress(Long id) {
-        Optional<Address> optionalAddress = addressRepository.findById(id);
+    public ServiceResult<Address> deleteAddress(AddressRequest addressRequest) {
+        Optional<Address> optionalAddress = addressRepository.findById(addressRequest.getId());
         if (optionalAddress.isPresent()){
             Address address = optionalAddress.get();
-            addressRepository.deleteById(address.getId());
+            addressRepository.save(address);
             return new ServiceResult<>(AppConstant.SUCCESS,"delete Success",null);
         }else{
             return new ServiceResult<>(AppConstant.FAIL,"Id not exist",null);
