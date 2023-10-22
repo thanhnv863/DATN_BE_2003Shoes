@@ -33,14 +33,18 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public ServiceResult<RegisterResponse> register(RegisterRequest registerRequest) {
         Account account = new Account();
+
+        Calendar calendar = Calendar.getInstance();
+        Date now = calendar.getTime();
         account.setName(registerRequest.getName());
         account.setEmail(registerRequest.getEmail());
+        account.setCreatedAt(now);
+        account.setUpdatedAt(now);
+        account.setStatus(1);
         account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         account.setRole(Role.builder().id(registerRequest.getIdRole()).build());
         account = accountRepository.save(account);
         Cart cart = new Cart();
-        Calendar calendar = Calendar.getInstance();
-        Date now = calendar.getTime();
         cart.setAccount(account);
         cart.setCreatedAt(now);
         cart.setUpdatedAt(now);
@@ -58,7 +62,7 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public Boolean exitsEmail(RegisterRequest registerRequest) {
         Optional<Account> optionalAccount = accountRepository.findByEmail(registerRequest.getEmail());
-        if (optionalAccount.isPresent()){
+        if (optionalAccount.isPresent()) {
             return true;
         } else {
             return false;
