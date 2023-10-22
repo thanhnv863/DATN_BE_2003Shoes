@@ -18,9 +18,14 @@ public class CartDetailController {
     @Autowired
     private ICartDetailService iCartDetailService;
 
-    @PostMapping("/addCartDetail")
+    @PostMapping("/addCartDetailAtCart")
+    public ResponseEntity<?> addCartDetailAtCart(@RequestBody CartDetailRequest cartDetailRequest){
+        return ResponseEntity.ok(iCartDetailService.addCartDetailAtCart(cartDetailRequest));
+    }
+
+    @PostMapping("/addCartDetailAtViewPageItem")
     public ResponseEntity<?> addCartDetail(@RequestBody CartDetailRequest cartDetailRequest){
-        return ResponseEntity.ok(iCartDetailService.addCartDetail(cartDetailRequest));
+        return ResponseEntity.ok(iCartDetailService.addCartDetailAtViewPageItem(cartDetailRequest));
     }
 
     @PostMapping("/deleteCartDetail")

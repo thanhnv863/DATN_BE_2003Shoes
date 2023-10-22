@@ -41,7 +41,7 @@ public class CardDetailServiceImpl implements ICartDetailService {
     private ShoeDetailCustomRepository shoeDetailCustomRepository;
 
     @Override
-    public ServiceResult<CartDetail> addCartDetail(CartDetailRequest cartDetailRequest) {
+    public ServiceResult<CartDetail> addCartDetailAtCart(CartDetailRequest cartDetailRequest) {
         Long cartId = cartDetailRequest.getIdCart();
         Long shoeDetailId = cartDetailRequest.getIdShoeDetail();
         Integer quantity = cartDetailRequest.getQty();
@@ -71,6 +71,38 @@ public class CardDetailServiceImpl implements ICartDetailService {
             return new ServiceResult<>(AppConstant.NOT_FOUND, "Ko tim thay idcart, shoedetailis", null);
         }
 
+    }
+
+    @Override
+    public ServiceResult<CartDetail> addCartDetailAtViewPageItem(CartDetailRequest cartDetailRequest) {
+        Long cartId = cartDetailRequest.getIdCart();
+        Long shoeDetailId = cartDetailRequest.getIdShoeDetail();
+        Integer quantity = cartDetailRequest.getQty();
+
+        Optional<Cart> optionalCart = cartRepository.findById(cartId);
+        Optional<ShoeDetail> optionalShoeDetail = shoeDetailRepository.findById(shoeDetailId);
+
+        if (optionalCart.isPresent() && optionalShoeDetail.isPresent()) {
+            Cart cart = optionalCart.get();
+            ShoeDetail shoeDetail = optionalShoeDetail.get();
+
+            CartDetail existingCartDetail = cartDetailRepository.findByCartAndShoeDetail(cart, shoeDetail);
+
+            if (existingCartDetail != null) {
+                existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantity);
+                cartDetailRepository.save(existingCartDetail);
+                return new ServiceResult<>(AppConstant.SUCCESS, "Update cartdetail successfully!", null);
+            } else {
+                CartDetail newCartDetail = new CartDetail();
+                newCartDetail.setCart(cart);
+                newCartDetail.setShoeDetail(shoeDetail);
+                newCartDetail.setQuantity(quantity);
+                cartDetailRepository.save(newCartDetail);
+                return new ServiceResult<>(AppConstant.SUCCESS, "Add new succesfully!", null);
+            }
+        } else {
+            return new ServiceResult<>(AppConstant.NOT_FOUND, "Ko tim thay idcart, shoedetailis", null);
+        }
     }
 
     @Override
@@ -114,6 +146,7 @@ public class CardDetailServiceImpl implements ICartDetailService {
         }
     }
 
+
     private List<CartDetailResponse> convertToCartDetailResponse(List<CartDetail> cartDetailList) {
         return cartDetailList.stream().map(CartDetail ->
                 CartDetailResponse.builder()
@@ -125,16 +158,16 @@ public class CardDetailServiceImpl implements ICartDetailService {
 
     }
 
-    private Object searchShoeDetailById(BigInteger id){
-         Object result = shoeDetailCustomRepository.getOne(id);
-         Object[] objects = (Object[]) result;
-         ResultItem resultItem = convertToResultItem(objects);
+    private Object searchShoeDetailById(BigInteger id) {
+        Object result = shoeDetailCustomRepository.getOne(id);
+        Object[] objects = (Object[]) result;
+        ResultItem resultItem = convertToResultItem(objects);
         return resultItem;
     }
 
-    private ResultItem convertToResultItem(Object[] objects){
+    private ResultItem convertToResultItem(Object[] objects) {
         ResultItem resultItem = new ResultItem();
-        resultItem.setId(((BigInteger)objects[0]).longValue());
+        resultItem.setId(((BigInteger) objects[0]).longValue());
         resultItem.setNameShoe((String) objects[1]);
         resultItem.setSize((Float) objects[2]);
         resultItem.setCategory((String) objects[3]);
