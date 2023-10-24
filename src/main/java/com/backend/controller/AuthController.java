@@ -126,38 +126,89 @@ public class AuthController {
         }
     }
 
-    @PostMapping( "/refreshToken")
-    public JwtResponse refreshToken(HttpServletRequest request) {
-            String refreshTokenFromCookie = refreshTokenService.getRefreshTokenFromCookie(request);
+//    @PostMapping( "/refreshToken")
+//    public JwtResponse refreshToken(HttpServletRequest request) {
+//            String refreshTokenFromCookie = refreshTokenService.getRefreshTokenFromCookie(request);
+//
+//            if (refreshTokenFromCookie == null) {
+//                return JwtResponse
+//                        .builder()
+//                        .statusCode(AppConstant.NOT_FOUND)
+//                        .message("Refresh token is not in cookie!")
+//                        .build();
+//            }
+//
+//            if (jwtService.isRefreshTokenExpired(refreshTokenFromCookie)) {
+////            throw new RuntimeException("Refresh token has expired. Please make a new signin request");
+//                return JwtResponse
+//                        .builder()
+//                        .statusCode(AppConstant.NOT_FOUND)
+//                        .message("Refresh token has expired. Please make a new signin request!")
+//                        .build();
+//            }
+//
+//            String email = jwtService.extractUsernameFromRefreshToken(refreshTokenFromCookie);
+//            String accessToken = jwtService.generateToken(email);
+//
+//            return JwtResponse
+//                    .builder()
+//                    .accessToken(accessToken)
+//                    .refreshToken(refreshTokenFromCookie)
+//                    .message("New token has created!")
+//                    .build();
+//    }
+@PostMapping("/refreshToken")
+public JwtResponse refreshToken(HttpServletRequest request) {
+    String refreshTokenFromCookie = refreshTokenService.getRefreshTokenFromCookie(request);
 
-            if (refreshTokenFromCookie == null) {
-                return JwtResponse
-                        .builder()
-                        .statusCode(AppConstant.NOT_FOUND)
-                        .message("Refresh token is not in cookie!")
-                        .build();
-            }
-
-            if (jwtService.isRefreshTokenExpired(refreshTokenFromCookie)) {
-//            throw new RuntimeException("Refresh token has expired. Please make a new signin request");
-                return JwtResponse
-                        .builder()
-                        .statusCode(AppConstant.NOT_FOUND)
-                        .message("Refresh token has expired. Please make a new signin request!")
-                        .build();
-            }
-
-            String email = jwtService.extractUsernameFromRefreshToken(refreshTokenFromCookie);
-            String accessToken = jwtService.generateToken(email);
-
-            return JwtResponse
-                    .builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshTokenFromCookie)
-                    .message("New token has created!")
-                    .build();
+    if (refreshTokenFromCookie == null) {
+        return JwtResponse
+                .builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value()) // Change status code to BAD_REQUEST
+                .message("Refresh token is not in cookie!")
+                .build();
     }
 
+    if (jwtService.isRefreshTokenExpired(refreshTokenFromCookie)) {
+        return JwtResponse
+                .builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value()) // Change status code to BAD_REQUEST
+                .message("Refresh token has expired. Please make a new signin request!")
+                .build();
+    }
+
+    String email = jwtService.extractUsernameFromRefreshToken(refreshTokenFromCookie);
+    String accessToken = jwtService.generateToken(email);
+
+    return JwtResponse
+            .builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshTokenFromCookie)
+            .message("New token has created!")
+            .build();
+}
+
+
+//    @GetMapping("/fetchAccount")
+//    public ResponseEntity<Object> fetchAccountInfo(HttpServletRequest request) {
+//        String authorizationHeader = request.getHeader("Authorization");
+//        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+//            return new ResponseEntity<>("Access token is missing or invalid!", HttpStatus.UNAUTHORIZED);
+//        }
+//        String accessToken = authorizationHeader.substring(7);
+//
+//        String email = jwtService.extractEmail(accessToken);
+//        System.out.println("email " + email);
+//
+//        Optional<Account> userInfoOptional = accountRepository.findByEmail(email);
+//
+//        if (userInfoOptional.isPresent()) {
+//            Account userInfo = userInfoOptional.get();
+//            return new ResponseEntity<>(userInfo, HttpStatus.OK);
+//        } else {
+//            return new ResponseEntity<>("User not found for email: " + email, HttpStatus.NOT_FOUND);
+//        }
+//    }
 
     @GetMapping("/fetchAccount")
     public ResponseEntity<Object> fetchAccountInfo(HttpServletRequest request) {
@@ -167,8 +218,16 @@ public class AuthController {
         }
         String accessToken = authorizationHeader.substring(7);
 
+        if (accessToken == null || accessToken.isEmpty()) {
+            return new ResponseEntity<>("Access token is missing or invalid!", HttpStatus.UNAUTHORIZED);
+        }
+
         String email = jwtService.extractEmail(accessToken);
         System.out.println("email " + email);
+
+        if (email == null || email.isEmpty()) {
+            return new ResponseEntity<>("Access token is invalid!", HttpStatus.UNAUTHORIZED);
+        }
 
         Optional<Account> userInfoOptional = accountRepository.findByEmail(email);
 
@@ -181,12 +240,15 @@ public class AuthController {
     }
 
 
+//    @PostMapping("/logout")
+//    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @PostMapping("/logout")
-    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletResponse response,HttpServletRequest request) {
         Cookie cookie = new Cookie("refreshToken", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
+        cookie.setDomain(request.getServerName());
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
         return ResponseEntity.status(HttpStatus.OK).body(JwtResponse.builder()
                 .statusCode(AppConstant.SUCCESS)
