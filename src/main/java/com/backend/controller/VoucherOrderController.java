@@ -53,4 +53,9 @@ public class VoucherOrderController {
         return ResponseEntity.ok(voucherOrderService.deleteVoucher(voucherOrderRequest));
     }
 
+    @PostMapping("/searchTotalMoneyMyOrder")
+    public ResponseEntity<?> searchTotalMoneyMyOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
+        return ResponseEntity.ok(voucherOrderService.searchTotalMoneyMyOrder(voucherOrderRequest));
+    }
+
 }

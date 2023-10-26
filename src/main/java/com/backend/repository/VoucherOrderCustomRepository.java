@@ -13,4 +13,6 @@ public interface VoucherOrderCustomRepository {
     long getTotalCount(String voucher,
                        Integer status
     );
+
+    List<Object> doSearchMinBillValue(BigDecimal totalMoneyMyOrder);
 }
