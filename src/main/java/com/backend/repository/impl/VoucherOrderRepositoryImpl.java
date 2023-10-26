@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -78,5 +79,24 @@ public class VoucherOrderRepositoryImpl implements VoucherOrderCustomRepository 
         }
 
         return ((Number) countQuery.getSingleResult()).longValue();
+    }
+
+    @Override
+    public List<Object> doSearchMinBillValue(BigDecimal totalMoneyMyOrder) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT v.id, v.code, v.name, v.quantity, v.min_order_value, v.discount_amount, v.start_date, ");
+        sql.append(" v.end_date, v.created_time, v.updated_time, v.reduce_form, v.status FROM voucher as v");
+        sql.append(" WHERE v.status=1");
+
+        if (totalMoneyMyOrder != null) {
+            sql.append(" AND (v.min_order_value < :totalMoneyMyOrder)");
+        }
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("totalMoneyMyOrder", totalMoneyMyOrder);
+
+        List<Object> results = query.getResultList();
+        return results;
+
     }
 }
