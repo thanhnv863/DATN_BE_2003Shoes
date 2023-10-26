@@ -29,7 +29,7 @@ public class ImageUploadService {
     }
 
     public String uploadImageByName(String imageName) throws IOException {
-        String imagePath = "C:\\Users\\Admin\\Pictures\\Screenshots\\" + imageName;
+        String imagePath = "D:\\datn-2\\" + imageName;
 
         File imageFile = new File(imagePath);
         if (!imageFile.exists()) {
