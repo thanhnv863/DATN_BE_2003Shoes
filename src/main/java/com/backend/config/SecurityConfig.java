@@ -37,7 +37,8 @@ public class SecurityConfig  {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/v1/auth/signUp", "/api/v1/auth/login", "/api/v1/auth/refreshToken",
-                        "/api/v1/auth/fetchAccount","/api/v1/auth/logout","/images/avatar/**").permitAll()
+                        "/api/v1/auth/fetchAccount","/api/v1/auth/logout","/images/avatar/**","/submitOrder","/vnpay-payment")
+                .permitAll()
                 .antMatchers("/api/v1/auth/**").authenticated()
                 .and()
                 .sessionManagement()

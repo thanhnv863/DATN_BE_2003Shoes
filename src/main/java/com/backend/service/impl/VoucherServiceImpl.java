@@ -337,4 +337,20 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         }
     }
 
+    @Override
+    public List<VoucherOrderResponse> searchTotalMoneyMyOrder(VoucherOrderRequest voucherOrderRequest) {
+
+        List<Object> objects = voucherOrderCustomRepository.doSearchMinBillValue(
+                voucherOrderRequest.getTotalMoneyMyOrder()
+        );
+
+        List<VoucherOrderResponse> list = new ArrayList<>();
+        for (Object object : objects) {
+            Object[] result = (Object[]) object;
+            VoucherOrderResponse voucherOrderResponse = convertPage(result);
+            list.add(voucherOrderResponse);
+        }
+        return list;
+    }
+
 }

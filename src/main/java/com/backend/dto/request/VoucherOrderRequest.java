@@ -1,5 +1,6 @@
 package com.backend.dto.request;
 
+import com.backend.entity.Order;
 import com.backend.util.DateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -11,6 +12,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -53,4 +55,7 @@ public class VoucherOrderRequest {
     private int page;
 
     private int size;
+
+    //private List<BigDecimal> totalMoneyMyOrderList;
+    private BigDecimal totalMoneyMyOrder;
 }

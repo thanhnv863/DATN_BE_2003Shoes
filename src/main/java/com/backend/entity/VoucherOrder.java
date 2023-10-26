@@ -1,6 +1,7 @@
 package com.backend.entity;
 
 import com.backend.util.DateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +14,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "voucher")
@@ -72,4 +75,9 @@ public class VoucherOrder {
     // Status=1: Đã kích hoạt
     // Status=2: Hết hạn
     // Status=3: Khi xoá đổi sang trạng thái ẩn
+
+    @OneToMany(mappedBy = "voucherOrder")
+    @JsonIgnore
+    private List<Order> orderList;
+
 }

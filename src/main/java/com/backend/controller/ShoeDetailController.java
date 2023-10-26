@@ -4,6 +4,7 @@ import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.SearchOrderRequest;
+import com.backend.dto.request.ShoeDetailRequestUpdate;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.OrderReponse;
@@ -49,6 +50,12 @@ public class ShoeDetailController {
 //    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> addNewShoe(@RequestBody ShoeDetailRequest shoeDetailRequest){
         return ResponseEntity.ok(iShoeDetailService.addNewShoe(shoeDetailRequest));
+    }
+
+    @PostMapping("/updateShoeDetail")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> updateShoeDetail(@RequestBody ShoeDetailRequestUpdate shoeDetailRequestUpdate){
+        return ResponseEntity.ok(iShoeDetailService.updateShoeDetail(shoeDetailRequestUpdate));
     }
 
     @PostMapping("/getAllHomePage")
