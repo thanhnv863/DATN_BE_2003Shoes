@@ -129,7 +129,7 @@ public class OrderServiceImpl implements IOrderService {
             Order order = new Order();
             order.setCode(generateOrderCode());
             order.setCreatedBy(orderRequest.getCreatedBy());
-            order.setUpdatedBy(order.getUpdatedBy());
+//            order.setUpdatedBy(order.getUpdatedBy());
             order.setCreatedDate(date);
             order.setStatus(1);
             Order orderAdd = orderRepository.save(order);
@@ -159,11 +159,19 @@ public class OrderServiceImpl implements IOrderService {
             orderGet.setId(orderGet.getId());
             orderGet.setCode(orderGet.getCode());
             // voucher
-            VoucherOrder voucherOrder = voucherOrderRepository.findById(orderRequetUpdate.getIdVoucher()).get();
-            orderGet.setVoucherOrder(voucherOrder);
+            if(orderRequetUpdate.getIdVoucher() != null) {
+                VoucherOrder voucherOrder = voucherOrderRepository.findById(orderRequetUpdate.getIdVoucher()).get();
+                orderGet.setVoucherOrder(voucherOrder);
+            }else {
+                orderGet.setVoucherOrder(null);
+            }
             //
-            Account account = accountRepository.findById(orderRequetUpdate.getIdAccount()).get();
-            orderGet.setAccount(account);
+            if(orderRequetUpdate.getIdAccount() != null) {
+                Account account = accountRepository.findById(orderRequetUpdate.getIdAccount()).get();
+                orderGet.setAccount(account);
+            }else{
+                orderGet.setAccount(null);
+            }
             //
             orderGet.setType(orderRequetUpdate.getType());
             orderGet.setId(orderGet.getId());
