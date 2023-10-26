@@ -2,6 +2,7 @@ package com.backend.service.impl;
 
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
+import com.backend.dto.request.ShoeDetailRequestUpdate;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.OrderReponse;
@@ -107,11 +108,11 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
 
     @Override
     public List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest) {
-        if (searchShoeDetailRequest.getShoe() != null){
+        if (searchShoeDetailRequest.getShoe() != null) {
             String shoe = searchShoeDetailRequest.getShoe();
-            shoe = shoe.replaceAll("\\\\","\\\\\\");
-            shoe = shoe.replaceAll("%","\\\\\\%");
-            shoe = shoe.replaceAll("_","\\\\\\_");
+            shoe = shoe.replaceAll("\\\\", "\\\\\\");
+            shoe = shoe.replaceAll("%", "\\\\\\%");
+            shoe = shoe.replaceAll("_", "\\\\\\_");
             searchShoeDetailRequest.setShoe(shoe);
         }
         List<Object> objectList = shoeDetailCustomRepository.getListByCustom(
@@ -127,10 +128,104 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         List<ResultItem> list = new ArrayList<>();
         for (Object object : objectList) {
             Object[] result = (Object[]) object;
-            ResultItem resultItem= convertToPage(result);
+            ResultItem resultItem = convertToPage(result);
             list.add(resultItem);
         }
         return list;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceResult<Shoe> updateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequestUpdate) {
+        String result = validateUpdateShoeDetail(shoeDetailRequestUpdate);
+        if (result != null) {
+            return resultValidate(result);
+        } else {
+            try {
+                Optional<ShoeDetail> shoeDetailOptional = shoeDetailRepository.findById(shoeDetailRequestUpdate.getId());
+                if (shoeDetailOptional.isPresent()) {
+                    ShoeDetail shoeDetail = shoeDetailOptional.get();
+                    Optional<Shoe> optionalShoe = shoeRepository.findById(shoeDetailRequestUpdate.getShoe().getId());
+                    Optional<Color> optionalColor = colorRepository.findById(shoeDetailRequestUpdate.getColor().getId());
+                    Optional<Category> optionalCategory = categoryRepository.findById(shoeDetailRequestUpdate.getCategory().getId());
+                    Optional<Brand> optionalBrand = brandCategory.findById(shoeDetailRequestUpdate.getBrand().getId());
+                    Optional<Size> optionalSize = sizeRepository.findById(shoeDetailRequestUpdate.getSize().getId());
+                    Optional<Sole> optionalSole = soleRepository.findById(shoeDetailRequestUpdate.getSole().getId());
+
+                    List<String> errors = new ArrayList<>();
+
+                    if (!optionalShoe.isPresent()) {
+                        errors.add("Shoe không tồn tại");
+                    }
+
+                    if (!optionalSize.isPresent()) {
+                        errors.add("Size không tồn tại");
+                    }
+
+                    if (!optionalSole.isPresent()) {
+                        errors.add("Sole không tồn tại");
+                    }
+
+                    if (!optionalBrand.isPresent()) {
+                        errors.add("Brand không tồn tại");
+                    }
+
+                    if (!optionalCategory.isPresent()) {
+                        errors.add("Loại giày không tồn tại");
+                    }
+
+                    if (!optionalColor.isPresent()) {
+                        errors.add("Màu sắc không tồn tại");
+                    }
+
+                    if (!errors.isEmpty()) {
+                        throw new RuntimeException(String.join(", ", errors));
+                    }
+
+                    shoeDetail.setShoe(optionalShoe.get());
+                    shoeDetail.setColor(optionalColor.get());
+                    shoeDetail.setCategory(optionalCategory.get());
+                    shoeDetail.setBrand(optionalBrand.get());
+                    shoeDetail.setSize(optionalSize.get());
+                    shoeDetail.setSole(optionalSole.get());
+                    shoeDetail.setPriceInput(shoeDetailRequestUpdate.getPriceInput());
+                    shoeDetail.setQuantity(shoeDetailRequestUpdate.getQuantity());
+                    shoeDetail.setCreatedAt(shoeDetailRequestUpdate.getCreatedAt());
+                    shoeDetail.setUpdatedAt(new Date());
+                    shoeDetail.setStatus(1);
+                    shoeDetail.setQrCode(shoeDetailRequestUpdate.getQrCode());
+                    shoeDetail.setCreatedBy(shoeDetailRequestUpdate.getCreatedBy());
+                    shoeDetail.setUpdatedBy(shoeDetailRequestUpdate.getUpdatedBy());
+
+                    Float sizeName = optionalSize.get().getName();
+                    String shoeName = optionalShoe.get().getName();
+                    String colorName = optionalColor.get().getName();
+                    shoeDetail.setCode(shoeName.toLowerCase() + " - " + colorName.toLowerCase() + " - " + sizeName);
+
+
+                    if (shoeDetailRequestUpdate.getThumbnails() == null || shoeDetailRequestUpdate.getThumbnails().size() <= 0) {
+                        throw new RuntimeException("Thumbnail không được để trống");
+                    } else {
+                        saveThumbnails(shoeDetail, shoeDetailRequestUpdate.getThumbnails());
+                    }
+                    if (shoeDetailRequestUpdate.getImages() == null || shoeDetailRequestUpdate.getImages().size() <= 0) {
+                        throw new RuntimeException("Images không được để trống");
+                    } else {
+                        saveImages(shoeDetail, shoeDetailRequestUpdate.getImages());
+                    }
+                    shoeDetailRepository.save(shoeDetail);
+                    return new ServiceResult<>(AppConstant.SUCCESS, "Shoe update successfully", null);
+                }else {
+                    return new ServiceResult<>(AppConstant.NOT_FOUND, "ShoeDetail not found", null);
+                }
+//                    String qrCode = generateQrCode(ShoeDetail.builder().id(shoeDetail.getId()).build());
+//                    saveQrCode(shoeDetail, qrCode);
+
+            } catch (Exception e) {
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null);
+            }
+        }
     }
 
     @Override
@@ -144,13 +239,13 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
                 for (ShoeDetail requestShoeDetail : shoeDetailRequest.getShoeDetailList()) {
                     ShoeDetail shoeDetail = createShoeDetail(requestShoeDetail);
                     if (requestShoeDetail.getThumbnails() == null || requestShoeDetail.getThumbnails().size() <= 0) {
-                       throw new RuntimeException("Thumbnail không được để trống");
-                    }else {
+                        throw new RuntimeException("Thumbnail không được để trống");
+                    } else {
                         saveThumbnails(shoeDetail, requestShoeDetail.getThumbnails());
                     }
                     if (requestShoeDetail.getImages() == null || requestShoeDetail.getImages().size() <= 0) {
                         throw new RuntimeException("Images không được để trống");
-                    }else {
+                    } else {
                         saveImages(shoeDetail, requestShoeDetail.getImages());
                     }
                     String qrCode = generateQrCode(ShoeDetail.builder().id(shoeDetail.getId()).build());
@@ -164,9 +259,9 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         }
     }
 
-    private ResultItem convertToPage(Object[] objects){
+    private ResultItem convertToPage(Object[] objects) {
         ResultItem resultItem = new ResultItem();
-        resultItem.setId(((BigInteger)objects[0]).longValue());
+        resultItem.setId(((BigInteger) objects[0]).longValue());
         resultItem.setNameShoe((String) objects[1]);
         resultItem.setSize((Float) objects[2]);
         resultItem.setCategory((String) objects[3]);
@@ -192,12 +287,12 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
 
     @Override
     public Page<ResultItem> searchShoeDetail(SearchShoeDetailRequest searchShoeDetailRequest) {
-        Pageable pageable = PageRequest.of(searchShoeDetailRequest.getPage() -1 ,searchShoeDetailRequest.getPageSize());
-        if (searchShoeDetailRequest.getShoe() != null){
+        Pageable pageable = PageRequest.of(searchShoeDetailRequest.getPage() - 1, searchShoeDetailRequest.getPageSize());
+        if (searchShoeDetailRequest.getShoe() != null) {
             String shoe = searchShoeDetailRequest.getShoe();
-            shoe = shoe.replaceAll("\\\\","\\\\\\");
-            shoe = shoe.replaceAll("%","\\\\\\%");
-            shoe = shoe.replaceAll("_","\\\\\\_");
+            shoe = shoe.replaceAll("\\\\", "\\\\\\");
+            shoe = shoe.replaceAll("%", "\\\\\\%");
+            shoe = shoe.replaceAll("_", "\\\\\\_");
             searchShoeDetailRequest.setShoe(shoe);
         }
         Page<Object> objectPage = shoeDetailCustomRepository.doSearch(pageable,
@@ -209,11 +304,11 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
                 searchShoeDetailRequest.getColorList(),
                 searchShoeDetailRequest.getMinPrice(),
                 searchShoeDetailRequest.getMaxPrice()
-                );
+        );
         List<ResultItem> list = new ArrayList<>();
         for (Object object : objectPage) {
             Object[] result = (Object[]) object;
-            ResultItem resultItem= convertToPage(result);
+            ResultItem resultItem = convertToPage(result);
             list.add(resultItem);
         }
         return new PageImpl<>(list, pageable, objectPage.getTotalElements());
@@ -259,6 +354,67 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         }
 
         return result.toString();
+    }
+
+    private ShoeDetail updateShoeDetailProperties(ShoeDetailRequestUpdate requestShoeDetail) {
+        Optional<Shoe> optionalShoe = shoeRepository.findById(requestShoeDetail.getShoe().getId());
+        Optional<Color> optionalColor = colorRepository.findById(requestShoeDetail.getColor().getId());
+        Optional<Category> optionalCategory = categoryRepository.findById(requestShoeDetail.getCategory().getId());
+        Optional<Brand> optionalBrand = brandCategory.findById(requestShoeDetail.getBrand().getId());
+        Optional<Size> optionalSize = sizeRepository.findById(requestShoeDetail.getSize().getId());
+        Optional<Sole> optionalSole = soleRepository.findById(requestShoeDetail.getSole().getId());
+
+        List<String> errors = new ArrayList<>();
+
+        if (!optionalShoe.isPresent()) {
+            errors.add("Shoe không tồn tại");
+        }
+
+        if (!optionalSize.isPresent()) {
+            errors.add("Size không tồn tại");
+        }
+
+        if (!optionalSole.isPresent()) {
+            errors.add("Sole không tồn tại");
+        }
+
+        if (!optionalBrand.isPresent()) {
+            errors.add("Brand không tồn tại");
+        }
+
+        if (!optionalCategory.isPresent()) {
+            errors.add("Loại giày không tồn tại");
+        }
+
+        if (!optionalColor.isPresent()) {
+            errors.add("Màu sắc không tồn tại");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new RuntimeException(String.join(", ", errors));
+        }
+
+        ShoeDetail shoeDetail = new ShoeDetail();
+        shoeDetail.setShoe(optionalShoe.get());
+        shoeDetail.setColor(optionalColor.get());
+        shoeDetail.setCategory(optionalCategory.get());
+        shoeDetail.setBrand(optionalBrand.get());
+        shoeDetail.setSize(optionalSize.get());
+        shoeDetail.setSole(optionalSole.get());
+        shoeDetail.setPriceInput(requestShoeDetail.getPriceInput());
+        shoeDetail.setQuantity(requestShoeDetail.getQuantity());
+        shoeDetail.setCreatedAt(new Date());
+        shoeDetail.setUpdatedAt(new Date());
+        shoeDetail.setStatus(1);
+        shoeDetail.setQrCode(requestShoeDetail.getQrCode());
+        shoeDetail.setCreatedBy(requestShoeDetail.getCreatedBy());
+        shoeDetail.setUpdatedBy(requestShoeDetail.getUpdatedBy());
+
+        Float sizeName = optionalSize.get().getName();
+        String shoeName = optionalShoe.get().getName();
+        String colorName = optionalColor.get().getName();
+        shoeDetail.setCode(shoeName.toLowerCase() + " - " + colorName.toLowerCase() + " - " + sizeName);
+        return shoeDetailRepository.save(shoeDetail);
     }
 
     private ShoeDetail createShoeDetail(ShoeDetail requestShoeDetail) {
@@ -319,6 +475,7 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
     }
 
     private void saveThumbnails(ShoeDetail shoeDetail, List<Thumbnail> thumbnails) {
+        thumbnailRepository.deleteByShoeDetail_Id(shoeDetail.getId());
         for (Thumbnail thumbnail : thumbnails) {
             try {
                 String thumbnailUrl = imageUploadService.uploadImageByName(String.valueOf(thumbnail.getImgName()));
@@ -333,6 +490,7 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
     }
 
     private void saveImages(ShoeDetail shoeDetail, List<Image> images) {
+        imageRepository.deleteByShoeDetail_Id(shoeDetail.getId());
         for (Image image : images) {
             try {
                 String thumbnailUrl = imageUploadService.uploadImageByName(String.valueOf(image.getImgName()));
@@ -353,6 +511,18 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
             if (requestShoeDetail.getPriceInput() == null) {
                 errorMessages.add("Thuộc tính không được để trống");
             }
+        }
+        if (errorMessages.size() > 0) {
+            return String.join(", ", errorMessages);
+        } else {
+            return null;
+        }
+    }
+
+    private String validateUpdateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequest) {
+        List<String> errorMessages = new ArrayList<>();
+        if (shoeDetailRequest.getPriceInput() == null) {
+            errorMessages.add("Thuộc tính không được để trống");
         }
         if (errorMessages.size() > 0) {
             return String.join(", ", errorMessages);

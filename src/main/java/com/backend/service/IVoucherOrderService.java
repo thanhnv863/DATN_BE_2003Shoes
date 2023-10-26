@@ -31,4 +31,6 @@ public interface IVoucherOrderService {
     Page<VoucherOrderResponse> searchVoucher(VoucherOrderRequest voucherOrderRequest);
 
     ServiceResultReponse<VoucherOrder> getOne(String code);
+
+    List<VoucherOrderResponse> searchTotalMoneyMyOrder(VoucherOrderRequest voucherOrderRequest);
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ThumbnailRepository extends JpaRepository<Thumbnail, Long> {
+    void deleteByShoeDetail_Id(Long shoeDetailId);
 }
