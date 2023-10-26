@@ -1,6 +1,7 @@
 package com.backend.service;
 
 import com.backend.ServiceResult;
+import com.backend.dto.request.ShoeDetailRequestUpdate;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.shoedetail.ResultItem;
@@ -20,4 +21,6 @@ public interface IShoeDetailService {
     Object searchById(BigInteger id);
 
     List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest);
+
+    ServiceResult<Shoe> updateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequestUpdate);
 }
