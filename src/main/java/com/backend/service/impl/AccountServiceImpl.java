@@ -2,6 +2,7 @@ package com.backend.service.impl;
 
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
+import com.backend.dto.request.EmailRequest;
 import com.backend.dto.request.RegisterRequest;
 import com.backend.dto.response.RegisterResponse;
 import com.backend.entity.Cart;
@@ -10,6 +11,7 @@ import com.backend.entity.Account;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.CartRepository;
 import com.backend.service.IAccountService;
+import com.backend.service.IEmailTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,9 @@ public class AccountServiceImpl implements IAccountService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private IEmailTemplateService iEmailTemplateService;
 
     @Override
     public ServiceResult<RegisterResponse> register(RegisterRequest registerRequest) {
@@ -51,6 +56,13 @@ public class AccountServiceImpl implements IAccountService {
         cart.setStatus(1);
         cartRepository.save(cart);
         RegisterResponse registerResponse = new RegisterResponse();
+
+        String to = registerRequest.getEmail();
+        String subject = "Welcome to store bee shoe of group SD-66";
+        String mailType = "chao mung nhan vien ";
+        String mailContent = "mat khau acccount cua ban la :"+registerRequest.getPassword();
+
+        iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
         return new ServiceResult<>(AppConstant.SUCCESS,
                 "Registered Successfully",
                 registerResponse.builder()

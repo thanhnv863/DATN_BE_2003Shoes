@@ -12,7 +12,7 @@ import java.util.List;
 public interface IAddressService {
     ServiceResult<AddressResponse> addAddress(AddressRequest addressRequest);
 
-    ServiceResult<AddressResponse> updateAddress(AddressRequest addressRequest,Long id);
+    ServiceResult<Address> updateAddress(AddressRequest addressRequest);
 
     String validateAddress(AddressRequest addressRequest);
 
@@ -22,5 +22,5 @@ public interface IAddressService {
 
     ServiceResult<List<AddressResponse>> getAllAddress();
 
-    ServiceResult<AddressResponse> deleteAddress(Long id);
+    ServiceResult<Address> deleteAddress(AddressRequest addressRequest);
 }

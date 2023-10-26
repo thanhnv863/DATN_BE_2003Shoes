@@ -4,6 +4,7 @@ import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.config.UserInfoUserDetailsService;
 import com.backend.dto.request.AuthRequest;
+import com.backend.dto.request.EmailRequest;
 import com.backend.dto.response.JwtResponse;
 import com.backend.dto.Product;
 import com.backend.dto.request.RegisterRequest;
@@ -11,6 +12,7 @@ import com.backend.dto.response.RefreshToken;
 import com.backend.entity.Account;
 import com.backend.repository.AccountRepository;
 import com.backend.service.IAccountService;
+import com.backend.service.IEmailTemplateService;
 import com.backend.service.JwtService;
 import com.backend.service.impl.ProductService;
 import com.backend.service.RefreshTokenService;
@@ -63,7 +65,6 @@ public class AuthController {
 
     @Autowired
     private IAccountService iAccountService;
-
 
     @PostMapping("/signUp")
     public ResponseEntity<?> addNewUser(@RequestBody RegisterRequest registerRequest) {
