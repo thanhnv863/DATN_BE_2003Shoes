@@ -54,28 +54,37 @@ public class OrderDetailServiceImpl implements IOrderDetailSerivice {
     @Override
     @Transactional
     public ServiceResultReponse<?> addOrderDetail(OrderDetailRequest orderDetailRequest) {
-        try {
-            OrderDetail orderDetail = new OrderDetail();
-            Optional<ShoeDetail> shoeDetail = shoeDetailRepository.findById(orderDetailRequest.getIdShoeDetail());
-            Optional<Order> order = orderRepository.findById(orderDetailRequest.getIdOrder());
-            if (shoeDetail.isPresent() && order.isPresent()) {
-                ShoeDetail shoeDetailAddOrderDetail = shoeDetail.get();
-                Order orderAddOrderDetail = order.get();
-                orderDetail.setShoeDetail(shoeDetailAddOrderDetail);
-                orderDetail.setOrder(orderAddOrderDetail);
-                orderDetail.setQuantity(orderDetailRequest.getQuantity());
-                orderDetail.setPrice(orderDetailRequest.getPrice());
-                orderDetail.setDiscount(orderDetailRequest.getDiscount());
-                orderDetail.setStatus(orderDetailRequest.getStatus());
-                OrderDetail orderDetail1 = orderDetailRepository.save(orderDetail);
-                OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
-                return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetailRequest1, "Thêm orderDetail thành công");
-            } else {
-                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Không tồn tại hóa đơn hoặc sản phẩm");
+        Optional<ShoeDetail> shoeDetail = shoeDetailRepository.findById(orderDetailRequest.getIdShoeDetail());
+        Optional<Order> order = orderRepository.findById(orderDetailRequest.getIdOrder());
+        OrderDetail orderDetailCheck = orderDetailRepository.orderDetailByOrderAndShoeDetail(orderDetailRequest.getIdOrder(), orderDetailRequest.getIdShoeDetail());
+        if (orderDetailCheck != null) {
+            orderDetailCheck.setQuantity(orderDetailCheck.getQuantity() + orderDetailRequest.getQuantity());
+            orderDetailCheck.setPrice(orderDetailCheck.getPrice().add(orderDetailRequest.getPrice()));
+            OrderDetail orderDetail1 = orderDetailRepository.save(orderDetailCheck);
+            OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetailRequest1, "Thành công!");
+        } else {
+            try {
+                OrderDetail orderDetail = new OrderDetail();
+                if (shoeDetail.isPresent() && order.isPresent()) {
+                    ShoeDetail shoeDetailAddOrderDetail = shoeDetail.get();
+                    Order orderAddOrderDetail = order.get();
+                    orderDetail.setShoeDetail(shoeDetailAddOrderDetail);
+                    orderDetail.setOrder(orderAddOrderDetail);
+                    orderDetail.setQuantity(orderDetailRequest.getQuantity());
+                    orderDetail.setPrice(orderDetailRequest.getPrice());
+                    orderDetail.setDiscount(orderDetailRequest.getDiscount());
+                    orderDetail.setStatus(orderDetailRequest.getStatus());
+                    OrderDetail orderDetail1 = orderDetailRepository.save(orderDetail);
+                    OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
+                    return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetailRequest1, "Thêm orderDetail thành công");
+                } else {
+                    return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Không tồn tại hóa đơn hoặc sản phẩm");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Thêm orderDetail thất bại");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Thêm orderDetail thất bại");
         }
     }
 

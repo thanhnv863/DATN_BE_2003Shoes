@@ -177,20 +177,37 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         voucherOrderResponse.setMinBillValue((BigDecimal) object[4]);
         voucherOrderResponse.setDiscountAmount((BigDecimal) object[5]);
 
-        Timestamp startDateTimestamp = (Timestamp) object[6];
-        voucherOrderResponse.setStartDate(startDateTimestamp.toLocalDateTime());
+//        Timestamp startDateTimestamp = (Timestamp) object[6];
+//        voucherOrderResponse.setStartDate(startDateTimestamp.toLocalDateTime());
+        if (object[6] != null) {
+            Timestamp updateAtTimestamp = (Timestamp) object[6];
+            voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+        }
 
         // Convert java.sql.Timestamp to java.time.LocalDateTime
-        Timestamp endDateTimestamp = (Timestamp) object[7];
-        voucherOrderResponse.setEndDate(endDateTimestamp.toLocalDateTime());
+//        Timestamp endDateTimestamp = (Timestamp) object[7];
+//        voucherOrderResponse.setEndDate(endDateTimestamp.toLocalDateTime());
+        if (object[7] != null) {
+            Timestamp updateAtTimestamp = (Timestamp) object[7];
+            voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+        }
 
         // Convert java.sql.Timestamp to java.time.LocalDateTime
-        Timestamp createDateTimestamp = (Timestamp) object[8];
-        voucherOrderResponse.setCreateDate(createDateTimestamp.toLocalDateTime());
+//        Timestamp createDateTimestamp = (Timestamp) object[8];
+//        voucherOrderResponse.setCreateDate(createDateTimestamp.toLocalDateTime());
+        if (object[8] != null) {
+            Timestamp updateAtTimestamp = (Timestamp) object[8];
+            voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+        }
 
         // Convert java.sql.Timestamp to java.time.LocalDateTime
-        Timestamp updateAtTimestamp = (Timestamp) object[9];
-        voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+//        Timestamp updateAtTimestamp = (Timestamp) object[9];
+//        voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+
+        if (object[9] != null) {
+            Timestamp updateAtTimestamp = (Timestamp) object[9];
+            voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+        }
 
         voucherOrderResponse.setReduceForm((Integer) object[10]);
         voucherOrderResponse.setStatus((Integer) object[11]);
