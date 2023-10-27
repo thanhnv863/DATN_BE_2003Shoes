@@ -22,11 +22,6 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     Page<OrderDetailReponse> orderDetailByOrderId(Pageable pageable, @Param("idOrder") Long idOrder);
 
 
-    @Query(value = "SELECT NEW com.backend.dto.response.OrderDetailReponse" +
-            "(s.id,s.shoeDetail.code,c.imgUrl,s.order.code,s.quantity,s.price,s.discount,s.status)" +
-            " FROM OrderDetail as s" +
-            " left join ShoeDetail as b on s.shoeDetail.id = b.id" +
-            " left join Thumbnail c on c.shoeDetail.id = b.id" +
-            " where s.order.id = :idOrder and s.shoeDetail.id = :idShoeDetail")
+    @Query(value = "SELECT s.* FROM order_detail s where s.order_id = :idOrder and s.shoe_detail_id = :idShoeDetail", nativeQuery = true)
     OrderDetail orderDetailByOrderAndShoeDetail(@Param("idOrder") Long idOrder, @Param("idShoeDetail") Long idShoeDetail);
 }
