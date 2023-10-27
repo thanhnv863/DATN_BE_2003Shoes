@@ -1,6 +1,7 @@
 package com.backend.service.impl;
 
 import com.backend.ServiceResult;
+import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.AddressRequest;
 import com.backend.dto.response.AddressResponse;
@@ -121,6 +122,17 @@ public class AddressServiceImpl implements IAddressService {
                     addressResponses);
     }
 
+
+
+    @Override
+    public ServiceResult<List<Address>> searchNameClient(String name) {
+        List<Address> addressName = addressRepository.searchNameClient(name);
+
+        return new ServiceResult<>(AppConstant.SUCCESS,"success",addressName);
+    }
+
+
+
     @Override
     public ServiceResult<Address> deleteAddress(AddressRequest addressRequest) {
         Optional<Address> optionalAddress = addressRepository.findById(addressRequest.getId());
@@ -133,9 +145,11 @@ public class AddressServiceImpl implements IAddressService {
         }
     }
 
+
+
+
     @Override
     public String validateAddress(AddressRequest addressRequest) {
-
         List<String> errorMessages = new ArrayList<>();
 
         if (addressRequest.getAccountId() == null){

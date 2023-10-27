@@ -124,28 +124,33 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public ServiceResultReponse<Order> add(OrderRequest orderRequest) {
-        try {
-            Date date = new Date();
-            Order order = new Order();
-            order.setCode(generateOrderCode());
-            order.setCreatedBy(orderRequest.getCreatedBy());
+        List<Object> objectList = orderRepository.listOrderByStatus(1);
+        if (!objectList.isEmpty() && objectList.size() >= 5) {
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Chỉ được tạo tối đa 5 hóa đơn chờ! ");
+        } else {
+            try {
+                Date date = new Date();
+                Order order = new Order();
+                order.setCode(generateOrderCode());
+                order.setCreatedBy(orderRequest.getCreatedBy());
 //            order.setUpdatedBy(order.getUpdatedBy());
-            order.setCreatedDate(date);
-            order.setStatus(1);
-            Order orderAdd = orderRepository.save(order);
-            //
-            OrderHistory orderHistory = new OrderHistory();
-            orderHistory.setOrder(orderAdd);
-            orderHistory.setCreatedTime(date);
-            orderHistory.setCreatedBy(orderRequest.getCreatedBy());
-            orderHistory.setNote("Nhân viên tạo đơn cho khách");
-            orderHistory.setType("Created");
-            orderHistoryRepository.save(orderHistory);
-            //
-            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAdd, "Tạo hóa đơn thành công");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo hoá đơn thất bại");
+                order.setCreatedDate(date);
+                order.setStatus(1);
+                Order orderAdd = orderRepository.save(order);
+                //
+                OrderHistory orderHistory = new OrderHistory();
+                orderHistory.setOrder(orderAdd);
+                orderHistory.setCreatedTime(date);
+                orderHistory.setCreatedBy(orderRequest.getCreatedBy());
+                orderHistory.setNote("Nhân viên tạo đơn cho khách");
+                orderHistory.setType("Created");
+                orderHistoryRepository.save(orderHistory);
+                //
+                return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAdd, "Tạo hóa đơn thành công");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo hoá đơn thất bại");
+            }
         }
     }
 
@@ -159,17 +164,17 @@ public class OrderServiceImpl implements IOrderService {
             orderGet.setId(orderGet.getId());
             orderGet.setCode(orderGet.getCode());
             // voucher
-            if(orderRequetUpdate.getIdVoucher() != null) {
+            if (orderRequetUpdate.getIdVoucher() != null) {
                 VoucherOrder voucherOrder = voucherOrderRepository.findById(orderRequetUpdate.getIdVoucher()).get();
                 orderGet.setVoucherOrder(voucherOrder);
-            }else {
+            } else {
                 orderGet.setVoucherOrder(null);
             }
             //
-            if(orderRequetUpdate.getIdAccount() != null) {
+            if (orderRequetUpdate.getIdAccount() != null) {
                 Account account = accountRepository.findById(orderRequetUpdate.getIdAccount()).get();
                 orderGet.setAccount(account);
-            }else{
+            } else {
                 orderGet.setAccount(null);
             }
             //
@@ -230,5 +235,16 @@ public class OrderServiceImpl implements IOrderService {
         } else {
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 0L, null, "Mã không tồn tại");
         }
+    }
+    @Override
+    public ServiceResultReponse<?> getOrderByStatus(Integer status) {
+        List<Object> objectList = orderRepository.listOrderByStatus(status);
+        List<OrderReponse> list = new ArrayList<>();
+        for (Object object : objectList) {
+            Object[] result = (Object[]) object;
+            OrderReponse orderReponse = convertPage(result);
+            list.add(orderReponse);
+        }
+        return new ServiceResultReponse<>(AppConstant.SUCCESS, Long.valueOf(list.size()), list, "Lấy danh sách hóa đơn chờ thành công!");
     }
 }

@@ -22,4 +22,6 @@ public interface IOrderService {
 
     ServiceResultReponse<Order> delete(OrderRequetUpdate orderRequetUpdate);
 
+    ServiceResultReponse<?> getOrderByStatus(Integer status);
+
 }

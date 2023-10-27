@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/admin/order")
 public class OrderController {
@@ -51,4 +53,9 @@ public class OrderController {
         return ResponseEntity.ok().body(iOrderService.delete(orderRequetUpdate));
     }
 
+    @PostMapping("/get-order-by-status")
+    public ResponseEntity<?> getOrderByStatus1() {
+        Integer status = 1;
+        return ResponseEntity.ok().body(iOrderService.getOrderByStatus(status));
+    }
 }
