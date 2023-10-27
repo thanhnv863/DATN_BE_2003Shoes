@@ -75,8 +75,8 @@ public class OrderDetailServiceImpl implements IOrderDetailSerivice {
                     orderDetail.setDiscount(orderDetailRequest.getDiscount());
                     orderDetail.setStatus(orderDetailRequest.getStatus());
                     OrderDetail orderDetail1 = orderDetailRepository.save(orderDetail);
-//                    OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
-                    return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetail1, "Thêm orderDetail thành công");
+                    OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
+                    return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetailRequest1, "Thêm orderDetail thành công");
                 } else {
                     return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Không tồn tại hóa đơn hoặc sản phẩm");
                 }
@@ -103,8 +103,8 @@ public class OrderDetailServiceImpl implements IOrderDetailSerivice {
             orderDetailUpdate.setDiscount(orderDetailRequest.getDiscount());
             orderDetailUpdate.setStatus(orderDetailRequest.getStatus());
             OrderDetail orderDetail1 = orderDetailRepository.save(orderDetailUpdate);
-//            OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
-            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetail1, "Cập nhật orderDetail thành công");
+            OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetailRequest1, "Cập nhật orderDetail thành công");
         } else {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Không tồn tại chi tiết hóa đơn hoặc hóa đơn hoặc sản phẩm");
         }
