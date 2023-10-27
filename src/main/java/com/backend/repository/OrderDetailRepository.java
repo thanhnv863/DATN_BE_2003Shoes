@@ -12,4 +12,7 @@ import org.springframework.stereotype.Repository;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
     @Query(value = "SELECT s.* FROM order_detail s where s.order_id = :idOrder", nativeQuery = true)
     Page<OrderDetail> orderDetailByOrderId (Pageable pageable, @Param("idOrder") Long idOrder);
+
+    @Query(value = "SELECT s.* FROM order_detail s where s.order_id = :idOrder and s.shoe_detail_id = :idShoeDetail", nativeQuery = true)
+    OrderDetail orderDetailByOrderAndShoeDetail (@Param("idOrder") Long idOrder, @Param("idShoeDetail") Long idShoeDetail);
 }
