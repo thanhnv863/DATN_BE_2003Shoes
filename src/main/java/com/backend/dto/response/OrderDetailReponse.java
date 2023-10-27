@@ -21,6 +21,8 @@ public class OrderDetailReponse {
 
     private String codeShoeDetail;
 
+    private String imgUrl;
+
     private String codeOrder;
 
     private Integer quantity;
