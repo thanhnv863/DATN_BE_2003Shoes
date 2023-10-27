@@ -1,16 +1,13 @@
 package com.backend.controller;
 
 import com.backend.dto.request.AddressRequest;
-import com.backend.dto.request.VoucherOrderRequest;
 import com.backend.service.IAddressService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,5 +38,10 @@ public class AddressController {
     @PostMapping("/deleteaddress")
     public ResponseEntity<?> addressDelete(@RequestBody AddressRequest addressRequest){
         return ResponseEntity.ok(iAddressService.deleteAddress(addressRequest));
+    }
+
+    @GetMapping("/addressname")
+    public ResponseEntity<?> addressName(@RequestParam("name") String name){
+        return ResponseEntity.ok(iAddressService.searchNameClient(name));
     }
 }
