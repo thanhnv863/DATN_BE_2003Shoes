@@ -23,7 +23,7 @@ public class AddressRequest {
 
     private String specificAddress;
 
-    private Integer ward;
+    private String ward;
 
     private Integer district;
 

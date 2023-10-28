@@ -41,7 +41,7 @@ public class Address {
     private String specificAddress;
 
     @Column(name = "ward")
-    private Integer ward;
+    private String ward;
 
     @Column(name = "district")
     private Integer district;

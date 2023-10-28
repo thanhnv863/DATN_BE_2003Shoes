@@ -1,22 +1,17 @@
 package com.backend.service.impl;
 
 import com.backend.ServiceResult;
-import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.AddressRequest;
 import com.backend.dto.response.AddressResponse;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
-import com.backend.entity.EmailTemplate;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.AddressRepository;
 import com.backend.service.IAddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -122,7 +117,14 @@ public class AddressServiceImpl implements IAddressService {
                     addressResponses);
     }
 
+    @Override
+    public ServiceResult<List<Address>> getAllAccountAndAddress() {
+        List<Address> addressList = addressRepository.getAllAccountAndAddress();
 
+        return new ServiceResult<>(AppConstant.SUCCESS,
+                "Successfully retrieved",
+                addressList);
+    }
 
     @Override
     public ServiceResult<List<Address>> searchNameClient(String name) {
@@ -130,6 +132,7 @@ public class AddressServiceImpl implements IAddressService {
 
         return new ServiceResult<>(AppConstant.SUCCESS,"success",addressName);
     }
+
 
 
 

@@ -44,4 +44,9 @@ public class AddressController {
     public ResponseEntity<?> addressName(@RequestParam("name") String name){
         return ResponseEntity.ok(iAddressService.searchNameClient(name));
     }
+
+    @GetMapping("/addressandaccount")
+    public ResponseEntity<?> addressAndAccount(){
+        return ResponseEntity.ok(iAddressService.getAllAccountAndAddress());
+    }
 }
