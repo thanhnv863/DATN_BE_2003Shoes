@@ -14,7 +14,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
 
 
     @Query(value = "SELECT NEW com.backend.dto.response.OrderDetailReponse" +
-            "(s.id,s.shoeDetail.code,c.imgUrl,s.order.code,s.quantity,s.price,s.discount,s.status)" +
+            "(s.id,s.shoeDetail.id,s.shoeDetail.code,c.imgUrl,s.order.code,s.quantity,s.price,s.discount,s.status)" +
             " FROM OrderDetail as s" +
             " left join ShoeDetail as b on s.shoeDetail.id = b.id" +
             " left join Thumbnail c on c.shoeDetail.id = b.id" +
