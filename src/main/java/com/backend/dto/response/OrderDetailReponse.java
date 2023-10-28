@@ -19,6 +19,8 @@ public class OrderDetailReponse {
 
     private Long id;
 
+    private Long idShoeDetail;
+
     private String codeShoeDetail;
 
     private String imgUrl;
