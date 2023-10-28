@@ -17,7 +17,7 @@ public class AddressResponse {
     private String name;
     private String phoneNumber;
     private String specificAddress;
-    private Integer ward;
+    private String ward;
     private Integer district;
     private Integer province;
     private String note;

@@ -6,7 +6,6 @@ import com.backend.dto.response.AddressResponse;
 import com.backend.entity.Address;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface IAddressService {
     ServiceResult<AddressResponse> addAddress(AddressRequest addressRequest);
@@ -25,5 +24,5 @@ public interface IAddressService {
 
     ServiceResult<List<Address>> searchNameClient(String name);
 
-
+    ServiceResult<List<Address>> getAllAccountAndAddress();
 }
