@@ -123,7 +123,8 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
                 searchShoeDetailRequest.getSole(),
                 searchShoeDetailRequest.getColor(),
                 searchShoeDetailRequest.getMinPrice(),
-                searchShoeDetailRequest.getMaxPrice()
+                searchShoeDetailRequest.getMaxPrice(),
+                searchShoeDetailRequest.getStatus()
         );
         List<ResultItem> list = new ArrayList<>();
         for (Object object : objectList) {

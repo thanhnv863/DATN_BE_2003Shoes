@@ -198,7 +198,8 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
     }
 
     @Override
-    public List<Object> getListByCustom(String shoe, Float size, String category, String brand, String sole, String color, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Object> getListByCustom(String shoe, Float size, String category, String brand, String sole,
+                                        String color, BigDecimal minPrice, BigDecimal maxPrice, Integer status) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT a.id, d.name as nameShoe, e.name as size, f.name as category,");
         sql.append(" g.name as brand, h.name as sole, i.name as color, a.code, a.qrcode,");
@@ -238,6 +239,10 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
             sql.append(" AND (a.price >= :minPrice AND a.price <= :maxPrice)");
         }
 
+        if (status != null) {
+            sql.append(" AND (a.status = :status)");
+        }
+
         sql.append(" GROUP BY a.id ORDER BY a.updated_time DESC");
 
         Query query = entityManager.createNativeQuery(sql.toString());
@@ -269,6 +274,10 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
         if (minPrice != null && maxPrice != null) {
             query.setParameter("minPrice",minPrice);
             query.setParameter("maxPrice",maxPrice);
+        }
+
+        if (status != null) {
+            query.setParameter("status",status);
         }
 
         List<Object> results = query.getResultList();

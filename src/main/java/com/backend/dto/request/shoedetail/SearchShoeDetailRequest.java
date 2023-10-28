@@ -34,4 +34,5 @@ public class SearchShoeDetailRequest {
     private BigDecimal maxPrice;
     private int page;
     private int pageSize;
+    private Integer status;
 }

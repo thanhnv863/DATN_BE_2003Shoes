@@ -24,5 +24,5 @@ public interface ShoeDetailCustomRepository {
     List<Object> getListByCustom(String shoe,
                                  Float size, String category, String brand,
                                  String sole, String color, BigDecimal minPrice,
-                                 BigDecimal maxPrice);
+                                 BigDecimal maxPrice, Integer status);
 }
