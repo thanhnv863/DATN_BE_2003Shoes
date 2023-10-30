@@ -68,7 +68,18 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 voucherHoaDon.setCode("Voucher" + cutRandomString);
                 voucherHoaDon.setName(voucherOrderRequest.getName());
                 voucherHoaDon.setQuantity(voucherOrderRequest.getQuantity());
-                voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+                //voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+                if (voucherOrderRequest.getReduceForm() == 0) {
+                    // Nếu reduceForm=0, discountAmount là số tiền giảm giá trực tiếp
+                    voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+                } else {
+                    // Nếu reduceForm=1, discountAmount là phần trăm giảm giá
+                    BigDecimal discountPercentage = voucherOrderRequest.getDiscountAmount();
+                    if (discountPercentage.compareTo(BigDecimal.ZERO) < 0 || discountPercentage.compareTo(new BigDecimal(100)) > 0) {
+                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100.", null);
+                    }
+                    voucherHoaDon.setDiscountAmount(discountPercentage);
+                }
                 voucherHoaDon.setMinBillValue(voucherOrderRequest.getMinBillValue());
                 voucherHoaDon.setStartDate(voucherOrderRequest.getStartDate());
                 voucherHoaDon.setEndDate(voucherOrderRequest.getEndDate());
@@ -111,7 +122,18 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 try {
                     voucherHoaDon.setName(voucherOrderRequest.getName());
                     voucherHoaDon.setQuantity(voucherOrderRequest.getQuantity());
-                    voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+                    //voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+                    if (voucherOrderRequest.getReduceForm() == 0) {
+                        // Nếu reduceForm=0, discountAmount là số tiền giảm giá trực tiếp
+                        voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+                    } else {
+                        // Nếu reduceForm=1, discountAmount là phần trăm giảm giá
+                        BigDecimal discountPercentage = voucherOrderRequest.getDiscountAmount();
+                        if (discountPercentage.compareTo(BigDecimal.ZERO) < 0 || discountPercentage.compareTo(new BigDecimal(100)) > 0) {
+                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100.", null);
+                        }
+                        voucherHoaDon.setDiscountAmount(discountPercentage);
+                    }
                     voucherHoaDon.setMinBillValue(voucherOrderRequest.getMinBillValue());
                     voucherHoaDon.setStartDate(voucherOrderRequest.getStartDate());
                     voucherHoaDon.setEndDate(voucherOrderRequest.getEndDate());
