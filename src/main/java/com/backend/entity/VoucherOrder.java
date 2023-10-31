@@ -48,6 +48,9 @@ public class VoucherOrder {
     @Column(name = "min_order_value")
     private BigDecimal minBillValue;
 
+    @Column(name = "maximum_reduction_value")
+    private BigDecimal maximumReductionValue;
+
     @Column(name = "start_date")
     //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime startDate;

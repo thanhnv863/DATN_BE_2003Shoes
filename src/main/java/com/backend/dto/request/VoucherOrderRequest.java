@@ -32,6 +32,8 @@ public class VoucherOrderRequest {
 
     private BigDecimal minBillValue;
 
+    private BigDecimal maximumReductionValue;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     //@JsonSerialize(using = DateTimeSerializer.class)
     private LocalDateTime startDate;
