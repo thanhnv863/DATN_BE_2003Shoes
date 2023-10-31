@@ -68,25 +68,44 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 voucherHoaDon.setCode("Voucher" + cutRandomString);
                 voucherHoaDon.setName(voucherOrderRequest.getName());
                 voucherHoaDon.setQuantity(voucherOrderRequest.getQuantity());
-                //voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+
                 if (voucherOrderRequest.getReduceForm() == 0) {
                     // Nếu reduceForm=0, discountAmount là số tiền giảm giá trực tiếp
                     voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+                    voucherHoaDon.setMaximumReductionValue(null); // Không cần thiết nhập khi reduceForm = 0
                 } else {
                     // Nếu reduceForm=1, discountAmount là phần trăm giảm giá
                     BigDecimal discountPercentage = voucherOrderRequest.getDiscountAmount();
                     if (discountPercentage.compareTo(BigDecimal.ZERO) < 0 || discountPercentage.compareTo(new BigDecimal(100)) > 0) {
-                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100.", null);
+                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100", null);
                     }
+
+                    // Kiểm tra xem maximumReductionValue đã được nhập hay chưa
+                    BigDecimal maximumReductionValue = voucherOrderRequest.getMaximumReductionValue();
+                    if (maximumReductionValue == null) {
+                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Vui lòng nhập giá trị phần trăm giảm tối đa", null);
+                    }
+
+                    // Kiểm tra xem maximumReductionValue có hợp lệ không
+                    if (maximumReductionValue.compareTo(BigDecimal.ZERO) < 0 || maximumReductionValue.compareTo(new BigDecimal(100)) > 0) {
+                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá tối đa phải nằm trong khoảng từ 0 đến 100", null);
+                    }
+
+                    // Kiểm tra xem phần trăm giảm giá có lớn hơn phần trăm giảm giá tối đa không
+                    if (discountPercentage.compareTo(maximumReductionValue) > 0) {
+                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá không được vượt quá phần trăm giảm giá tối đa", null);
+                    }
+
                     voucherHoaDon.setDiscountAmount(discountPercentage);
+                    voucherHoaDon.setMaximumReductionValue(maximumReductionValue);
                 }
+
                 voucherHoaDon.setMinBillValue(voucherOrderRequest.getMinBillValue());
                 voucherHoaDon.setStartDate(voucherOrderRequest.getStartDate());
                 voucherHoaDon.setEndDate(voucherOrderRequest.getEndDate());
                 voucherHoaDon.setCreateDate(currentDateTime);
                 voucherHoaDon.setUpdateAt(currentDateTime);
                 voucherHoaDon.setReduceForm(voucherOrderRequest.getReduceForm());
-                //voucherHoaDon.setStatus(0);
 
                 // Kiểm tra xem người dùng đã cung cấp giá trị status chưa
                 if (voucherOrderRequest.getStatus() != null) {
@@ -97,11 +116,8 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 }
 
                 voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
-                //VoucherOrderResponse convertVoucherOrderResponse = convertPage(voucherHoaDon);
                 return new ServiceResult<>(AppConstant.SUCCESS, "Add thành công", voucherHoaDon);
             } catch (Exception e) {
-                // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
-                //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null); // hoặc xử lý lỗi một cách thích hợp dựa trên nhu cầu của bạn
             }
@@ -122,24 +138,43 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 try {
                     voucherHoaDon.setName(voucherOrderRequest.getName());
                     voucherHoaDon.setQuantity(voucherOrderRequest.getQuantity());
-                    //voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+
                     if (voucherOrderRequest.getReduceForm() == 0) {
                         // Nếu reduceForm=0, discountAmount là số tiền giảm giá trực tiếp
                         voucherHoaDon.setDiscountAmount(voucherOrderRequest.getDiscountAmount());
+                        voucherHoaDon.setMaximumReductionValue(null); // Không cần thiết nhập khi reduceForm = 0
                     } else {
                         // Nếu reduceForm=1, discountAmount là phần trăm giảm giá
                         BigDecimal discountPercentage = voucherOrderRequest.getDiscountAmount();
                         if (discountPercentage.compareTo(BigDecimal.ZERO) < 0 || discountPercentage.compareTo(new BigDecimal(100)) > 0) {
-                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100.", null);
+                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá phải nằm trong khoảng từ 0 đến 100", null);
                         }
+
+                        // Kiểm tra xem maximumReductionValue đã được nhập hay chưa
+                        BigDecimal maximumReductionValue = voucherOrderRequest.getMaximumReductionValue();
+                        if (maximumReductionValue == null) {
+                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Vui lòng nhập giá trị phần trăm giảm tối đa", null);
+                        }
+
+                        // Kiểm tra xem maximumReductionValue có hợp lệ không
+                        if (maximumReductionValue.compareTo(BigDecimal.ZERO) < 0 || maximumReductionValue.compareTo(new BigDecimal(100)) > 0) {
+                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá tối đa phải nằm trong khoảng từ 0 đến 100", null);
+                        }
+
+                        // Kiểm tra xem phần trăm giảm giá có lớn hơn phần trăm giảm giá tối đa không
+                        if (discountPercentage.compareTo(maximumReductionValue) > 0) {
+                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá không được vượt quá phần trăm giảm giá tối đa", null);
+                        }
+
                         voucherHoaDon.setDiscountAmount(discountPercentage);
+                        voucherHoaDon.setMaximumReductionValue(maximumReductionValue);
                     }
+
                     voucherHoaDon.setMinBillValue(voucherOrderRequest.getMinBillValue());
                     voucherHoaDon.setStartDate(voucherOrderRequest.getStartDate());
                     voucherHoaDon.setEndDate(voucherOrderRequest.getEndDate());
                     voucherHoaDon.setUpdateAt(currentDateTime);
                     voucherHoaDon.setReduceForm(voucherOrderRequest.getReduceForm());
-                    // voucherHoaDon.setStatus(0);
 
                     //Kiểm tra xem người dùng đã cung cấp giá trị status chưa
                     if (voucherOrderRequest.getStatus() != null) {
@@ -154,7 +189,6 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     return new ServiceResult<>(AppConstant.SUCCESS, "Update thành công", voucherHoaDon);
                 } catch (Exception e) {
                     // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
-                    //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null); // hoặc xử lý lỗi một cách thích hợp dựa trên nhu cầu của bạn
                 }
@@ -198,41 +232,30 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         voucherOrderResponse.setQuantity((Integer) object[3]);
         voucherOrderResponse.setMinBillValue((BigDecimal) object[4]);
         voucherOrderResponse.setDiscountAmount((BigDecimal) object[5]);
+        voucherOrderResponse.setMaximumReductionValue((BigDecimal) object[6]);
 
-//        Timestamp startDateTimestamp = (Timestamp) object[6];
-//        voucherOrderResponse.setStartDate(startDateTimestamp.toLocalDateTime());
-        if (object[6] != null) {
-            Timestamp updateAtTimestamp = (Timestamp) object[6];
-            voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
-        }
-
-        // Convert java.sql.Timestamp to java.time.LocalDateTime
-//        Timestamp endDateTimestamp = (Timestamp) object[7];
-//        voucherOrderResponse.setEndDate(endDateTimestamp.toLocalDateTime());
         if (object[7] != null) {
-            Timestamp updateAtTimestamp = (Timestamp) object[7];
-            voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+            Timestamp startDateTimestamp = (Timestamp) object[7];
+            voucherOrderResponse.setStartDate(startDateTimestamp.toLocalDateTime());
         }
 
-        // Convert java.sql.Timestamp to java.time.LocalDateTime
-//        Timestamp createDateTimestamp = (Timestamp) object[8];
-//        voucherOrderResponse.setCreateDate(createDateTimestamp.toLocalDateTime());
         if (object[8] != null) {
-            Timestamp updateAtTimestamp = (Timestamp) object[8];
-            voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
+            Timestamp endDateTimestamp = (Timestamp) object[8];
+            voucherOrderResponse.setEndDate(endDateTimestamp.toLocalDateTime());
         }
-
-        // Convert java.sql.Timestamp to java.time.LocalDateTime
-//        Timestamp updateAtTimestamp = (Timestamp) object[9];
-//        voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
 
         if (object[9] != null) {
-            Timestamp updateAtTimestamp = (Timestamp) object[9];
+            Timestamp createDateTimestamp = (Timestamp) object[9];
+            voucherOrderResponse.setCreateDate(createDateTimestamp.toLocalDateTime());
+        }
+
+        if (object[10] != null) {
+            Timestamp updateAtTimestamp = (Timestamp) object[10];
             voucherOrderResponse.setUpdateAt(updateAtTimestamp.toLocalDateTime());
         }
 
-        voucherOrderResponse.setReduceForm((Integer) object[10]);
-        voucherOrderResponse.setStatus((Integer) object[11]);
+        voucherOrderResponse.setReduceForm((Integer) object[11]);
+        voucherOrderResponse.setStatus((Integer) object[12]);
         return voucherOrderResponse;
     }
 
@@ -353,7 +376,9 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         Page<Object> objects = voucherOrderCustomRepository.doSearch(
                 pageable,
                 voucherOrderRequest.getName(),
-                voucherOrderRequest.getStatus()
+                voucherOrderRequest.getStatus(),
+                voucherOrderRequest.getStartDate(),
+                voucherOrderRequest.getEndDate()
         );
 
         List<VoucherOrderResponse> list = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.backend.controller;
 
+import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.SearchOrderRequest;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/admin/voucher-order")
 public class VoucherOrderController {
@@ -30,7 +33,7 @@ public class VoucherOrderController {
     @PostMapping("/get-all")
     public ResponseEntity<?> getAllVoucherOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
         Page<VoucherOrderResponse> page = voucherOrderService.searchVoucher(voucherOrderRequest);
-        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
+        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công"));
     }
 
     @GetMapping("/get-one/{name}")
@@ -55,7 +58,9 @@ public class VoucherOrderController {
 
     @PostMapping("/searchTotalMoneyMyOrder")
     public ResponseEntity<?> searchTotalMoneyMyOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
-        return ResponseEntity.ok(voucherOrderService.searchTotalMoneyMyOrder(voucherOrderRequest));
+        //return ResponseEntity.ok(voucherOrderService.searchTotalMoneyMyOrder(voucherOrderRequest));
+        List<VoucherOrderResponse> list = voucherOrderService.searchTotalMoneyMyOrder(voucherOrderRequest);
+        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Lấy danh sách thành công",list));
     }
 
 }
