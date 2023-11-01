@@ -135,7 +135,7 @@ public class OrderServiceImpl implements IOrderService {
                 order.setCreatedBy(orderRequest.getCreatedBy());
 //            order.setUpdatedBy(order.getUpdatedBy());
                 order.setCreatedDate(date);
-                order.setStatus(1);
+                order.setStatus(0);
                 Order orderAdd = orderRepository.save(order);
                 //
                 OrderHistory orderHistory = new OrderHistory();
