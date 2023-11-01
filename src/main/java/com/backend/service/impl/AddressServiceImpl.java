@@ -1,11 +1,13 @@
 package com.backend.service.impl;
 
 import com.backend.ServiceResult;
+import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.AddressRequest;
 import com.backend.dto.response.AddressResponse;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
+import com.backend.entity.VoucherOrder;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.AddressRepository;
 import com.backend.service.IAddressService;
@@ -118,6 +120,21 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
+    public ServiceResult<List<Address>> getCustomer(Long id) {
+        List<Address> customerId = addressRepository.findAddressesByAccount_Id(id);
+
+        return new ServiceResult<>(AppConstant.SUCCESS,"success",customerId);
+
+//        if (customerId.isPresent()) {
+//            Address getCustomer = customerId.get();
+//            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, getCustomer, "success");
+//        }else {
+//            return new ServiceResultReponse<>(AppConstant.FAIL,0L, null,"Customer not exists");
+//        }
+
+    }
+
+    @Override
     public ServiceResult<List<Address>> getAllAccountAndAddress() {
         List<Address> addressList = addressRepository.getAllAccountAndAddress();
 
@@ -125,6 +142,8 @@ public class AddressServiceImpl implements IAddressService {
                 "Successfully retrieved",
                 addressList);
     }
+
+
 
     @Override
     public ServiceResult<List<Address>> searchNameClient(String name) {
