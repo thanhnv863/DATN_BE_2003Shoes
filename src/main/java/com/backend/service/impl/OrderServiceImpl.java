@@ -124,7 +124,7 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public ServiceResultReponse<Order> add(OrderRequest orderRequest) {
-        List<Object> objectList = orderRepository.listOrderByStatus(1);
+        List<Object> objectList = orderRepository.listOrderByStatus(0);
         if (!objectList.isEmpty() && objectList.size() >= 5) {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Chỉ được tạo tối đa 5 hóa đơn chờ! ");
         } else {
