@@ -1,6 +1,7 @@
 package com.backend.service;
 
 import com.backend.ServiceResult;
+import com.backend.ServiceResultReponse;
 import com.backend.dto.request.AddressRequest;
 import com.backend.dto.response.AddressResponse;
 import com.backend.entity.Address;
@@ -25,4 +26,8 @@ public interface IAddressService {
     ServiceResult<List<Address>> searchNameClient(String name);
 
     ServiceResult<List<Address>> getAllAccountAndAddress();
+
+    ServiceResult<List<Address>> getCustomer(Long id);
+
+
 }
