@@ -54,8 +54,8 @@ public class OrderController {
     }
 
     @PostMapping("/get-order-by-status")
-    public ResponseEntity<?> getOrderByStatus1() {
-        Integer status = 1;
+    public ResponseEntity<?> getOrderByStatus0() {
+        Integer status = 0;
         return ResponseEntity.ok().body(iOrderService.getOrderByStatus(status));
     }
 }
