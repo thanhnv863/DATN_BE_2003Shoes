@@ -23,4 +23,6 @@ public interface IShoeDetailService {
     List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest);
 
     ServiceResult<Shoe> updateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequestUpdate);
+
+    ServiceResult<String> updateQtyShoeDetail(List<ShoeDetailRequestUpdate> shoeDetailRequestUpdateList);
 }

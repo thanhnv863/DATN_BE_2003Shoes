@@ -216,7 +216,7 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
                     }
                     shoeDetailRepository.save(shoeDetail);
                     return new ServiceResult<>(AppConstant.SUCCESS, "Shoe update successfully", null);
-                }else {
+                } else {
                     return new ServiceResult<>(AppConstant.NOT_FOUND, "ShoeDetail not found", null);
                 }
 //                    String qrCode = generateQrCode(ShoeDetail.builder().id(shoeDetail.getId()).build());
@@ -226,6 +226,32 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null);
             }
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceResult<String> updateQtyShoeDetail(List<ShoeDetailRequestUpdate> shoeDetailRequestUpdateList) {
+        try {
+            for (ShoeDetailRequestUpdate update : shoeDetailRequestUpdateList) {
+                Long id = update.getId();
+                Integer qty = update.getQuantity();
+                ShoeDetail shoeDetail = shoeDetailRepository.findById(id).orElse(null);
+                if (shoeDetail != null) {
+                    int currentQuantity = shoeDetail.getQuantity();
+                    if (currentQuantity < qty) {
+                        throw new RuntimeException("Số lượng không đủ");
+                    }
+                    shoeDetail.setQuantity(currentQuantity - qty);
+                    shoeDetailRepository.save(shoeDetail);
+                } else {
+                    throw new RuntimeException("Sản phẩm không tồn tại");
+                }
+            }
+            return new ServiceResult<>(AppConstant.SUCCESS, "Cập nhật thành công", null);
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null);
         }
     }
 

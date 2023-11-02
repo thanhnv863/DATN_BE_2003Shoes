@@ -36,7 +36,6 @@ public class ShoeDetailController {
     private IShoeDetailService iShoeDetailService;
 
     @GetMapping("/getAllShoeDetailWithPaginate")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> getAllShoeDetailWithPaginate(@RequestParam(defaultValue = "0") Integer page,
                                                           @RequestParam(defaultValue = "2") Integer pageSize,
                                                           @RequestParam(name = "nameShoe",required = false) String name,
@@ -86,6 +85,11 @@ public class ShoeDetailController {
                         list.stream().collect(Collectors.toList())
                 )
         );
+    }
+
+    @PostMapping("/updateQtyShoeDetail")
+    public ResponseEntity<?> updateQtyShoeDetail(@RequestBody List<ShoeDetailRequestUpdate> shoeDetailRequestUpdate){
+        return ResponseEntity.ok(iShoeDetailService.updateQtyShoeDetail(shoeDetailRequestUpdate));
     }
 
 }
