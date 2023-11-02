@@ -4,18 +4,31 @@ import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.VoucherOrderRequest;
-import com.backend.dto.response.OrderReponse;
 import com.backend.dto.response.VoucherOrderResponse;
-import com.backend.dto.response.shoedetail.DataPaginate;
-import com.backend.dto.response.shoedetail.Meta;
-import com.backend.dto.response.shoedetail.ResultItem;
-import com.backend.entity.Order;
-import com.backend.entity.ShoeDetail;
+import com.backend.dto.response.VoucherResponseImport;
 import com.backend.entity.VoucherOrder;
 import com.backend.repository.VoucherOrderCustomRepository;
 import com.backend.repository.VoucherOrderRepository;
 import com.backend.service.IVoucherOrderService;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,14 +37,22 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Tuple;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -417,4 +438,475 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         return list;
     }
 
+    @Override
+    public byte[] createExcelFile() throws IOException {
+        // Đường dẫn tới tệp Excel mẫu
+        String excelResourcePath = "/static/fileMau/fileMauVoucher.xlsx";
+//        String excelResourcePath = "/static/fileMau/fileMauVoucherTest.xlsm";
+
+        // Đọc tệp Excel mẫu từ tài nguyên
+        Resource resource = new ClassPathResource(excelResourcePath);
+        InputStream inputStream = resource.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        inputStream.close();
+
+        // Lấy danh sách reduce
+        List<Integer> reduce = voucherOrderRepository.listAllByReduce();
+        // Tạo sheet riêng cho reduce
+        Sheet reduceSheet = workbook.createSheet("ReduceSheet");
+        // Đổ dữ liệu reduce vào sheet ReduceSheet
+        int rowIndexReduce = 0;
+        for (int j = 0; j < reduce.size(); j++) {
+            Row row = reduceSheet.createRow(rowIndexReduce++);
+            row.createCell(0).setCellValue(reduce.get(j));
+        }
+        Sheet sheet = workbook.getSheet("Sheet1");
+        int maxRows = 1000;
+        for (int i = 1; i <= maxRows; i++) {
+            Row currentRow = sheet.createRow(i);
+            DataValidationHelper dvHelper = sheet.getDataValidationHelper();
+            // Ràng buộc dữ liệu cho hình thức giảm(Cột G) sử dụng giá trị từ reduce
+            CellRangeAddressList addressListType = new CellRangeAddressList(i, i, 6, 6); // Cột G
+            DataValidationConstraint dvConstraintType = dvHelper.createFormulaListConstraint("ReduceSheet!$A$1:$A$" + rowIndexReduce);
+            DataValidation validationType = dvHelper.createValidation(dvConstraintType, addressListType);
+            validationType.setShowErrorBox(true);
+            validationType.setErrorStyle(DataValidation.ErrorStyle.STOP);
+            validationType.createErrorBox("Lỗi dữ liệu", "Chọn một giá trị từ danh sách hình thức giảm.");
+            sheet.addValidationData(validationType);
+        }
+        workbook.setSheetHidden(workbook.getSheetIndex("ReduceSheet"), true);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return outputStream.toByteArray();
+    }
+
+    @Override
+    public VoucherOrderResponse createVoucherResponse(Row row, List<String> errors, List<VoucherOrderResponse> voucherListError, Integer type) {
+        Cell codeCell = row.getCell(1);
+        Cell nameCell = row.getCell(2);
+        Cell quantityCell = row.getCell(3);
+        Cell minBillValueCell = row.getCell(4);
+        Cell discountAmountCell = row.getCell(5);
+        Cell reduceFormCell = row.getCell(6);
+        Cell maximumReductionValueCell = row.getCell(7);
+        Cell startDateCell = row.getCell(8);
+        Cell endDateCell = row.getCell(9);
+
+        String code = (codeCell == null) ? " " : codeCell.getStringCellValue();
+        String name = (nameCell == null) ? " " : nameCell.getStringCellValue();
+        double quantity;
+        if (quantityCell == null || quantityCell.getCellType() == CellType.BLANK) {
+            quantity = 0;
+        } else {
+            quantity = quantityCell.getNumericCellValue();
+        }
+        //
+        double minBillValue;
+        if (minBillValueCell == null || minBillValueCell.getCellType() == CellType.BLANK) {
+            minBillValue = 0;
+        } else {
+            minBillValue = minBillValueCell.getNumericCellValue();
+        }
+        //
+        double discountAmount;
+        if (discountAmountCell == null || discountAmountCell.getCellType() == CellType.BLANK) {
+            discountAmount = 0;
+        } else {
+            discountAmount = discountAmountCell.getNumericCellValue();
+        }
+        //
+        double reduceForm;
+        if (reduceFormCell == null || reduceFormCell.getCellType() == CellType.BLANK) {
+            reduceForm = 2.0;
+        } else {
+            reduceForm = reduceFormCell.getNumericCellValue();
+        }
+        //
+        double maximumReductionValue;
+        if (maximumReductionValueCell == null || maximumReductionValueCell.getCellType() == CellType.BLANK) {
+            maximumReductionValue = 0;
+        } else {
+            maximumReductionValue = maximumReductionValueCell.getNumericCellValue();
+        }
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+
+        if (startDateCell != null && startDateCell.getCellType() == CellType.NUMERIC) {
+            Date date = startDateCell.getDateCellValue();
+            startDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else if (startDateCell != null && startDateCell.getCellType() == CellType.STRING) {
+            try {
+                startDate = LocalDateTime.parse(startDateCell.getStringCellValue(), dateFormatter);
+            } catch (DateTimeParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (endDateCell != null && endDateCell.getCellType() == CellType.NUMERIC) {
+            Date date = endDateCell.getDateCellValue();
+            endDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        } else if (endDateCell != null && endDateCell.getCellType() == CellType.STRING) {
+            try {
+                endDate = LocalDateTime.parse(endDateCell.getStringCellValue(), dateFormatter);
+            } catch (DateTimeParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        VoucherOrderResponse voucherOrderResponse = new VoucherOrderResponse();
+        voucherOrderResponse.setCode(code);
+        voucherOrderResponse.setName(name);
+        voucherOrderResponse.setQuantity(Integer.valueOf((int) quantity));
+        voucherOrderResponse.setDiscountAmount(BigDecimal.valueOf(discountAmount));
+        voucherOrderResponse.setMinBillValue(BigDecimal.valueOf(minBillValue));
+        voucherOrderResponse.setMaximumReductionValue(BigDecimal.valueOf(maximumReductionValue));
+        voucherOrderResponse.setStartDate(startDate);
+        voucherOrderResponse.setEndDate(endDate);
+        voucherOrderResponse.setCreateDate(currentDateTime);
+        try {
+            long reduceValue = (long) reduceForm;
+            voucherOrderResponse.setReduceForm((int) reduceValue);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+        // checkvalidate import
+        String errorMessage = "";
+        if (nameCell == null || nameCell.getStringCellValue().trim().isEmpty()) {
+            errorMessage += "Tên voucher không được để trống. " + "\n";
+        }
+        if (codeCell == null || codeCell.getStringCellValue().trim().isEmpty()) {
+            errorMessage += "Mã voucher không được để trống. " + "\n";
+        }
+        if (codeCell != null && type == 0) {
+            if (code.trim().length() > 50) {
+                errorMessage += "Mã môn học không được lớn hơn 50. " + "\n";
+            }
+            else {
+                Optional<VoucherOrder> voucherOrder = voucherOrderRepository.findVoucherByCode(code);
+                if (voucherOrder.isPresent()) {
+                    errorMessage += "Mã voucher đã tồn tại. " + "\n";
+                }
+            }
+        }
+        if (codeCell != null && type == 1) {
+            if (code.trim().length() > 50) {
+                errorMessage += "Mã môn học không được lớn hơn 50. " + "\n";
+            }
+            else {
+                Optional<VoucherOrder> voucherOrder = voucherOrderRepository.findVoucherByCode(code);
+                if (!voucherOrder.isPresent()) {
+                    errorMessage += "Mã voucher không tồn tại. " + "\n";
+                }
+            }
+        }
+        if (!name.equals(" ") && name.trim().length() > 250) {
+            errorMessage += "Tên voucher không được lớn hơn 250. " + "\n";
+        }
+        if (quantityCell == null || quantityCell.getCellType() == CellType.BLANK) {
+            errorMessage += "Số lượng không được để trống. " + "\n";
+        }
+        if (minBillValueCell == null || minBillValueCell.getCellType() == CellType.BLANK) {
+            errorMessage += "Giá trị tối thiểu của hóa đơn không được để trống. " + "\n";
+        }
+        if (discountAmountCell == null || discountAmountCell.getCellType() == CellType.BLANK) {
+            errorMessage += "Giá trị giảm không được để trống. " + "\n";
+        }
+        if (reduceFormCell == null || reduceFormCell.getCellType() == CellType.BLANK) {
+            errorMessage += "Hình thức giảm không được để trống. " + "\n";
+        }
+        if (reduceFormCell != null && reduceForm == 1 && (maximumReductionValueCell == null ||  maximumReductionValueCell.getCellType() == CellType.BLANK)) {
+            errorMessage += "Giá trị giảm tối đa không được để trống. " + "\n";
+        }
+        if (startDateCell == null || startDateCell.getCellType() == CellType.BLANK) {
+            errorMessage += "Ngày bắt đầu không được để trống. " + "\n";
+        }
+        if (endDateCell == null || endDateCell.getCellType() == CellType.BLANK) {
+            errorMessage += "Ngày kết thúc không được để trống. " + "\n";
+        }
+        if (!errorMessage.isEmpty()) {
+            errors.add(errorMessage);
+            voucherListError.add(voucherOrderResponse);
+            return null;
+        } else {
+            // Nếu không có lỗi, trả về đối tượng voucherOrderResponse
+            return voucherOrderResponse;
+        }
+    }
+
+    @Override
+    public void saveVoucherOrder(VoucherOrderResponse voucherOrderResponse, Integer type) {
+        VoucherOrder voucherOrder = new VoucherOrder();
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        if (type == 1) {
+            // update
+            voucherOrder = voucherOrderRepository.findVoucherByCode(voucherOrderResponse.getCode()).get();
+            voucherOrder.setUpdateAt(currentDateTime);
+        }
+        voucherOrder.setName(voucherOrderResponse.getName());
+        voucherOrder.setCode(voucherOrderResponse.getCode());
+        voucherOrder.setQuantity(voucherOrderResponse.getQuantity());
+        voucherOrder.setDiscountAmount(voucherOrderResponse.getDiscountAmount());
+        voucherOrder.setMinBillValue(voucherOrderResponse.getMinBillValue());
+        voucherOrder.setReduceForm(voucherOrderResponse.getReduceForm());
+        voucherOrder.setMaximumReductionValue(voucherOrderResponse.getMaximumReductionValue());
+        voucherOrder.setStartDate(voucherOrderResponse.getStartDate());
+        voucherOrder.setEndDate(voucherOrderResponse.getEndDate());
+        voucherOrder.setCreateDate(currentDateTime);
+        voucherOrder.setStatus(0);
+        voucherOrderRepository.save(voucherOrder);
+    }
+
+    @Override
+    public VoucherResponseImport importDataFromExcel(MultipartFile file, Integer type) throws IOException {
+        int fail = 0;
+        int total = 0;
+        List<String> errors = new ArrayList<>();
+        List<VoucherOrderResponse> voucherListError = new ArrayList<>();
+        Workbook workbook = new XSSFWorkbook(file.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0);
+        // check file trống hoặc có mỗi header
+        if (sheet.getPhysicalNumberOfRows() <= 1) {
+            total = 0;
+        } else {
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) {
+                    continue;
+                }
+                // Kiểm tra và xử lý lỗi nếu ô trống hoặc không tồn tại
+                VoucherOrderResponse voucherOrderResponse = createVoucherResponse(row, errors, voucherListError, type);
+
+                if (voucherOrderResponse != null) {
+                    // Xử lý dữ liệu hợp lệ và lưu voucherRespose vào database
+                    saveVoucherOrder(voucherOrderResponse, type);
+                }
+                total++;
+            }
+        }
+        if (!errors.isEmpty()) {
+            String existingExcelFilePath = "C://Users//Admin//Desktop//DATN//DATN_BE_2003Shoes//src//main//java//com//backend//file//error-file-voucher.xlsx";
+            createErrorExcelFile(existingExcelFilePath, errors, voucherListError, type);
+//            System.out.println(errors);
+        }
+        fail = errors.size();
+        VoucherResponseImport voucherResponseImport = new VoucherResponseImport();
+        voucherResponseImport.setFail(fail);
+        voucherResponseImport.setTotal(total);
+        voucherResponseImport.setSuccess((total - fail));
+        workbook.close();
+        return voucherResponseImport;
+    }
+
+    @Override
+    public void createErrorExcelFile(String existingExcelFilePath, List<String> errors, List<VoucherOrderResponse> voucherListError, Integer type) {
+        try (FileInputStream existingExcelFileInputStream = new FileInputStream(existingExcelFilePath)) {
+            Workbook errorWorkbook = new XSSFWorkbook(existingExcelFileInputStream);
+            Sheet errorSheet = errorWorkbook.getSheet("Sheet1");
+            if (errorSheet != null) {
+                int lastRowNum = errorSheet.getLastRowNum();
+                for (int rowIndex = 1; rowIndex <= lastRowNum; rowIndex++) {
+                    Row row = errorSheet.getRow(rowIndex);
+                    if (row != null) {
+                        errorSheet.removeRow(row);
+                    }
+                }
+            } else {
+                errorSheet = errorWorkbook.createSheet("Sheet1");
+            }
+            Row headerRow = errorSheet.getRow(0);
+            if (headerRow == null) {
+                headerRow = errorSheet.createRow(0);
+            }
+            Cell headerCell = headerRow.createCell(8);
+            headerCell.setCellValue("Chi tiết lỗi");
+            int columnWidth = 40;
+            errorSheet.setColumnWidth(10, columnWidth * 256);
+            CellStyle headerCellStyle = createHeaderCellStyle(errorWorkbook);
+            headerCell.setCellStyle(headerCellStyle);
+            // Font cho lỗi
+            CellStyle errorCellStyle = createErrorCellStyle(errorWorkbook);
+
+            // Font cho symbol
+            CellStyle cellSymble = createErrorCellStyleSymble(errorWorkbook);
+
+            // Border cho lỗi
+            CellStyle cellStyle = createBorderCellStyle(errorWorkbook);
+            if (errorSheet == null) {
+                errorSheet = errorWorkbook.createSheet("Sheet1");
+            }
+            int rowIndex = 1;
+            for (int i = 0; i < errors.size() || i < voucherListError.size(); i++) {
+                Row errorRow = errorSheet.createRow(rowIndex++);
+
+                // Tạo ô dữ liệu từ danh sách errors nếu có
+                if (i < errors.size()) {
+                    Cell cell = errorRow.createCell(10);
+                    cell.setCellValue(errors.get(i));
+                    cell.setCellStyle(errorCellStyle);
+                }
+
+                // Tạo ô dữ liệu từ danh sách voucherListError nếu có
+                if (i < voucherListError.size()) {
+                    Cell cellSTT = errorRow.createCell(0);
+                    cellSTT.setCellValue(i + 1);
+                    cellSTT.setCellStyle(cellSymble);
+
+                    // code
+                    Cell cellCode = errorRow.createCell(1);
+                    cellCode.setCellValue(voucherListError.get(i).getCode().trim());
+                    if (voucherListError.get(i).getCode().equals(" ") || voucherListError.get(i).getCode().trim().isEmpty()) {
+                        cellCode.setCellStyle(cellStyle);
+                    }
+//                    else {
+//                        Subject subject1 = subjectRepository.checkDuplicate(subjectListError.get(i).getCode());
+//                        if (subjectListError.get(i).getCode().matches(regex)) {
+//                            cellCode.setCellStyle(cellStyle);
+//                        } else if (subjectListError.get(i).getCode().trim().length() > 50) {
+//                            cellCode.setCellStyle(cellStyle);
+//                        } else if (subject1 != null && type == 0) {
+//                            cellCode.setCellStyle(cellStyle);
+//                        } else if (subject1 == null && type == 1) {
+//                            cellCode.setCellStyle(cellStyle);
+//                        } else {
+//                            cellCode.setCellStyle(cellSymble);
+//                        }
+//                    }
+                    // name
+                    Cell cellName = errorRow.createCell(2);
+                    cellName.setCellValue(voucherListError.get(i).getName().trim());
+                    if (voucherListError.get(i).getName().equals(" ") || voucherListError.get(i).getName().trim().isEmpty()) {
+                        cellName.setCellStyle(cellStyle);
+                    } else if (voucherListError.get(i).getName().trim().length() > 250) {
+                        cellName.setCellStyle(cellStyle);
+                    } else {
+                        cellName.setCellStyle(cellSymble);
+                    }
+                    // reduce
+                    Cell cellType = errorRow.createCell(5);
+                    if (voucherListError.get(i).getReduceForm() == 2) {
+                        cellType.setCellValue((Date) null);
+                        cellType.setCellStyle(cellStyle);
+                    } else {
+                        cellType.setCellValue(voucherListError.get(i).getReduceForm());
+                        cellType.setCellStyle(cellSymble);
+                    }
+                }
+
+            }
+            errorSheet.autoSizeColumn(0);
+            errorSheet.autoSizeColumn(1);
+            errorSheet.autoSizeColumn(2);
+            errorSheet.autoSizeColumn(3);
+            errorSheet.autoSizeColumn(4);
+            errorSheet.autoSizeColumn(5);
+            errorSheet.autoSizeColumn(6);
+            errorSheet.autoSizeColumn(7);
+            errorSheet.autoSizeColumn(8);
+            errorSheet.autoSizeColumn(9);
+            errorSheet.autoSizeColumn(10);
+            try (FileOutputStream errorOutputStream = new FileOutputStream(existingExcelFilePath)) {
+                errorWorkbook.write(errorOutputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                errorWorkbook.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public byte[] exportExcelFileError() throws IOException {
+        FileInputStream inputStream = new FileInputStream("C://Users//Admin//Desktop//DATN//DATN_BE_2003Shoes//src//main//java//com//backend//file//error-file-voucher.xlsx");
+        // Đọc dữ liệu từ InputStream vào mảng byte
+        byte[] excelBytes;
+        try {
+            excelBytes = inputStream.readAllBytes();
+        } finally {
+            inputStream.close();
+        }
+        return excelBytes;
+    }
+
+    @Override
+    public CellStyle createHeaderCellStyle(Workbook workbook) {
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setFontName("Times New Roman");
+        headerFont.setFontHeightInPoints((short) 12);
+        headerFont.setBold(true); // Đặt đậm
+        headerCellStyle.setFont(headerFont);
+        headerCellStyle.setAlignment(HorizontalAlignment.CENTER); // Đặt căn giữa ngang
+        headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER); // Bỏ bottom align
+        headerCellStyle.setBorderTop(BorderStyle.THIN);
+        headerCellStyle.setBorderBottom(BorderStyle.THIN);
+        headerCellStyle.setBorderLeft(BorderStyle.THIN);
+        headerCellStyle.setBorderRight(BorderStyle.THIN);
+        headerCellStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        headerCellStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        headerCellStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        headerCellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        return headerCellStyle;
+    }
+
+    @Override
+    public CellStyle createErrorCellStyle(Workbook workbook) {
+        CellStyle errorCellStyle = workbook.createCellStyle();
+        Font fontError = workbook.createFont();
+        fontError.setColor(IndexedColors.RED.getIndex()); // Đặt màu chữ thành đỏ
+        fontError.setFontName("Times New Roman");
+        fontError.setBold(true); // Đặt đậm
+        fontError.setFontHeightInPoints((short) 12); // Đặt cỡ chữ là 12
+        errorCellStyle.setWrapText(true);
+        errorCellStyle.setBorderBottom(BorderStyle.THIN);
+        errorCellStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        errorCellStyle.setBorderLeft(BorderStyle.THIN);
+        errorCellStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        errorCellStyle.setBorderRight(BorderStyle.THIN);
+        errorCellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        errorCellStyle.setBorderTop(BorderStyle.THIN);
+        errorCellStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        errorCellStyle.setFont(fontError);
+        return errorCellStyle;
+    }
+
+    @Override
+    public CellStyle createErrorCellStyleSymble(Workbook workbook) {
+        CellStyle cellSymble = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman"); // Đặt font thành Times New Roman
+        font.setFontHeightInPoints((short) 12); // Đặt cỡ chữ là 12
+        cellSymble.setFont(font);
+        cellSymble.setBorderBottom(BorderStyle.THIN);
+        cellSymble.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        cellSymble.setBorderLeft(BorderStyle.THIN);
+        cellSymble.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        cellSymble.setBorderRight(BorderStyle.THIN);
+        cellSymble.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        cellSymble.setBorderTop(BorderStyle.THIN);
+        cellSymble.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        return cellSymble;
+    }
+
+    @Override
+    public CellStyle createBorderCellStyle(Workbook workbook) {
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setBorderTop(BorderStyle.MEDIUM);
+        cellStyle.setBorderBottom(BorderStyle.MEDIUM);
+        cellStyle.setBorderLeft(BorderStyle.MEDIUM);
+        cellStyle.setBorderRight(BorderStyle.MEDIUM);
+        cellStyle.setTopBorderColor(IndexedColors.RED.getIndex());
+        cellStyle.setBottomBorderColor(IndexedColors.RED.getIndex());
+        cellStyle.setLeftBorderColor(IndexedColors.RED.getIndex());
+        cellStyle.setRightBorderColor(IndexedColors.RED.getIndex());
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman");
+        font.setFontHeightInPoints((short) 12);
+        cellStyle.setFont(font);
+        return cellStyle;
+    }
 }

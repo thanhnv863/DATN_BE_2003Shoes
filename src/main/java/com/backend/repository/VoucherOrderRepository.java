@@ -18,4 +18,8 @@ import java.util.Optional;
 public interface VoucherOrderRepository extends JpaRepository<VoucherOrder, Long> {
 
     Optional<VoucherOrder> findVoucherByCode(String code);
+
+
+    @Query(value = "SELECT distinct reduce_form FROM voucher", nativeQuery = true)
+    List<Integer> listAllByReduce();
 }
