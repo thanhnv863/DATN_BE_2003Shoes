@@ -7,10 +7,13 @@ import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.request.VoucherOrderRequest;
 import com.backend.dto.response.OrderReponse;
 import com.backend.dto.response.VoucherOrderResponse;
+import com.backend.dto.response.VoucherResponseImport;
 import com.backend.entity.VoucherOrder;
 import com.backend.service.IVoucherOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +23,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -63,4 +69,31 @@ public class VoucherOrderController {
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Lấy danh sách thành công",list));
     }
 
+    @GetMapping("/download-excel-template")
+    public ResponseEntity<byte[]> downloadExcelTemplate(HttpServletResponse response) throws IOException {
+        byte[] excelBytes = voucherOrderService.createExcelFile();
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition", "attachment; filename=TemplateImportVoucherFile.xlsx");
+        return ResponseEntity.ok().body(excelBytes);
+    }
+
+
+    @PostMapping("/import")
+    public ResponseEntity<?> importData(@RequestParam("file") MultipartFile file, @RequestParam("type") Integer type) {
+        try {
+            VoucherResponseImport voucherResponseImport = voucherOrderService.importDataFromExcel(file, type);
+            return ResponseEntity.ok(voucherResponseImport);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi nhập dữ liệu từ Excel");
+        }
+    }
+
+    @GetMapping("/download-excel-file-error")
+    public ResponseEntity<byte[]> exportExcelFileError(HttpServletResponse response) throws IOException {
+        byte[] excelBytes = voucherOrderService.exportExcelFileError();
+        // Thiết lập các thông số cho response
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition", "attachment; filename=error-file-voucher.xlsx");
+        return ResponseEntity.ok().body(excelBytes);
+    }
 }
