@@ -14,12 +14,14 @@ import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
@@ -47,6 +49,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -497,21 +500,21 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         String name = (nameCell == null) ? " " : nameCell.getStringCellValue();
         double quantity;
         if (quantityCell == null || quantityCell.getCellType() == CellType.BLANK) {
-            quantity = 0;
+            quantity = 99999999;
         } else {
             quantity = quantityCell.getNumericCellValue();
         }
         //
         double minBillValue;
         if (minBillValueCell == null || minBillValueCell.getCellType() == CellType.BLANK) {
-            minBillValue = 0;
+            minBillValue = 0.1;
         } else {
             minBillValue = minBillValueCell.getNumericCellValue();
         }
         //
         double discountAmount;
         if (discountAmountCell == null || discountAmountCell.getCellType() == CellType.BLANK) {
-            discountAmount = 0;
+            discountAmount = 0.1;
         } else {
             discountAmount = discountAmountCell.getNumericCellValue();
         }
@@ -525,7 +528,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         //
         double maximumReductionValue;
         if (maximumReductionValueCell == null || maximumReductionValueCell.getCellType() == CellType.BLANK) {
-            maximumReductionValue = 0;
+            maximumReductionValue = 0.1;
         } else {
             maximumReductionValue = maximumReductionValueCell.getNumericCellValue();
         }
@@ -583,9 +586,8 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         }
         if (codeCell != null && type == 0) {
             if (code.trim().length() > 50) {
-                errorMessage += "Mã môn học không được lớn hơn 50. " + "\n";
-            }
-            else {
+                errorMessage += "Mã voucher không được lớn hơn 50. " + "\n";
+            } else {
                 Optional<VoucherOrder> voucherOrder = voucherOrderRepository.findVoucherByCode(code);
                 if (voucherOrder.isPresent()) {
                     errorMessage += "Mã voucher đã tồn tại. " + "\n";
@@ -594,9 +596,8 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         }
         if (codeCell != null && type == 1) {
             if (code.trim().length() > 50) {
-                errorMessage += "Mã môn học không được lớn hơn 50. " + "\n";
-            }
-            else {
+                errorMessage += "Mã voucher không được lớn hơn 50. " + "\n";
+            } else {
                 Optional<VoucherOrder> voucherOrder = voucherOrderRepository.findVoucherByCode(code);
                 if (!voucherOrder.isPresent()) {
                     errorMessage += "Mã voucher không tồn tại. " + "\n";
@@ -609,23 +610,52 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         if (quantityCell == null || quantityCell.getCellType() == CellType.BLANK) {
             errorMessage += "Số lượng không được để trống. " + "\n";
         }
+        if (quantityCell != null) {
+            if (quantity == 0) {
+                errorMessage += "Số lượng phải lớn hơn 0 " + "\n";
+            }
+        }
         if (minBillValueCell == null || minBillValueCell.getCellType() == CellType.BLANK) {
             errorMessage += "Giá trị tối thiểu của hóa đơn không được để trống. " + "\n";
+        }
+        if (minBillValueCell != null) {
+            if (minBillValue == 0) {
+                errorMessage += "Giá trị tối thiểu của hóa đơn phải lớn hơn 0 " + "\n";
+            }
         }
         if (discountAmountCell == null || discountAmountCell.getCellType() == CellType.BLANK) {
             errorMessage += "Giá trị giảm không được để trống. " + "\n";
         }
+        if (discountAmountCell != null) {
+            if (discountAmount == 0) {
+                errorMessage += "Giá trị giảm phải lớn hơn 0 " + "\n";
+            }
+        }
         if (reduceFormCell == null || reduceFormCell.getCellType() == CellType.BLANK) {
             errorMessage += "Hình thức giảm không được để trống. " + "\n";
         }
-        if (reduceFormCell != null && reduceForm == 1 && (maximumReductionValueCell == null ||  maximumReductionValueCell.getCellType() == CellType.BLANK)) {
+        if (reduceFormCell != null && reduceForm == 1 && (maximumReductionValueCell == null || maximumReductionValueCell.getCellType() == CellType.BLANK)) {
             errorMessage += "Giá trị giảm tối đa không được để trống. " + "\n";
+        }
+        if (maximumReductionValueCell != null) {
+            if (reduceFormCell != null && reduceForm == 1 && maximumReductionValue == 0)
+                errorMessage += "Giá trị giảm tối đa phải lớn hơn 0. " + "\n";
         }
         if (startDateCell == null || startDateCell.getCellType() == CellType.BLANK) {
             errorMessage += "Ngày bắt đầu không được để trống. " + "\n";
         }
+        if(startDateCell != null){
+            if (startDate.isBefore(currentDateTime)) {
+                errorMessage += "Ngày bắt đầu phải lớn hơn ngày hiện tại. " + "\n";
+            }
+        }
         if (endDateCell == null || endDateCell.getCellType() == CellType.BLANK) {
             errorMessage += "Ngày kết thúc không được để trống. " + "\n";
+        }
+        if(startDate != null && endDate !=null){
+            if (endDate.isBefore(startDate)) {
+                errorMessage += "Ngày kết thúc phải lớn hơn ngày bắt đầu. " + "\n";
+            }
         }
         if (!errorMessage.isEmpty()) {
             errors.add(errorMessage);
@@ -720,23 +750,29 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             if (headerRow == null) {
                 headerRow = errorSheet.createRow(0);
             }
-            Cell headerCell = headerRow.createCell(8);
+            Cell headerCell = headerRow.createCell(10);
             headerCell.setCellValue("Chi tiết lỗi");
             int columnWidth = 40;
             errorSheet.setColumnWidth(10, columnWidth * 256);
             CellStyle headerCellStyle = createHeaderCellStyle(errorWorkbook);
             headerCell.setCellStyle(headerCellStyle);
+
+
             // Font cho lỗi
             CellStyle errorCellStyle = createErrorCellStyle(errorWorkbook);
 
-            // Font cho symbol
+            // Font cho symble
             CellStyle cellSymble = createErrorCellStyleSymble(errorWorkbook);
-
+            // Font cho symble date
+            CellStyle cellSymbleDate = createErrorCellStyleDateSymble(errorWorkbook);
             // Border cho lỗi
             CellStyle cellStyle = createBorderCellStyle(errorWorkbook);
+            // Border cho lỗi Date
+            CellStyle cellStyleDate = createBorderAndFormatDateCellStyle(errorWorkbook);
             if (errorSheet == null) {
                 errorSheet = errorWorkbook.createSheet("Sheet1");
             }
+            LocalDateTime currentDateTime = LocalDateTime.now();
             int rowIndex = 1;
             for (int i = 0; i < errors.size() || i < voucherListError.size(); i++) {
                 Row errorRow = errorSheet.createRow(rowIndex++);
@@ -759,21 +795,18 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     cellCode.setCellValue(voucherListError.get(i).getCode().trim());
                     if (voucherListError.get(i).getCode().equals(" ") || voucherListError.get(i).getCode().trim().isEmpty()) {
                         cellCode.setCellStyle(cellStyle);
+                    } else {
+                        VoucherOrder voucherOrder = voucherOrderRepository.checkDuplicate(voucherListError.get(i).getCode());
+                        if (voucherListError.get(i).getCode().trim().length() > 50) {
+                            cellCode.setCellStyle(cellStyle);
+                        } else if (voucherOrder != null && type == 0) {
+                            cellCode.setCellStyle(cellStyle);
+                        } else if (voucherOrder == null && type == 1) {
+                            cellCode.setCellStyle(cellStyle);
+                        } else {
+                            cellCode.setCellStyle(cellSymble);
+                        }
                     }
-//                    else {
-//                        Subject subject1 = subjectRepository.checkDuplicate(subjectListError.get(i).getCode());
-//                        if (subjectListError.get(i).getCode().matches(regex)) {
-//                            cellCode.setCellStyle(cellStyle);
-//                        } else if (subjectListError.get(i).getCode().trim().length() > 50) {
-//                            cellCode.setCellStyle(cellStyle);
-//                        } else if (subject1 != null && type == 0) {
-//                            cellCode.setCellStyle(cellStyle);
-//                        } else if (subject1 == null && type == 1) {
-//                            cellCode.setCellStyle(cellStyle);
-//                        } else {
-//                            cellCode.setCellStyle(cellSymble);
-//                        }
-//                    }
                     // name
                     Cell cellName = errorRow.createCell(2);
                     cellName.setCellValue(voucherListError.get(i).getName().trim());
@@ -784,14 +817,92 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     } else {
                         cellName.setCellStyle(cellSymble);
                     }
+                    // quantity
+                    Cell cellQuantity = errorRow.createCell(3);
+                    if (voucherListError.get(i).getQuantity() == 99999999) {
+                        cellQuantity.setCellValue((Date) null);
+                        cellQuantity.setCellStyle(cellStyle);
+                    } else if (voucherListError.get(i).getQuantity() == 0) {
+                        cellQuantity.setCellValue(voucherListError.get(i).getQuantity());
+                        cellQuantity.setCellStyle(cellStyle);
+                    } else {
+                        cellQuantity.setCellValue(voucherListError.get(i).getQuantity());
+                        cellQuantity.setCellStyle(cellSymble);
+                    }
+                    // minBillValueCell
+                    Cell cellMinBillValueCell = errorRow.createCell(4);
+                    BigDecimal minBillValueCell = voucherListError.get(i).getMinBillValue();
+                    if (minBillValueCell.compareTo(new BigDecimal("0.1")) == 0) {
+                        cellMinBillValueCell.setCellValue((Date) null);
+                        cellMinBillValueCell.setCellStyle(cellStyle);
+                    } else if (minBillValueCell.compareTo(BigDecimal.ZERO) == 0) {
+                        cellMinBillValueCell.setCellValue(0);
+                        cellMinBillValueCell.setCellStyle(cellStyle);
+                    } else {
+                        cellMinBillValueCell.setCellValue(minBillValueCell.toString());
+                        cellMinBillValueCell.setCellStyle(cellSymble);
+                    }
+                    // discountAmountCell
+                    Cell cellDiscountAmountCell = errorRow.createCell(5);
+                    BigDecimal discountAmount = voucherListError.get(i).getDiscountAmount();
+                    if (discountAmount.compareTo(new BigDecimal("0.1")) == 0) {
+                        cellDiscountAmountCell.setCellValue((Date) null);
+                        cellDiscountAmountCell.setCellStyle(cellStyle);
+                    } else if (discountAmount.compareTo(BigDecimal.ZERO) == 0) {
+                        cellDiscountAmountCell.setCellValue(0);
+                        cellDiscountAmountCell.setCellStyle(cellStyle);
+                    } else {
+                        cellDiscountAmountCell.setCellValue(discountAmount.toString());
+                        cellDiscountAmountCell.setCellStyle(cellSymble);
+                    }
                     // reduce
-                    Cell cellType = errorRow.createCell(5);
+                    Cell cellType = errorRow.createCell(6);
                     if (voucherListError.get(i).getReduceForm() == 2) {
                         cellType.setCellValue((Date) null);
                         cellType.setCellStyle(cellStyle);
                     } else {
                         cellType.setCellValue(voucherListError.get(i).getReduceForm());
                         cellType.setCellStyle(cellSymble);
+                    }
+                    // maximumReductionValueCell
+                    Cell cellMaximumReductionValueCell = errorRow.createCell(7);
+                    BigDecimal maximumReductionValue = voucherListError.get(i).getMaximumReductionValue();
+                    if (voucherListError.get(i).getReduceForm() == 1 && maximumReductionValue.compareTo(new BigDecimal("0.1")) == 0) {
+                        cellMaximumReductionValueCell.setCellValue((Date) null);
+                        cellMaximumReductionValueCell.setCellStyle(cellStyle);
+                    } else if (voucherListError.get(i).getReduceForm() == 1 && maximumReductionValue.compareTo(BigDecimal.ZERO) == 0) {
+                        cellMaximumReductionValueCell.setCellValue(0);
+                        cellMaximumReductionValueCell.setCellStyle(cellSymble);
+                    } else if(voucherListError.get(i).getReduceForm() == 1){
+                        cellMaximumReductionValueCell.setCellValue(maximumReductionValue.toString());
+                        cellMaximumReductionValueCell.setCellStyle(cellSymble);
+                    }else{
+                        cellMaximumReductionValueCell.setCellValue((Date) null);
+                        cellMaximumReductionValueCell.setCellStyle(cellSymble);
+                    }
+                    // startDate
+                    Cell cellStartDate = errorRow.createCell(8);
+                    if (voucherListError.get(i).getStartDate() == null) {
+                        cellStartDate.setCellValue((Date) null);
+                        cellStartDate.setCellStyle(cellStyle);
+                    } else if (voucherListError.get(i).getStartDate().isBefore(currentDateTime)) {
+                        cellStartDate.setCellValue(voucherListError.get(i).getStartDate());
+                        cellStartDate.setCellStyle(cellStyleDate);
+                    } else {
+                        cellStartDate.setCellValue(voucherListError.get(i).getStartDate());
+                        cellStartDate.setCellStyle(cellSymble);
+                    }
+                    // endDate
+                    Cell cellEndDate = errorRow.createCell(9);
+                    if (voucherListError.get(i).getEndDate() == null) {
+                        cellEndDate.setCellValue((Date) null);
+                        cellEndDate.setCellStyle(cellStyle);
+                    } else if (voucherListError.get(i).getEndDate().isBefore(voucherListError.get(i).getStartDate())) {
+                        cellEndDate.setCellValue(voucherListError.get(i).getEndDate());
+                        cellEndDate.setCellStyle(cellStyleDate);
+                    }else {
+                        cellEndDate.setCellValue(voucherListError.get(i).getEndDate());
+                        cellEndDate.setCellStyle(cellSymbleDate);
                     }
                 }
 
@@ -839,6 +950,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         headerFont.setFontName("Times New Roman");
         headerFont.setFontHeightInPoints((short) 12);
         headerFont.setBold(true); // Đặt đậm
+        headerFont.setColor(IndexedColors.RED.getIndex()); // Đặt màu chữ thành đỏ
         headerCellStyle.setFont(headerFont);
         headerCellStyle.setAlignment(HorizontalAlignment.CENTER); // Đặt căn giữa ngang
         headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER); // Bỏ bottom align
@@ -891,6 +1003,24 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         cellSymble.setTopBorderColor(IndexedColors.BLACK.getIndex());
         return cellSymble;
     }
+    public CellStyle createErrorCellStyleDateSymble(Workbook workbook) {
+        CellStyle cellSymbleDate = workbook.createCellStyle();
+        CreationHelper createHelper = workbook.getCreationHelper();
+        cellSymbleDate.setDataFormat(createHelper.createDataFormat().getFormat("MM/dd/yyyy"));
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman"); // Đặt font thành Times New Roman
+        font.setFontHeightInPoints((short) 12); // Đặt cỡ chữ là 12
+        cellSymbleDate.setFont(font);
+        cellSymbleDate.setBorderBottom(BorderStyle.THIN);
+        cellSymbleDate.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        cellSymbleDate.setBorderLeft(BorderStyle.THIN);
+        cellSymbleDate.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        cellSymbleDate.setBorderRight(BorderStyle.THIN);
+        cellSymbleDate.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        cellSymbleDate.setBorderTop(BorderStyle.THIN);
+        cellSymbleDate.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        return cellSymbleDate;
+    }
 
     @Override
     public CellStyle createBorderCellStyle(Workbook workbook) {
@@ -908,5 +1038,25 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         font.setFontHeightInPoints((short) 12);
         cellStyle.setFont(font);
         return cellStyle;
+    }
+
+    public CellStyle createBorderAndFormatDateCellStyle(Workbook workbook) {
+        // Đặt định dạng ngày tháng
+        CellStyle dateCellStyle = workbook.createCellStyle();
+        CreationHelper createHelper = workbook.getCreationHelper();
+        dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("MM/dd/yyyy"));
+        dateCellStyle.setBorderTop(BorderStyle.MEDIUM);
+        dateCellStyle.setBorderBottom(BorderStyle.MEDIUM);
+        dateCellStyle.setBorderLeft(BorderStyle.MEDIUM);
+        dateCellStyle.setBorderRight(BorderStyle.MEDIUM);
+        dateCellStyle.setTopBorderColor(IndexedColors.RED.getIndex());
+        dateCellStyle.setBottomBorderColor(IndexedColors.RED.getIndex());
+        dateCellStyle.setLeftBorderColor(IndexedColors.RED.getIndex());
+        dateCellStyle.setRightBorderColor(IndexedColors.RED.getIndex());
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman");
+        font.setFontHeightInPoints((short) 12);
+        dateCellStyle.setFont(font);
+        return dateCellStyle;
     }
 }
