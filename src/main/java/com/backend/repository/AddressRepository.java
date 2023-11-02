@@ -22,5 +22,7 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
             "from account \n" +
             "join address on account.id = address.account_id", nativeQuery = true)
     List<Address> getAllAccountAndAddress();
+
+    List<Address> findAddressesByAccount_Id(Long id);
 }
 
