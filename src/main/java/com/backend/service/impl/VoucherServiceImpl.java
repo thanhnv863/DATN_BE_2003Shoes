@@ -687,7 +687,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             }
         }
         if (!errors.isEmpty()) {
-            String existingExcelFilePath = "C://Users//Admin//Desktop//DATN//DATN_BE_2003Shoes//src//main//java//com//backend//file//error-file-voucher.xlsx";
+            String existingExcelFilePath = "src/main/java/com/backend/file/error-file-voucher.xlsx";
             createErrorExcelFile(existingExcelFilePath, errors, voucherListError, type);
 //            System.out.println(errors);
         }
@@ -821,7 +821,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
 
     @Override
     public byte[] exportExcelFileError() throws IOException {
-        FileInputStream inputStream = new FileInputStream("C://Users//Admin//Desktop//DATN//DATN_BE_2003Shoes//src//main//java//com//backend//file//error-file-voucher.xlsx");
+        FileInputStream inputStream = new FileInputStream("src/main/java/com/backend/file/error-file-voucher.xlsx");
         // Đọc dữ liệu từ InputStream vào mảng byte
         byte[] excelBytes;
         try {
