@@ -47,8 +47,8 @@ public class AddressController {
     }
 
     @GetMapping("/addressandaccount")
-    public ResponseEntity<?> addressAndAccount(){
-        return ResponseEntity.ok(iAddressService.getAllAccountAndAddress());
+    public ResponseEntity<?> addressAndAccount(@RequestParam("defaultAddress") String defaultAddress){
+        return ResponseEntity.ok(iAddressService.getAllAccountAndAddress(defaultAddress));
     }
 
     @GetMapping("/getcustomer/{id}")

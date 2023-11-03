@@ -20,8 +20,9 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
             "        account.role_id,account.name,account.email,account.avatar,account.created_time,\n" +
             "        account.updated_time,account.status\n" +
             "from account \n" +
-            "join address on account.id = address.account_id", nativeQuery = true)
-    List<Address> getAllAccountAndAddress();
+            "join address on account.id = address.account_id where " +
+            "address.default_address like concat('%', :defaultAddress, '%')", nativeQuery = true)
+    List<Address> getAllAccountAndAddress(String defaultAddress);
 
     List<Address> findAddressesByAccount_Id(Long id);
 }

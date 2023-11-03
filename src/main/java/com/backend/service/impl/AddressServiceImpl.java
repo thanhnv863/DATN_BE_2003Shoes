@@ -135,8 +135,8 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
-    public ServiceResult<List<Address>> getAllAccountAndAddress() {
-        List<Address> addressList = addressRepository.getAllAccountAndAddress();
+    public ServiceResult<List<Address>> getAllAccountAndAddress(String defaultAddress) {
+        List<Address> addressList = addressRepository.getAllAccountAndAddress(defaultAddress);
 
         return new ServiceResult<>(AppConstant.SUCCESS,
                 "Successfully retrieved",
