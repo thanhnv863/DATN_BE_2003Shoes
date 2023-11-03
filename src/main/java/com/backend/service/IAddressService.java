@@ -25,7 +25,7 @@ public interface IAddressService {
 
     ServiceResult<List<Address>> searchNameClient(String name);
 
-    ServiceResult<List<Address>> getAllAccountAndAddress();
+    ServiceResult<List<Address>> getAllAccountAndAddress(String defaultAddress);
 
     ServiceResult<List<Address>> getCustomer(Long id);
 
