@@ -31,10 +31,11 @@ public class VoucherOrderRepositoryImpl implements VoucherOrderCustomRepository 
 
         if (status != null) {
             sql.append(" AND (v.status = :status)");
-        }else {
-            // Thêm điều kiện chỉ lấy status = 0, 1 hoặc 2
-            sql.append(" AND (v.status IN (0, 1, 2))");
         }
+//        else {
+//            // Thêm điều kiện chỉ lấy status = 0, 1 hoặc 2
+//            sql.append(" AND (v.status IN (0, 1, 2))");
+//        }
 
         if (startDate != null && endDate != null) {
             sql.append(" AND (v.start_date >= :startDate AND v.end_date <= :endDate)");
