@@ -109,7 +109,7 @@ public class AddressServiceImpl implements IAddressService {
             addressResponse.setDistrict(address.getDistrict());
             addressResponse.setProvince(address.getProvince());
             addressResponse.setNote(address.getNote());
-            addressResponse.setDefaultAddress(address.getDefaultAddress());
+            addressResponse.setDefaultAddress(address.getDefaultAddress().equals("0") ? "this is a defaultAddress": "");
 
             addressResponses.add(addressResponse);
         }
@@ -151,7 +151,6 @@ public class AddressServiceImpl implements IAddressService {
 
         return new ServiceResult<>(AppConstant.SUCCESS,"success",addressName);
     }
-
 
 
 

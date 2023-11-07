@@ -24,4 +24,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             " LEFT JOIN address d on c.id = d.account_id where a.status = :status", nativeQuery = true)
     List<Object> listOrderByStatus(@Param("status") Integer status);
 
+
+
+
 }
