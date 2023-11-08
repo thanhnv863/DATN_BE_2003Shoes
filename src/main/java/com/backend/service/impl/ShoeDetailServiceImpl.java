@@ -34,7 +34,17 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -47,6 +57,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -558,5 +569,103 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         }
     }
 
+    // import
+    @Override
+    public byte[] createExcelFile() throws IOException {
+        // Đường dẫn tới tệp Excel mẫu
+        String excelResourcePath = "/static/fileMau/fileMauProduct.xlsx";
 
+        // Đọc tệp Excel mẫu từ tài nguyên
+        Resource resource = new ClassPathResource(excelResourcePath);
+        InputStream inputStream = resource.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        inputStream.close();
+        // shoe
+        // Lấy danh sách shoe
+        List<Shoe> shoeList = shoeRepository.findAll();
+        // Tạo sheet riêng cho shoeSheet
+        Sheet shoeSheet = workbook.createSheet("ShoeSheet");
+        // Đổ dữ liệu shoeSheet vào sheet ShoeSheet
+        int rowIndexShoe = 0;
+        for (int j = 0; j < shoeList.size(); j++) {
+            Row row = shoeSheet.createRow(rowIndexShoe++);
+            row.createCell(0).setCellValue(shoeList.get(j).getId() + " - " + shoeList.get(j).getName());
+        }
+
+        //brand
+        List<Brand> brandList = brandCategory.findAll();
+        Sheet brandSheet = workbook.createSheet("BrandSheet");
+        int rowIndexBrand = 0;
+        for (int k = 0; k < brandList.size(); k++) {
+            Row row = brandSheet.createRow(rowIndexBrand++);
+            row.createCell(0).setCellValue(brandList.get(k).getId() + " - " + brandList.get(k).getName());
+        }
+
+        //category
+        List<Category> categoryList = categoryRepository.findAll();
+        Sheet categorySheet = workbook.createSheet("CategorySheet");
+        int rowIndexCategory = 0;
+        for (int k = 0; k < categoryList.size(); k++) {
+            Row row = categorySheet.createRow(rowIndexCategory++);
+            row.createCell(0).setCellValue(categoryList.get(k).getId() + " - " + categoryList.get(k).getName());
+        }
+        // sole
+        List<Sole> soleList = soleRepository.findAll();
+        Sheet soleSheet = workbook.createSheet("SoleSheet");
+        int rowIndexSole = 0;
+        for (int k = 0; k < soleList.size(); k++) {
+            Row row = soleSheet.createRow(rowIndexSole++);
+            row.createCell(0).setCellValue(soleList.get(k).getId() + " - " + soleList.get(k).getName());
+        }
+
+        Sheet sheet = workbook.getSheet("Sheet1");
+        int maxRows = 1000;
+        for (int i = 1; i <= maxRows; i++) {
+            Row currentRow = sheet.createRow(i);
+            DataValidationHelper dvHelper = sheet.getDataValidationHelper();
+            // Ràng buộc dữ liệu cho hình thức giảm(Cột B) sử dụng giá trị từ shoe
+            CellRangeAddressList addressListShoe = new CellRangeAddressList(i, i, 1, 1);
+            DataValidationConstraint dvConstraintShoe = dvHelper.createFormulaListConstraint("ShoeSheet!$A$1:$A$" + rowIndexShoe);
+            DataValidation validationShoe = dvHelper.createValidation(dvConstraintShoe, addressListShoe);
+//            validationType.setShowErrorBox(true);
+//            validationType.setErrorStyle(DataValidation.ErrorStyle.STOP);
+//            validationType.createErrorBox("Lỗi dữ liệu", "Chọn một giá trị từ danh sách hình thức giảm.");
+            sheet.addValidationData(validationShoe);
+
+            // Ràng buộc dữ liệu cho hình thức giảm(Cột C) sử dụng giá trị từ brand
+            CellRangeAddressList addressListBrand = new CellRangeAddressList(i, i, 2, 2);
+            DataValidationConstraint dvConstraintBrand  = dvHelper.createFormulaListConstraint("BrandSheet!$A$1:$A$" + rowIndexBrand);
+            DataValidation validationBrand  = dvHelper.createValidation(dvConstraintBrand, addressListBrand);
+            validationBrand.setShowErrorBox(true);
+            validationBrand.setErrorStyle(DataValidation.ErrorStyle.STOP);
+            validationBrand.createErrorBox("Lỗi dữ liệu", "Chọn một giá trị từ danh sách Hãng Giày.");
+            sheet.addValidationData(validationBrand);
+
+            // Ràng buộc dữ liệu cho hình thức giảm(Cột D) sử dụng giá trị từ category
+            CellRangeAddressList addressListCategory = new CellRangeAddressList(i, i, 3, 3);
+            DataValidationConstraint dvConstraintCategory  = dvHelper.createFormulaListConstraint("CategorySheet!$A$1:$A$" + rowIndexBrand);
+            DataValidation validationCategory = dvHelper.createValidation(dvConstraintCategory, addressListCategory);
+            validationCategory.setShowErrorBox(true);
+            validationCategory.setErrorStyle(DataValidation.ErrorStyle.STOP);
+            validationCategory.createErrorBox("Lỗi dữ liệu", "Chọn một giá trị từ danh sách Loại Giày.");
+            sheet.addValidationData(validationCategory);
+
+            // Ràng buộc dữ liệu cho hình thức giảm(Cột E) sử dụng giá trị từ sole
+            CellRangeAddressList addressListSole = new CellRangeAddressList(i, i, 4, 4);
+            DataValidationConstraint dvConstraintSole  = dvHelper.createFormulaListConstraint("SoleSheet!$A$1:$A$" + rowIndexBrand);
+            DataValidation validationSole = dvHelper.createValidation(dvConstraintSole, addressListSole);
+            validationSole.setShowErrorBox(true);
+            validationSole.setErrorStyle(DataValidation.ErrorStyle.STOP);
+            validationSole.createErrorBox("Lỗi dữ liệu", "Chọn một giá trị từ danh sách Đế Giày.");
+            sheet.addValidationData(validationSole);
+        }
+        workbook.setSheetHidden(workbook.getSheetIndex("ShoeSheet"), true);
+        workbook.setSheetHidden(workbook.getSheetIndex("BrandSheet"), true);
+        workbook.setSheetHidden(workbook.getSheetIndex("CategorySheet"), true);
+        workbook.setSheetHidden(workbook.getSheetIndex("SoleSheet"), true);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return outputStream.toByteArray();
+    }
 }
