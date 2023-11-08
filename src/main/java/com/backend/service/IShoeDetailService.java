@@ -8,6 +8,7 @@ import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.entity.Shoe;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface IShoeDetailService {
     ServiceResult<Shoe> updateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequestUpdate);
 
     ServiceResult<String> updateQtyShoeDetail(List<ShoeDetailRequestUpdate> shoeDetailRequestUpdateList);
+
+    byte[] createExcelFile() throws IOException;
 }

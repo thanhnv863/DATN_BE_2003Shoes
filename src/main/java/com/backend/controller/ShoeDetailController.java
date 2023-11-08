@@ -13,6 +13,7 @@ import com.backend.service.IShoeDetailService;
 import com.backend.service.IShoeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,4 +95,12 @@ public class ShoeDetailController {
         return ResponseEntity.ok(iShoeDetailService.updateQtyShoeDetail(shoeDetailRequestUpdate));
     }
 
+
+    @GetMapping("/download-excel-template")
+    public ResponseEntity<byte[]> downloadExcelTemplate(HttpServletResponse response) throws IOException {
+        byte[] excelBytes = iShoeDetailService.createExcelFile();
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition", "attachment; filename=TemplateImportSanPhamFile.xlsx");
+        return ResponseEntity.ok().body(excelBytes);
+    }
 }
