@@ -917,6 +917,11 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         if (priceCell == null || priceCell.getCellType() == CellType.BLANK) {
             errorMessage += "Giá của giày không được để trống. " + "\n";
         }
+        if (priceCell != null) {
+            if (price == 0) {
+                errorMessage += "Giá của giày phải lớn hơn 0 " + "\n";
+            }
+        }
         if (quantityCell == null || quantityCell.getCellType() == CellType.BLANK) {
             errorMessage += "Số lượng không được để trống. " + "\n";
         }
