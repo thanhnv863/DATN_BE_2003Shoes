@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class VoucherResponseImport {
+public class ResponseImport {
     int total;
     int fail;
     int success;

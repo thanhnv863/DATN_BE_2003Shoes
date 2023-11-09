@@ -3,11 +3,8 @@ package com.backend.service;
 import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.dto.request.VoucherOrderRequest;
-import com.backend.dto.response.OrderReponse;
 import com.backend.dto.response.VoucherOrderResponse;
-import com.backend.dto.response.VoucherResponseImport;
-import com.backend.dto.response.shoedetail.DataPaginate;
-import com.backend.entity.Order;
+import com.backend.dto.response.ResponseImport;
 import com.backend.entity.VoucherOrder;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -15,7 +12,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Tuple;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,7 +42,7 @@ public interface IVoucherOrderService {
 
     void saveVoucherOrder(VoucherOrderResponse voucherOrderResponse, Integer type);
 
-    VoucherResponseImport importDataFromExcel(MultipartFile file, Integer type) throws IOException;
+    ResponseImport importDataFromExcel(MultipartFile file, Integer type) throws IOException;
 
     void createErrorExcelFile(String existingExcelFilePath, List<String> errors, List<VoucherOrderResponse> voucherListError, Integer type);
 

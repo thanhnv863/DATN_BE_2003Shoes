@@ -39,4 +39,13 @@ public interface ShoeDetailRepository extends JpaRepository<ShoeDetail, Long> {
     Page<ShoeDetail> findBySize_Name(Float sizeShoe, Pageable pageable);
 
     Page<ShoeDetail> findByBrand_NameContaining(String brandShoe, Pageable pageable);
+
+    @Query(value = "SELECT * FROM shoe_detail where \n" +
+            "shoe_detail.shoe_id = ?1 \n" +
+            "and shoe_detail.size_id = ?2 \n" +
+            "and shoe_detail.sole_id = ?3 \n" +
+            "and shoe_detail.brand_id = ?4 \n" +
+            "and shoe_detail.category_id = ?5 \n" +
+            "and shoe_detail.color_id = ?6 \n" , nativeQuery = true)
+    ShoeDetail getOneByAllForeignkey(Long idShoe, Long idSize, Long idSole, Long idBrand, Long idCategory, Long idColor);
 }
