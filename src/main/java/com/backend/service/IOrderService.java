@@ -9,6 +9,7 @@ import com.backend.dto.response.OrderReponse;
 import com.backend.entity.Order;
 import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -29,5 +30,12 @@ public interface IOrderService {
 
     //customer
     List<Order> listAllByCustomer(SearchOrderCutomerRequest searchOrderCutomerRequest);
+
+
+
+
+    // export
+    List<OrderReponse> searchOrderExport(SearchOrderRequest searchOrderRequest);
+    byte[] exportExcelListOrder(SearchOrderRequest searchOrderRequest) throws IOException;
 
 }

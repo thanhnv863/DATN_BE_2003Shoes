@@ -18,7 +18,20 @@ import com.backend.repository.OrderHistoryRepository;
 import com.backend.repository.OrderRepository;
 import com.backend.repository.VoucherOrderRepository;
 import com.backend.service.IOrderService;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +39,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -256,7 +272,7 @@ public class OrderServiceImpl implements IOrderService {
     public List<Order> listAllByCustomer(SearchOrderCutomerRequest searchOrderCutomerRequest) {
         return orderRepository.listOrderCustomer(searchOrderCutomerRequest.getIdAccount());
     }
-
+//    @Override
     ServiceResultReponse<Order> customerAddOrder(OrderCutomerRequest orderCutomerRequest){
         try {
             Date date = new Date();
@@ -321,5 +337,150 @@ public class OrderServiceImpl implements IOrderService {
             e.printStackTrace();
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
         }
+    }
+
+    @Override
+    public List<OrderReponse> searchOrderExport(SearchOrderRequest searchOrderRequest) {
+        if (searchOrderRequest.getCustomer() != null) {
+            String customer = searchOrderRequest.getCustomer();
+            customer = customer.replaceAll("\\\\", "\\\\\\\\");
+            customer = customer.replaceAll("%", "\\\\%");
+            customer = customer.replaceAll("_", "\\\\_");
+            searchOrderRequest.setCustomer(customer);
+        }
+        List<Object> objects = orderCustomRepository.getListExport(
+                searchOrderRequest.getType(),
+                searchOrderRequest.getVoucher(),
+                searchOrderRequest.getCustomer(),
+                searchOrderRequest.getDateFirst(),
+                searchOrderRequest.getDateLast(),
+                searchOrderRequest.getStatus(),
+                searchOrderRequest.getPriceMin(),
+                searchOrderRequest.getPriceMax()
+        );
+        List<OrderReponse> list = new ArrayList<>();
+        for (Object object : objects) {
+            Object[] result = (Object[]) object;
+            OrderReponse orderReponse = convertPage(result);
+            list.add(orderReponse);
+        }
+        return list;
+    }
+
+    @Override
+    public byte[] exportExcelListOrder(SearchOrderRequest searchOrderRequest) throws IOException {
+        String excelResourcePath = "static/xuatExcel/danhSachHoaDon.xlsx";
+        String type;
+        String status;
+
+        Resource resource = new ClassPathResource(excelResourcePath);
+        InputStream inputStream = resource.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        inputStream.close();
+        Sheet sheet = workbook.getSheet("Sheet1");
+
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman");
+        font.setFontHeightInPoints((short) 12);
+
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFont(font);
+        // Đặt căn giữa ngang
+        //        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        // Đặt căn giữa dọc
+        //        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setWrapText(true);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        cellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+
+        // set style căn giữa
+        CellStyle centerAlignmentStyle = workbook.createCellStyle();
+        centerAlignmentStyle.setWrapText(true);
+        centerAlignmentStyle.setFont(font);
+        centerAlignmentStyle.setAlignment(HorizontalAlignment.CENTER);
+        centerAlignmentStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        centerAlignmentStyle.setBorderBottom(BorderStyle.THIN);
+        centerAlignmentStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        centerAlignmentStyle.setBorderLeft(BorderStyle.THIN);
+        centerAlignmentStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        centerAlignmentStyle.setBorderRight(BorderStyle.THIN);
+        centerAlignmentStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        centerAlignmentStyle.setBorderTop(BorderStyle.THIN);
+        centerAlignmentStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        //
+
+        List<OrderReponse> orderReponsesList = this.searchOrderExport(searchOrderRequest);
+        int rowNum = 3;
+        for (OrderReponse orderReponse : orderReponsesList) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(rowNum - 3);
+            row.createCell(1).setCellValue(orderReponse.getCode());
+            row.createCell(2).setCellValue(orderReponse.getCustomerName());
+            row.createCell(3).setCellValue(orderReponse.getPhoneNumber());
+            if(orderReponse.getTotalMoney() != null) {
+                BigDecimal totalMoney = orderReponse.getTotalMoney();
+                row.createCell(4).setCellValue(totalMoney.toString());
+            }
+            if(orderReponse.getType() != null) {
+                if (orderReponse.getType().equals("1")) {
+                    type = "Tại quầy";
+                } else
+                    type = "Online";
+            }else{
+                type = "";
+            }
+            row.createCell(5).setCellValue(type);
+            row.createCell(6).setCellValue(orderReponse.getCreatedDate());
+            if (orderReponse.getStatus()== 0) {
+                status = "Hóa đơn chờ";
+            } else if(orderReponse.getStatus() == 1) {
+                status = "Chờ thanh toán";
+            }else if(orderReponse.getStatus() == 2) {
+                status = "Đã thanh toán";
+            }else if(orderReponse.getStatus() == 3) {
+                status = "Đã hủy";
+            }else if(orderReponse.getStatus() == 4) {
+                status = "Chờ xác nhận";
+            }else if(orderReponse.getStatus() == 5) {
+                status = "Chờ giao hàng";
+            }else if(orderReponse.getStatus() == 6){
+                status = "Đơn hàng thành công";
+            }else{
+                status = "";
+            }
+            row.createCell(7).setCellValue(status);
+//
+//            Cell cell7 = row.createCell(7);
+//            cell7.setCellValue(subjectDTO.getDescription());
+//            cell7.setCellStyle(centerAlignmentStyle); // Áp dụng căn giữa cho cell7
+
+            for (int i = 0; i <= 3; i++) {
+                Cell cell = row.getCell(i);
+                if (cell == null) {
+                    cell = row.createCell(i);
+                }
+                cell.setCellStyle(cellStyle);
+            }
+        }
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(1);
+        sheet.autoSizeColumn(2);
+        sheet.autoSizeColumn(3);
+        sheet.autoSizeColumn(4);
+        sheet.autoSizeColumn(5);
+        sheet.autoSizeColumn(6);
+        sheet.autoSizeColumn(7);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return outputStream.toByteArray();
     }
 }
