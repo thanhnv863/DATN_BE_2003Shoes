@@ -110,7 +110,7 @@ public class VoucherOrderRepositoryImpl implements VoucherOrderCustomRepository 
         sql.append(" WHERE v.status=1");
 
         if (totalMoneyMyOrder != null) {
-            sql.append(" AND (v.min_order_value < :totalMoneyMyOrder)");
+            sql.append(" AND (v.min_order_value <= :totalMoneyMyOrder)");
         }
 
         Query query = entityManager.createNativeQuery(sql.toString());
