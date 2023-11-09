@@ -15,5 +15,6 @@ import lombok.Setter;
 public class CartDetailResponse {
     private Long id;
     private Integer quantity;
+    private Integer status;
     private ResultItem detail;
 }
