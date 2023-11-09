@@ -181,6 +181,7 @@ public class CardDetailServiceImpl implements ICartDetailService {
                 CartDetailResponse.builder()
                         .id(CartDetail.getShoeDetail().getId())
                         .quantity(CartDetail.getQuantity())
+                        .status(CartDetail.getStatus())
                         .detail((ResultItem) searchShoeDetailById(BigInteger.valueOf(CartDetail.getShoeDetail().getId())))
                         .build()).collect(Collectors.toList());
 
