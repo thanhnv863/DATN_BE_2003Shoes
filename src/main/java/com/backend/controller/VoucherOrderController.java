@@ -3,12 +3,9 @@ package com.backend.controller;
 import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
-import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.request.VoucherOrderRequest;
-import com.backend.dto.response.OrderReponse;
 import com.backend.dto.response.VoucherOrderResponse;
-import com.backend.dto.response.VoucherResponseImport;
-import com.backend.entity.VoucherOrder;
+import com.backend.dto.response.ResponseImport;
 import com.backend.service.IVoucherOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -81,7 +77,7 @@ public class VoucherOrderController {
     @PostMapping("/import")
     public ResponseEntity<?> importData(@RequestParam("file") MultipartFile file, @RequestParam("type") Integer type) {
         try {
-            VoucherResponseImport voucherResponseImport = voucherOrderService.importDataFromExcel(file, type);
+            ResponseImport voucherResponseImport = voucherOrderService.importDataFromExcel(file, type);
             return ResponseEntity.ok(voucherResponseImport);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi nhập dữ liệu từ Excel");

@@ -5,7 +5,7 @@ import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.VoucherOrderRequest;
 import com.backend.dto.response.VoucherOrderResponse;
-import com.backend.dto.response.VoucherResponseImport;
+import com.backend.dto.response.ResponseImport;
 import com.backend.entity.VoucherOrder;
 import com.backend.repository.VoucherOrderCustomRepository;
 import com.backend.repository.VoucherOrderRepository;
@@ -21,7 +21,6 @@ import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
@@ -49,7 +48,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -691,7 +689,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
     }
 
     @Override
-    public VoucherResponseImport importDataFromExcel(MultipartFile file, Integer type) throws IOException {
+    public ResponseImport importDataFromExcel(MultipartFile file, Integer type) throws IOException {
         int fail = 0;
         int total = 0;
         List<String> errors = new ArrayList<>();
@@ -722,7 +720,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
 //            System.out.println(errors);
         }
         fail = errors.size();
-        VoucherResponseImport voucherResponseImport = new VoucherResponseImport();
+        ResponseImport voucherResponseImport = new ResponseImport();
         voucherResponseImport.setFail(fail);
         voucherResponseImport.setTotal(total);
         voucherResponseImport.setSuccess((total - fail));
