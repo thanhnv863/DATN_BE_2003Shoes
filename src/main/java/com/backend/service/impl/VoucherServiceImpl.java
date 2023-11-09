@@ -3,7 +3,9 @@ package com.backend.service.impl;
 import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
+import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.request.VoucherOrderRequest;
+import com.backend.dto.response.OrderReponse;
 import com.backend.dto.response.VoucherOrderResponse;
 import com.backend.dto.response.ResponseImport;
 import com.backend.entity.VoucherOrder;
@@ -941,6 +943,141 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         return excelBytes;
     }
 
+    // exportListVoucher
+    @Override
+    public List<VoucherOrderResponse> searchExportListVoucher(VoucherOrderRequest voucherOrderRequest) {
+        if (voucherOrderRequest.getName() != null) {
+            String name = voucherOrderRequest.getName();
+            name = name.replaceAll("\\\\", "\\\\\\");
+            name = name.replaceAll("%", "\\\\\\%");
+            name = name.replaceAll("_", "\\\\\\_");
+            voucherOrderRequest.setName(name);
+        }
+        List<Object> objects = voucherOrderCustomRepository.searchExportListVoucher(
+                voucherOrderRequest.getName(),
+                voucherOrderRequest.getStatus(),
+                voucherOrderRequest.getStartDate(),
+                voucherOrderRequest.getEndDate()
+        );
+
+        List<VoucherOrderResponse> list = new ArrayList<>();
+        for (Object object : objects) {
+            Object[] result = (Object[]) object;
+            VoucherOrderResponse voucherOrderResponse = convertPage(result);
+            list.add(voucherOrderResponse);
+        }
+        return list;
+    }
+    @Override
+    public byte[] exportExcelListVoucher(VoucherOrderRequest voucherOrderRequest) throws IOException {
+        String excelResourcePath = "static/xuatExcel/danhSachVoucher.xlsx";
+        String status;
+        Resource resource = new ClassPathResource(excelResourcePath);
+        InputStream inputStream = resource.getInputStream();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        inputStream.close();
+        Sheet sheet = workbook.getSheet("Sheet1");
+
+        Font font = workbook.createFont();
+        font.setFontName("Times New Roman");
+        font.setFontHeightInPoints((short) 12);
+
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setFont(font);
+        // Đặt căn giữa ngang
+        //        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        // Đặt căn giữa dọc
+        //        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setWrapText(true);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        cellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+
+        // set style căn giữa
+        CellStyle centerAlignmentStyle = workbook.createCellStyle();
+        centerAlignmentStyle.setWrapText(true);
+        centerAlignmentStyle.setFont(font);
+        centerAlignmentStyle.setAlignment(HorizontalAlignment.CENTER);
+        centerAlignmentStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        centerAlignmentStyle.setBorderBottom(BorderStyle.THIN);
+        centerAlignmentStyle.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        centerAlignmentStyle.setBorderLeft(BorderStyle.THIN);
+        centerAlignmentStyle.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        centerAlignmentStyle.setBorderRight(BorderStyle.THIN);
+        centerAlignmentStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        centerAlignmentStyle.setBorderTop(BorderStyle.THIN);
+        centerAlignmentStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        //
+
+        List<VoucherOrderResponse> voucherOrderResponseList = this.searchExportListVoucher(voucherOrderRequest);
+        int rowNum = 3;
+        for (VoucherOrderResponse voucherOrderResponse : voucherOrderResponseList) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(rowNum - 3);
+            row.createCell(1).setCellValue(voucherOrderResponse.getCode());
+            row.createCell(2).setCellValue(voucherOrderResponse.getName());
+            row.createCell(3).setCellValue(voucherOrderResponse.getQuantity());
+            BigDecimal giaTriGiam = voucherOrderResponse.getDiscountAmount();
+            if(voucherOrderResponse.getReduceForm() == 0){
+                row.createCell(4).setCellValue(giaTriGiam.toString() + "VND");
+            }
+            else{
+                row.createCell(4).setCellValue(giaTriGiam.toString() + "%");
+            }
+            BigDecimal giaTriDonHangToiThieu = voucherOrderResponse.getMinBillValue();
+            row.createCell(5).setCellValue(giaTriDonHangToiThieu.toString());
+            if(voucherOrderResponse.getMaximumReductionValue()!= null){
+                BigDecimal giaTriGiamToiDa = voucherOrderResponse.getMaximumReductionValue();
+                row.createCell(6).setCellValue(giaTriGiamToiDa.toString());
+            }else{
+                row.createCell(6).setCellValue("");
+            }
+            row.createCell(7).setCellValue(voucherOrderResponse.getStartDate());
+            row.createCell(8).setCellValue(voucherOrderResponse.getEndDate());
+            if (voucherOrderResponse.getStatus()== 0) {
+                status = "Chờ kích hoạt";
+            } else if(voucherOrderResponse.getStatus() == 1) {
+                status = "Đã kích hoạt";
+            }else if(voucherOrderResponse.getStatus() == 2) {
+                status = "Hết hạn";
+            }else{
+                status = "";
+            }
+            row.createCell(9).setCellValue(status);
+//
+//            Cell cell7 = row.createCell(7);
+//            cell7.setCellValue(subjectDTO.getDescription());
+//            cell7.setCellStyle(centerAlignmentStyle); // Áp dụng căn giữa cho cell7
+
+            for (int i = 0; i <= 3; i++) {
+                Cell cell = row.getCell(i);
+                if (cell == null) {
+                    cell = row.createCell(i);
+                }
+                cell.setCellStyle(cellStyle);
+            }
+        }
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(1);
+        sheet.autoSizeColumn(2);
+        sheet.autoSizeColumn(3);
+        sheet.autoSizeColumn(4);
+        sheet.autoSizeColumn(5);
+        sheet.autoSizeColumn(6);
+        sheet.autoSizeColumn(7);
+        sheet.autoSizeColumn(8);
+        sheet.autoSizeColumn(9);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return outputStream.toByteArray();
+    }
     @Override
     public CellStyle createHeaderCellStyle(Workbook workbook) {
         CellStyle headerCellStyle = workbook.createCellStyle();
@@ -1001,6 +1138,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         cellSymble.setTopBorderColor(IndexedColors.BLACK.getIndex());
         return cellSymble;
     }
+
     public CellStyle createErrorCellStyleDateSymble(Workbook workbook) {
         CellStyle cellSymbleDate = workbook.createCellStyle();
         CreationHelper createHelper = workbook.getCreationHelper();

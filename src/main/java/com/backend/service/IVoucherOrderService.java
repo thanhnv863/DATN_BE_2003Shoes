@@ -54,4 +54,8 @@ public interface IVoucherOrderService {
     CellStyle createErrorCellStyleSymble(Workbook workbook);
 
     CellStyle createBorderCellStyle(Workbook workbook);
+
+    List<VoucherOrderResponse> searchExportListVoucher(VoucherOrderRequest voucherOrderRequest);
+
+    byte[] exportExcelListVoucher(VoucherOrderRequest voucherOrderRequest) throws IOException;
 }

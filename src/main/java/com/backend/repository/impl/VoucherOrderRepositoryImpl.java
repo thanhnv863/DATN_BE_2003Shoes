@@ -120,4 +120,52 @@ public class VoucherOrderRepositoryImpl implements VoucherOrderCustomRepository 
         return results;
 
     }
+    @Override
+    public List<Object> searchExportListVoucher( String voucher, Integer status, LocalDateTime startDate, LocalDateTime endDate) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT v.id,v.code,v.name,v.quantity,v.min_order_value,v.discount_amount,v.maximum_reduction_value,v.start_date," +
+                " v.end_date,v.created_time,v.updated_time,v.reduce_form,v.status FROM voucher as v");
+        sql.append(" WHERE 1 = 1");
+
+        if (voucher != null) {
+            sql.append(" AND (v.name like CONCAT('%', :voucher, '%'))");
+        }
+
+        if (status != null) {
+            sql.append(" AND (v.status = :status)");
+        }
+//        else {
+//            // Thêm điều kiện chỉ lấy status = 0, 1 hoặc 2
+//            sql.append(" AND (v.status IN (0, 1, 2))");
+//        }
+
+        if (startDate != null && endDate != null) {
+            sql.append(" AND (v.start_date >= :startDate AND v.end_date <= :endDate)");
+        } else if (startDate != null) {
+            sql.append(" AND (v.start_date >= :startDate)");
+        } else if (endDate != null) {
+            sql.append(" AND (v.end_date <= :endDate)");
+        }
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+
+        if (voucher != null) {
+            query.setParameter("voucher", voucher);
+        }
+
+        if (status != null) {
+            query.setParameter("status", status);
+        }
+
+        if (startDate != null) {
+            query.setParameter("startDate", startDate);
+        }
+
+        if (endDate != null) {
+            query.setParameter("endDate", endDate);
+        }
+
+        List<Object> results = query.getResultList();
+        return results;
+    }
 }
