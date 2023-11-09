@@ -30,6 +30,9 @@ public class CartDetail {
     @Column(name = "quantity")
     private Integer quantity;
 
+    @Column(name = "status")
+    private Integer status;
+
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;

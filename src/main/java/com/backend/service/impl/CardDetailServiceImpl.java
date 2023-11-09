@@ -64,6 +64,7 @@ public class CardDetailServiceImpl implements ICartDetailService {
                 newCartDetail.setCart(cart);
                 newCartDetail.setShoeDetail(shoeDetail);
                 newCartDetail.setQuantity(quantity);
+                newCartDetail.setStatus(1);
                 cartDetailRepository.save(newCartDetail);
                 return new ServiceResult<>(AppConstant.SUCCESS, "Add new succesfully!", null);
             }
@@ -97,6 +98,7 @@ public class CardDetailServiceImpl implements ICartDetailService {
                 newCartDetail.setCart(cart);
                 newCartDetail.setShoeDetail(shoeDetail);
                 newCartDetail.setQuantity(quantity);
+                newCartDetail.setStatus(0);
                 cartDetailRepository.save(newCartDetail);
                 return new ServiceResult<>(AppConstant.SUCCESS, "Add new succesfully!", null);
             }
@@ -133,6 +135,33 @@ public class CardDetailServiceImpl implements ICartDetailService {
     }
 
     @Override
+    public ServiceResult<CartDetail> updateStatusCartDetail(CartDetailRequest cartDetailRequest) {
+        Long cartId = cartDetailRequest.getIdCart();
+        Long shoeDetailId = cartDetailRequest.getIdShoeDetail();
+        Integer status = cartDetailRequest.getStatus();
+
+        Optional<Cart> optionalCart = cartRepository.findById(cartId);
+        Optional<ShoeDetail> optionalShoeDetail = shoeDetailRepository.findById(shoeDetailId);
+
+        if (optionalCart.isPresent() && optionalShoeDetail.isPresent()) {
+            Cart cart = optionalCart.get();
+            ShoeDetail shoeDetail = optionalShoeDetail.get();
+
+            CartDetail existingCartDetail = cartDetailRepository.findByCartAndShoeDetail(cart, shoeDetail);
+
+            if (existingCartDetail != null) {
+                existingCartDetail.setStatus(status);
+                cartDetailRepository.save(existingCartDetail);
+                return new ServiceResult<>(AppConstant.SUCCESS, "Update cartdetail status successfully!", null);
+            } else {
+                return new ServiceResult<>(AppConstant.NOT_FOUND, "Record not found!", null);
+            }
+        } else {
+            return new ServiceResult<>(AppConstant.NOT_FOUND, "Ko tim thay idcart, shoedetailis", null);
+        }
+    }
+
+    @Override
     public ServiceResult<List<CartDetailResponse>> getCartDetailList(CartDetailRequest cartDetailRequest) {
         Long cartId = cartDetailRequest.getIdCart();
         Optional<Cart> optionalCart = cartRepository.findById(cartId);
@@ -152,6 +181,7 @@ public class CardDetailServiceImpl implements ICartDetailService {
                 CartDetailResponse.builder()
                         .id(CartDetail.getShoeDetail().getId())
                         .quantity(CartDetail.getQuantity())
+                        .status(CartDetail.getStatus())
                         .detail((ResultItem) searchShoeDetailById(BigInteger.valueOf(CartDetail.getShoeDetail().getId())))
                         .build()).collect(Collectors.toList());
 

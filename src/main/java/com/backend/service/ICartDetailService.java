@@ -16,6 +16,8 @@ public interface ICartDetailService {
 
     ServiceResult<CartDetail> deleteCartDetail(CartDetailRequest cartDetailRequest);
 
+    ServiceResult<CartDetail> updateStatusCartDetail(CartDetailRequest cartDetailRequest);
+
     ServiceResult<List<CartDetailResponse>> getCartDetailList(CartDetailRequest cartDetailRequest);
 
 

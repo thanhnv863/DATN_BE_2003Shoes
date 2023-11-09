@@ -15,4 +15,5 @@ public class CartDetailRequest {
     private Long idCart;
     private Long idShoeDetail;
     private Integer qty;
+    private Integer status;
 }
