@@ -1,10 +1,11 @@
 package com.backend.service.impl;
 
-import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.OrderRequest;
 import com.backend.dto.request.OrderRequetUpdate;
+import com.backend.dto.request.orderCustomer.OrderCutomerRequest;
+import com.backend.dto.request.orderCustomer.SearchOrderCutomerRequest;
 import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.response.OrderReponse;
 import com.backend.entity.Account;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -247,5 +249,77 @@ public class OrderServiceImpl implements IOrderService {
             list.add(orderReponse);
         }
         return new ServiceResultReponse<>(AppConstant.SUCCESS, Long.valueOf(list.size()), list, "Lấy danh sách hóa đơn chờ thành công!");
+    }
+
+    //customer
+    @Override
+    public List<Order> listAllByCustomer(SearchOrderCutomerRequest searchOrderCutomerRequest) {
+        return orderRepository.listOrderCustomer(searchOrderCutomerRequest.getIdAccount());
+    }
+
+    ServiceResultReponse<Order> customerAddOrder(OrderCutomerRequest orderCutomerRequest){
+        try {
+            Date date = new Date();
+            Order order = new Order();
+            order.setCode(generateOrderCode());
+            if (orderCutomerRequest.getIdVoucher() != null) {
+                VoucherOrder voucherOrder = voucherOrderRepository.findById(orderCutomerRequest.getIdVoucher()).get();
+                order.setVoucherOrder(voucherOrder);
+            } else {
+                order.setVoucherOrder(null);
+            }
+            //
+            if (orderCutomerRequest.getIdAccount() != null) {
+                Account account = accountRepository.findById(orderCutomerRequest.getIdAccount()).get();
+                order.setAccount(account);
+            } else {
+                order.setAccount(null);
+            }
+
+//            order.setUpdatedBy(order.getUpdatedBy());
+            order.setType("2");
+            order.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
+            order.setCustomerName(orderCutomerRequest.getCustomerName());
+            order.setAddress(orderCutomerRequest.getAddress());
+            order.setShipFee(orderCutomerRequest.getShipFee());
+            order.setMoneyReduce(orderCutomerRequest.getMoneyReduce());
+            order.setTotalMoney(orderCutomerRequest.getTotalMoney());
+            order.setCreatedDate(date);
+            order.setPayDate(date);
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            // Thêm 2 ngày vào ngày giao hàng
+            calendar.add(Calendar.DAY_OF_MONTH, 2);
+            Date shipDate = calendar.getTime();
+            order.setShipDate(shipDate);
+
+            // Thêm 2 ngày nữa vào ngày mong muốn
+            calendar.add(Calendar.DAY_OF_MONTH, 2);
+            Date desiredDate = calendar.getTime();
+            order.setDesiredDate(desiredDate);
+
+            order.setReceiveDate(null);
+            order.setCreatedBy(order.getAccount().getName());
+            order.setNote(orderCutomerRequest.getNote());
+            order.setStatus(4);
+            Order orderAddCustomer = orderRepository.save(order);
+            // orderHistory
+            OrderHistory orderHistory = new OrderHistory();
+            orderHistory.setOrder(orderAddCustomer);
+            orderHistory.setCreatedTime(date);
+            orderHistory.setCreatedBy(order.getCreatedBy());
+            orderHistory.setNote("Khách Hàng Đặt Hàng");
+            orderHistory.setType("Created");
+            orderHistoryRepository.save(orderHistory);
+            // orderDetail
+
+
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
+        }
     }
 }
