@@ -16,4 +16,6 @@ public interface VoucherOrderCustomRepository {
     );
 
     List<Object> doSearchMinBillValue(BigDecimal totalMoneyMyOrder);
+
+    List<Object> searchExportListVoucher( String voucher, Integer status, LocalDateTime startDate, LocalDateTime endDate);
 }

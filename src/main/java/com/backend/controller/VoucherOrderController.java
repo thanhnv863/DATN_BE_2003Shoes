@@ -3,6 +3,7 @@ package com.backend.controller;
 import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
+import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.request.VoucherOrderRequest;
 import com.backend.dto.response.VoucherOrderResponse;
 import com.backend.dto.response.ResponseImport;
@@ -91,5 +92,14 @@ public class VoucherOrderController {
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment; filename=error-file-voucher.xlsx");
         return ResponseEntity.ok().body(excelBytes);
+    }
+
+
+    @PostMapping("/export-voucher")
+    public ResponseEntity<byte[]> exportSubjectsToExcel(HttpServletResponse response, @RequestBody VoucherOrderRequest voucherOrderRequest) throws IOException {
+        byte[] excelData = voucherOrderService.exportExcelListVoucher(voucherOrderRequest);
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition", "attachment; filename=list-voucher-file.xlsx");
+        return ResponseEntity.ok().body(excelData);
     }
 }
