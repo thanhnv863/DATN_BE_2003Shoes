@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class StaffRequest {
+public class AccountRequest {
 
     private Long id;
 
@@ -27,7 +27,7 @@ public class StaffRequest {
 
     private Integer status;
 
-    public StaffRequest(String name, String email, String password, String avatar) {
+    public AccountRequest(String name, String email, String password, String avatar) {
         this.name = name;
         this.email = email;
         this.password = password;
