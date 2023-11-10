@@ -445,36 +445,52 @@ public class OrderServiceImpl implements IOrderService {
                 orderDetailRepository.save(orderDetail);
                 shoeDetailRepository.updateSoLuong(quantityNew,shoeDetail.getId());
             }
-            // tạo tài khoản
-            Account account = new Account();
-            Calendar calendar1 = Calendar.getInstance();
-            Date now = calendar1.getTime();
-            account.setName(orderCutomerRequest.getCustomerName());
-            account.setEmail(orderCutomerRequest.getEmail());
-            account.setCreatedAt(now);
-            account.setUpdatedAt(now);
-            account.setStatus(1);
-            account.setPassword(passwordEncoder.encode("123456"));
-            account.setRole(Role.builder().id(2).build());
-            account = accountRepository.save(account);
+            //check xem email đã có tài khoản hay chưa
+            Optional<Account> accountCheck = accountRepository.getOneByEmail(orderCutomerRequest.getEmail());
+            if(accountCheck.isPresent()){
+                String to = orderCutomerRequest.getEmail();
+                String subject = "Welcome to store 2003SHOES";
+                String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản đã được đăng ký với email này!";
+                String mailContent = "Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu";
+                iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
+                // lưu đơn hàng vào tài khoản đã có
+                Account account = accountCheck.get();
+                Order orderAccount = orderRepository.findById(order.getId()).get();
+                orderAccount.setAccount(account);
+                orderRepository.save(orderAccount);
+            }
+            else {
+                // tạo tài khoản
+                Account account = new Account();
+                Calendar calendar1 = Calendar.getInstance();
+                Date now = calendar1.getTime();
+                account.setName(orderCutomerRequest.getCustomerName());
+                account.setEmail(orderCutomerRequest.getEmail());
+                account.setCreatedAt(now);
+                account.setUpdatedAt(now);
+                account.setStatus(1);
+                account.setPassword(passwordEncoder.encode("123456"));
+                account.setRole(Role.builder().id(2).build());
+                account = accountRepository.save(account);
 
-            // tạo cart
-            Cart cart = new Cart();
-            cart.setAccount(account);
-            cart.setCreatedAt(now);
-            cart.setUpdatedAt(now);
-            cart.setStatus(1);
-            cartRepository.save(cart);
-            //
-            String to = orderCutomerRequest.getEmail();
-            String subject = "Welcome to store 2k3SHOES";
-            String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản dưới đây";
-            String mailContent = "Mật khẩu tài khoản của bạn là : 123456";
-            iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
-            // lưu đơn hàng vào tài khoản vừa tạo
-            Order orderAccount = orderRepository.findById(order.getId()).get();
-            orderAccount.setAccount(account);
-            orderRepository.save(orderAccount);
+                // tạo cart
+                Cart cart = new Cart();
+                cart.setAccount(account);
+                cart.setCreatedAt(now);
+                cart.setUpdatedAt(now);
+                cart.setStatus(1);
+                cartRepository.save(cart);
+                //
+                String to = orderCutomerRequest.getEmail();
+                String subject = "Welcome to store 2003SHOES";
+                String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản dưới đây";
+                String mailContent = "Mật khẩu tài khoản của bạn là : 123456";
+                iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                // lưu đơn hàng vào tài khoản vừa tạo
+                Order orderAccount = orderRepository.findById(order.getId()).get();
+                orderAccount.setAccount(account);
+                orderRepository.save(orderAccount);
+            }
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
         } catch (Exception e) {
             e.printStackTrace();
