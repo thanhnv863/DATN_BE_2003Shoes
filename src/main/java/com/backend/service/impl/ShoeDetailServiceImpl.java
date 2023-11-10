@@ -994,6 +994,8 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
                     shoeDetail.setStatus(1);
                     shoeDetail.setCode(shoe.getName().toLowerCase() + " - " + color.getName().toLowerCase() + " - " + size.getName());
                     shoeDetailRepository.save(shoeDetail);
+                    String qrCode = generateQrCode(ShoeDetail.builder().id(shoeDetail.getId()).build());
+                    saveQrCode(shoeDetail, qrCode);
                 }
             }
         }
