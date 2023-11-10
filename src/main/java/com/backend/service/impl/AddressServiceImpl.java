@@ -87,7 +87,7 @@ public class AddressServiceImpl implements IAddressService {
             return new ServiceResult<>(AppConstant.SUCCESS, "Update success", address);
 
         }else{
-            return new ServiceResult<>(AppConstant.BAD_REQUEST,"Update success",null);
+            return new ServiceResult<>(AppConstant.BAD_REQUEST,"Update fail",null);
         }
     }
 
@@ -148,7 +148,6 @@ public class AddressServiceImpl implements IAddressService {
     @Override
     public ServiceResult<List<Address>> searchNameClient(String name) {
         List<Address> addressName = addressRepository.searchNameClient(name);
-
         return new ServiceResult<>(AppConstant.SUCCESS,"success",addressName);
     }
 
@@ -234,7 +233,6 @@ public class AddressServiceImpl implements IAddressService {
     public ServiceResult<AddressResponse> result(String mess) {
         return new ServiceResult<>(AppConstant.FAIL,mess,null);
     }
-
 
 
 }
