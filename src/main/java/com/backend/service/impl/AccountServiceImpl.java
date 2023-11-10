@@ -58,9 +58,9 @@ public class AccountServiceImpl implements IAccountService {
         RegisterResponse registerResponse = new RegisterResponse();
 
         String to = registerRequest.getEmail();
-        String subject = "Welcome to store bee shoe of group SD-66";
+        String subject = "Welcome to store 2003SHOES";
         String mailType = "chao mung nhan vien ";
-        String mailContent = "mat khau acccount cua ban la :"+registerRequest.getPassword();
+        String mailContent = "Mật khẩu tài khoản của bạn là  :"+registerRequest.getPassword();
 
         iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
         return new ServiceResult<>(AppConstant.SUCCESS,

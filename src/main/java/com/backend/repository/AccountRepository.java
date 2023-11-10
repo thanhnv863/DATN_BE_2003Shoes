@@ -21,4 +21,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             " a.name like concat('%', :name, '%')")
     List<Account> searchNameStaff(String name);
 
+    @Query(value = "SELECT * FROM account \n" +
+            "where account.email = ?1 and account.role_id = 2", nativeQuery = true)
+    Optional<Account> getOneByEmail(String email);
 }
