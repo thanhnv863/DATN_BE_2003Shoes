@@ -1,5 +1,7 @@
 package com.backend.controller;
 
+import com.backend.dto.request.OrderRequest;
+import com.backend.dto.request.orderCustomer.OrderCutomerRequest;
 import com.backend.dto.request.orderCustomer.SearchOrderCutomerRequest;
 import com.backend.entity.Order;
 import com.backend.service.IOrderService;
@@ -24,5 +26,8 @@ public class OrderControllerCustomer {
         return ResponseEntity.ok().body(listOrderCustomer);
     }
 
-
+    @PostMapping("/save")
+    public ResponseEntity<?> add(@RequestBody OrderCutomerRequest orderCutomerRequest) {
+        return ResponseEntity.ok().body(iOrderService.customerAddOrder(orderCutomerRequest));
+    }
 }

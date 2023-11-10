@@ -9,13 +9,21 @@ import com.backend.dto.request.orderCustomer.SearchOrderCutomerRequest;
 import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.response.OrderReponse;
 import com.backend.entity.Account;
+import com.backend.entity.Cart;
+import com.backend.entity.CartDetail;
 import com.backend.entity.Order;
+import com.backend.entity.OrderDetail;
 import com.backend.entity.OrderHistory;
+import com.backend.entity.ShoeDetail;
 import com.backend.entity.VoucherOrder;
 import com.backend.repository.AccountRepository;
+import com.backend.repository.CartDetailRepository;
+import com.backend.repository.CartRepository;
 import com.backend.repository.OrderCustomRepository;
+import com.backend.repository.OrderDetailRepository;
 import com.backend.repository.OrderHistoryRepository;
 import com.backend.repository.OrderRepository;
+import com.backend.repository.ShoeDetailRepository;
 import com.backend.repository.VoucherOrderRepository;
 import com.backend.service.IOrderService;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -67,6 +75,19 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private CartDetailRepository cartDetailRepository;
+
+    @Autowired
+    private ShoeDetailRepository shoeDetailRepository;
+
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
 
     public OrderReponse convertPage(Object[] object) {
         OrderReponse orderReponse = new OrderReponse();
@@ -272,8 +293,8 @@ public class OrderServiceImpl implements IOrderService {
     public List<Order> listAllByCustomer(SearchOrderCutomerRequest searchOrderCutomerRequest) {
         return orderRepository.listOrderCustomer(searchOrderCutomerRequest.getIdAccount());
     }
-//    @Override
-    ServiceResultReponse<Order> customerAddOrder(OrderCutomerRequest orderCutomerRequest){
+    @Override
+    public ServiceResultReponse<Order> customerAddOrder(OrderCutomerRequest orderCutomerRequest){
         try {
             Date date = new Date();
             Order order = new Order();
@@ -330,8 +351,22 @@ public class OrderServiceImpl implements IOrderService {
             orderHistory.setType("Created");
             orderHistoryRepository.save(orderHistory);
             // orderDetail
-
-
+            Cart cart = cartRepository.findByAccount_Id(order.getAccount().getId());
+            List<CartDetail> cartDetailList = cartDetailRepository.listCartDetailByStatus(cart.getId());
+            for(CartDetail cartDetail : cartDetailList){
+                ShoeDetail shoeDetail = shoeDetailRepository.findById(cartDetail.getShoeDetail().getId()).get();
+                OrderDetail orderDetail = new OrderDetail();
+                orderDetail.setShoeDetail(shoeDetail);
+                orderDetail.setOrder(order);
+                orderDetail.setQuantity(cartDetail.getQuantity());
+                orderDetail.setPrice(shoeDetail.getPriceInput());
+                orderDetail.setDiscount(BigDecimal.valueOf(0));
+                orderDetail.setStatus(1);
+                Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
+                orderDetailRepository.save(orderDetail);
+                shoeDetailRepository.updateSoLuong(quantityNew,shoeDetail.getId());
+                cartDetailRepository.deleteCartDetailByStatus(cartDetail.getStatus());
+            }
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
         } catch (Exception e) {
             e.printStackTrace();
