@@ -1,5 +1,6 @@
 package com.backend.dto.request.orderCustomer;
 
+import com.backend.entity.ShoeDetail;
 import com.backend.util.DateTimeSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -39,6 +42,9 @@ public class OrderCutomerRequest {
 
     private BigDecimal totalMoney;
 
+    private List<ShoeDetail> shoeDetailListRequets;
+
+    private String email;
     @JsonSerialize(using = DateTimeSerializer.class)
     private Date payDate;
 
