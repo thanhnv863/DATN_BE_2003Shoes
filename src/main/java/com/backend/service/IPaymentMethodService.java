@@ -1,5 +1,6 @@
 package com.backend.service;
 
+import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.dto.request.SearchPaymentMethod;
 import com.backend.dto.request.paymentMethod.PaymentMethodRequest;
@@ -15,4 +16,6 @@ public interface IPaymentMethodService {
     ServiceResultReponse<PaymentMethod> add(PaymentMethodRequest paymentMethodRequest);
 
     ServiceResultReponse<PaymentMethod> update(PaymentMethodRequestUpdate paymentMethodRequestUpdate);
+
+    ServiceResult<?> getAllByIdOrder(Long idOrder);
 }
