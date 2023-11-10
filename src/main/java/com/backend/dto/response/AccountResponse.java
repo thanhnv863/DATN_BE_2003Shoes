@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class StaffResponse {
+public class AccountResponse {
     private Long id;
 
     private Integer roleId;
@@ -26,7 +26,7 @@ public class StaffResponse {
 
     private Integer status;
 
-    public StaffResponse(String name, String email, String password, String avatar) {
+    public AccountResponse(String name, String email, String password, String avatar) {
         this.name = name;
         this.email = email;
         this.password = password;

@@ -21,4 +21,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             " a.name like concat('%', :name, '%')")
     List<Account> searchNameStaff(String name);
 
+    @Query("select a from Account a where " +
+            " a.status = 1 ")
+    List<Account> getAllAccount();
 }
