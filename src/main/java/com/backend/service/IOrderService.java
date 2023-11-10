@@ -3,6 +3,7 @@ package com.backend.service;
 import com.backend.ServiceResultReponse;
 import com.backend.dto.request.OrderRequest;
 import com.backend.dto.request.OrderRequetUpdate;
+import com.backend.dto.request.orderCustomer.OrderCutomerRequest;
 import com.backend.dto.request.orderCustomer.SearchOrderCutomerRequest;
 import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.response.OrderReponse;
@@ -31,6 +32,7 @@ public interface IOrderService {
     //customer
     List<Order> listAllByCustomer(SearchOrderCutomerRequest searchOrderCutomerRequest);
 
+    ServiceResultReponse<Order> customerAddOrder(OrderCutomerRequest orderCutomerRequest);
 
 
 
