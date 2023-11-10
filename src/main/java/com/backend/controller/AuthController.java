@@ -3,19 +3,17 @@ package com.backend.controller;
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.config.UserInfoUserDetailsService;
-import com.backend.dto.request.AuthRequest;
-import com.backend.dto.request.EmailRequest;
-import com.backend.dto.response.JwtResponse;
 import com.backend.dto.Product;
+import com.backend.dto.request.AuthRequest;
 import com.backend.dto.request.RegisterRequest;
+import com.backend.dto.response.JwtResponse;
 import com.backend.dto.response.RefreshToken;
 import com.backend.entity.Account;
 import com.backend.repository.AccountRepository;
 import com.backend.service.IAccountService;
-import com.backend.service.IEmailTemplateService;
 import com.backend.service.JwtService;
-import com.backend.service.impl.ProductService;
 import com.backend.service.RefreshTokenService;
+import com.backend.service.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -256,4 +254,10 @@ public JwtResponse refreshToken(HttpServletRequest request) {
                 .message("User logged out successfully")
                 .build());
     }
+
+//    @GetMapping("/forgotpassword")
+//    public ResponseEntity<?> forgotPassword(@PathVariable("email") String email){
+//        return ResponseEntity.ok(iAccountService.forgotPassword(email));
+//    }
+
 }

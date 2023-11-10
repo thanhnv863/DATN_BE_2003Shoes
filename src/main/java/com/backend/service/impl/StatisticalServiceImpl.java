@@ -77,7 +77,6 @@ public class StatisticalServiceImpl implements IStatistical {
         }else{
             return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
         }
-
     }
 
     @Override

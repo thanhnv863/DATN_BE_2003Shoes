@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.Column;
@@ -46,19 +48,21 @@ public class Account {
     @Column(name = "avatar")
     private String avatar;
 
+    @CreationTimestamp
     @Column(name = "created_time")
     private Date createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_time")
     private Date updatedAt;
 
     @Column(name = "status")
     private Integer status;
 
-
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
+
 
     public Account(Long id, String name, String email, String password, Role role, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;

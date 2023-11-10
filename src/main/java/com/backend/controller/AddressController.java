@@ -2,6 +2,7 @@ package com.backend.controller;
 
 import com.backend.dto.request.AddressRequest;
 import com.backend.service.IAddressService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/address")
 public class AddressController {
 
+    @Autowired
     private IAddressService iAddressService;
 
     public AddressController(IAddressService iAddressService) {
@@ -55,4 +57,6 @@ public class AddressController {
     public ResponseEntity<?> getCustomer(@PathVariable("id") Long id){
         return ResponseEntity.ok(iAddressService.getCustomer(id));
     }
+
+
 }
