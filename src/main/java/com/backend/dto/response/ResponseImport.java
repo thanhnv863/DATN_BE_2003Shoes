@@ -1,4 +1,4 @@
-package com.backend.dto.request;
+package com.backend.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class CartDetailRequest {
-    private Long idCart;
-    private Long idShoeDetail;
-    private Integer qty;
-    private Integer status;
+public class ResponseImport {
+    int total;
+    int fail;
+    int success;
 }

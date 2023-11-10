@@ -1,5 +1,6 @@
 package com.backend.service.impl;
 
+import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.SearchPaymentMethod;
@@ -126,5 +127,12 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
             e.printStackTrace();
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Cập nhật phương thức thanh toán thất bại");
         }
+    }
+
+    @Override
+    public ServiceResult<?> getAllByIdOrder(Long idOrder) {
+        Order order = orderRepository.findById(idOrder).get();
+        List<PaymentMethod> paymentMethodList = paymentMethodRepository.findAllByAndOrder(order);
+        return new ServiceResult<>(AppConstant.SUCCESS, "Lấy danh sách thành công", paymentMethodList);
     }
 }

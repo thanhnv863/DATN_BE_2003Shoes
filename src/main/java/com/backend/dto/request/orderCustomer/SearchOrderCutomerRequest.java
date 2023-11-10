@@ -1,4 +1,4 @@
-package com.backend.dto.response;
+package com.backend.dto.request.orderCustomer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class VoucherResponseImport {
-    int total;
-    int fail;
-    int success;
+public class SearchOrderCutomerRequest {
+    private Long idAccount;
 }

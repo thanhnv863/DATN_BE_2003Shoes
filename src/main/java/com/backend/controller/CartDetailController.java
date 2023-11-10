@@ -37,4 +37,9 @@ public class CartDetailController {
     public ResponseEntity<?> getListCartDetail(@RequestBody CartDetailRequest cartDetailRequest){
         return ResponseEntity.ok(iCartDetailService.getCartDetailList(cartDetailRequest));
     }
+
+    @PostMapping("/updateStatusCartDetail")
+    public ResponseEntity<?> updateStatusCartDetail(@RequestBody CartDetailRequest cartDetailRequest){
+        return ResponseEntity.ok(iCartDetailService.updateStatusCartDetail(cartDetailRequest));
+    }
 }

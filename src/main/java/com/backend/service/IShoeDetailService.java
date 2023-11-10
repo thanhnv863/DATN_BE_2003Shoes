@@ -4,10 +4,17 @@ import com.backend.ServiceResult;
 import com.backend.dto.request.ShoeDetailRequestUpdate;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
+import com.backend.dto.response.ResponseImport;
+import com.backend.dto.response.ShoeAndShoeDetailResponse;
 import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.entity.Shoe;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -23,4 +30,23 @@ public interface IShoeDetailService {
     List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest);
 
     ServiceResult<Shoe> updateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequestUpdate);
+
+    ServiceResult<String> updateQtyShoeDetail(List<ShoeDetailRequestUpdate> shoeDetailRequestUpdateList);
+
+    byte[] createExcelFile() throws IOException;
+
+    ShoeAndShoeDetailResponse createShoeAndShoeDetailResponse(Row row, List<String> errors, List<ShoeAndShoeDetailResponse> shoeAndShoeDetailListError, Integer type);
+
+    void saveShoeAndShoeDetail(ShoeAndShoeDetailResponse shoeAndShoeDetailResponse, Integer type);
+
+    ResponseImport importDataFromExcel(MultipartFile file, Integer type) throws IOException;
+    void createErrorExcelFile(String existingExcelFilePath, List<String> errors, List<ShoeAndShoeDetailResponse> shoeAndShoeDetailListError, Integer type);
+    byte[] exportExcelFileError() throws IOException;
+    CellStyle createHeaderCellStyle(Workbook workbook);
+
+    CellStyle createErrorCellStyle(Workbook workbook);
+
+    CellStyle createErrorCellStyleSymble(Workbook workbook);
+
+    CellStyle createBorderCellStyle(Workbook workbook);
 }

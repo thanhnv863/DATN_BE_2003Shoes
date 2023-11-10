@@ -4,11 +4,15 @@ import com.backend.entity.ShoeDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Tuple;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface ShoeDetailRepository extends JpaRepository<ShoeDetail, Long> {
@@ -39,4 +43,18 @@ public interface ShoeDetailRepository extends JpaRepository<ShoeDetail, Long> {
     Page<ShoeDetail> findBySize_Name(Float sizeShoe, Pageable pageable);
 
     Page<ShoeDetail> findByBrand_NameContaining(String brandShoe, Pageable pageable);
+
+    @Query(value = "SELECT * FROM shoe_detail where \n" +
+            "shoe_detail.shoe_id = ?1 \n" +
+            "and shoe_detail.size_id = ?2 \n" +
+            "and shoe_detail.sole_id = ?3 \n" +
+            "and shoe_detail.brand_id = ?4 \n" +
+            "and shoe_detail.category_id = ?5 \n" +
+            "and shoe_detail.color_id = ?6 \n" , nativeQuery = true)
+    ShoeDetail getOneByAllForeignkey(Long idShoe, Long idSize, Long idSole, Long idBrand, Long idCategory, Long idColor);
+
+    @Transactional
+    @Modifying
+    @Query("update ShoeDetail shoeDetail set shoeDetail.quantity = :quantityNew where shoeDetail.id = :idShoeDetail")
+    void updateSoLuong(@Param("quantityNew") Integer quantityNew, @Param("idShoeDetail") Long idShoeDetail);
 }
