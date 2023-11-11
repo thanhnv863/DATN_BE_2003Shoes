@@ -324,79 +324,83 @@ public class OrderServiceImpl implements IOrderService {
             } else {
                 order.setAccount(null);
             }
-
-//            order.setUpdatedBy(order.getUpdatedBy());
-            order.setType("2");
-            order.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
-            order.setCustomerName(orderCutomerRequest.getCustomerName());
-            order.setAddress(orderCutomerRequest.getAddress());
-            order.setShipFee(orderCutomerRequest.getShipFee());
-            order.setMoneyReduce(orderCutomerRequest.getMoneyReduce());
-            order.setTotalMoney(orderCutomerRequest.getTotalMoney());
-            order.setCreatedDate(date);
-            order.setPayDate(date);
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-
-            // Thêm 2 ngày vào ngày giao hàng
-            calendar.add(Calendar.DAY_OF_MONTH, 2);
-            Date shipDate = calendar.getTime();
-            order.setShipDate(shipDate);
-
-            // Thêm 2 ngày nữa vào ngày mong muốn
-            calendar.add(Calendar.DAY_OF_MONTH, 2);
-            Date desiredDate = calendar.getTime();
-            order.setDesiredDate(desiredDate);
-
-            order.setReceiveDate(null);
-            order.setCreatedBy(order.getAccount().getName());
-            order.setNote(orderCutomerRequest.getNote());
-            order.setStatus(4);
-            Order orderAddCustomer = orderRepository.save(order);
-            // orderHistory
-            OrderHistory orderHistory = new OrderHistory();
-            orderHistory.setOrder(orderAddCustomer);
-            orderHistory.setCreatedTime(date);
-            orderHistory.setCreatedBy(order.getCreatedBy());
-            orderHistory.setNote("Khách Hàng Đặt Hàng");
-            orderHistory.setType("Created");
-            orderHistoryRepository.save(orderHistory);
-            // orderDetail
+            // check xem có sản phẩm mua không!
             Cart cart = cartRepository.findByAccount_Id(order.getAccount().getId());
             List<CartDetail> cartDetailList = cartDetailRepository.listCartDetailByStatus(cart.getId());
-            for(CartDetail cartDetail : cartDetailList){
-                ShoeDetail shoeDetail = shoeDetailRepository.findById(cartDetail.getShoeDetail().getId()).get();
-                OrderDetail orderDetail = new OrderDetail();
-                orderDetail.setShoeDetail(shoeDetail);
-                orderDetail.setOrder(order);
-                orderDetail.setQuantity(cartDetail.getQuantity());
-                orderDetail.setPrice(shoeDetail.getPriceInput());
-                orderDetail.setDiscount(BigDecimal.valueOf(0));
-                orderDetail.setStatus(1);
-                Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
-                orderDetailRepository.save(orderDetail);
-                shoeDetailRepository.updateSoLuong(quantityNew,shoeDetail.getId());
-                cartDetailRepository.deleteCartDetailByStatus(cartDetail.getStatus());
-            }
-            // gửi mail
-            Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
-            if(emailTemplateCheckCustomer.isPresent()){
-                EmailTemplate emailTemplate = emailTemplateCheckCustomer.get();
-                String to = order.getAccount().getEmail();
-                String subject = emailTemplate.getSubject();
-                String mailType = "";
-                String mailContent = emailTemplate.getMailContent();
-                iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+            if(cartDetailList.isEmpty()){
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại, vui lòng chọn sản phẩm mua!");
             }
             else {
-                String to = order.getAccount().getEmail();
-                String subject = "Xin chào bạn đến với store 2003SHOES";
-                String mailType = "";
-                String mailContent = "Cảm ơn bạn đã mua hàng. Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu!!!!!!!! ";
-                iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+//            order.setUpdatedBy(order.getUpdatedBy());
+                order.setType("2");
+                order.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
+                order.setCustomerName(orderCutomerRequest.getCustomerName());
+                order.setAddress(orderCutomerRequest.getAddress());
+                order.setShipFee(orderCutomerRequest.getShipFee());
+                order.setMoneyReduce(orderCutomerRequest.getMoneyReduce());
+                order.setTotalMoney(orderCutomerRequest.getTotalMoney());
+                order.setCreatedDate(date);
+                order.setPayDate(date);
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+
+                // Thêm 2 ngày vào ngày giao hàng
+                calendar.add(Calendar.DAY_OF_MONTH, 2);
+                Date shipDate = calendar.getTime();
+                order.setShipDate(shipDate);
+
+                // Thêm 2 ngày nữa vào ngày mong muốn
+                calendar.add(Calendar.DAY_OF_MONTH, 2);
+                Date desiredDate = calendar.getTime();
+                order.setDesiredDate(desiredDate);
+
+                order.setReceiveDate(null);
+                order.setCreatedBy(order.getAccount().getName());
+                order.setNote(orderCutomerRequest.getNote());
+                order.setStatus(4);
+                Order orderAddCustomer = orderRepository.save(order);
+                // orderHistory
+                OrderHistory orderHistory = new OrderHistory();
+                orderHistory.setOrder(orderAddCustomer);
+                orderHistory.setCreatedTime(date);
+                orderHistory.setCreatedBy(order.getCreatedBy());
+                orderHistory.setNote("Khách Hàng Đặt Hàng");
+                orderHistory.setType("Created");
+                orderHistoryRepository.save(orderHistory);
+                // orderDetail
+                for (CartDetail cartDetail : cartDetailList) {
+                    ShoeDetail shoeDetail = shoeDetailRepository.findById(cartDetail.getShoeDetail().getId()).get();
+                    OrderDetail orderDetail = new OrderDetail();
+                    orderDetail.setShoeDetail(shoeDetail);
+                    orderDetail.setOrder(order);
+                    orderDetail.setQuantity(cartDetail.getQuantity());
+                    orderDetail.setPrice(shoeDetail.getPriceInput());
+                    orderDetail.setDiscount(BigDecimal.valueOf(0));
+                    orderDetail.setStatus(1);
+                    Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
+                    orderDetailRepository.save(orderDetail);
+                    shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+                    cartDetailRepository.deleteCartDetailByStatus(cartDetail.getStatus());
+                }
+                // gửi mail
+                Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
+                if (emailTemplateCheckCustomer.isPresent()) {
+                    EmailTemplate emailTemplate = emailTemplateCheckCustomer.get();
+                    String to = order.getAccount().getEmail();
+                    String subject = emailTemplate.getSubject();
+                    String mailType = "";
+                    String mailContent = emailTemplate.getMailContent();
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                } else {
+                    String to = order.getAccount().getEmail();
+                    String subject = "Xin chào bạn đến với store 2003SHOES";
+                    String mailType = "";
+                    String mailContent = "Cảm ơn bạn đã mua hàng. Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu!!!!!!!! ";
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                }
+                return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
             }
-            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
         } catch (Exception e) {
             e.printStackTrace();
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
@@ -405,137 +409,139 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public ServiceResultReponse<Order> customerNoLoginAddOrder(OrderCutomerRequest orderCutomerRequest){
         try {
-            Date date = new Date();
-            Order order = new Order();
-            order.setCode(generateOrderCode());
-            if (orderCutomerRequest.getIdVoucher() != null) {
-                VoucherOrder voucherOrder = voucherOrderRepository.findById(orderCutomerRequest.getIdVoucher()).get();
-                order.setVoucherOrder(voucherOrder);
-            } else {
-                order.setVoucherOrder(null);
-            }
-            order.setType("2");
-            order.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
-            order.setCustomerName(orderCutomerRequest.getCustomerName());
-            order.setAddress(orderCutomerRequest.getAddress());
-            order.setShipFee(orderCutomerRequest.getShipFee());
-            order.setMoneyReduce(orderCutomerRequest.getMoneyReduce());
-            order.setTotalMoney(orderCutomerRequest.getTotalMoney());
-            order.setCreatedDate(date);
-            order.setPayDate(date);
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-
-            // Thêm 2 ngày vào ngày giao hàng
-//            calendar.add(Calendar.DAY_OF_MONTH, 2);
-//            Date shipDate = calendar.getTime();
-            order.setShipDate(null);
-
-            // Thêm 2 ngày nữa vào ngày mong muốn
-//            calendar.add(Calendar.DAY_OF_MONTH, 2);
-//            Date desiredDate = calendar.getTime();
-            order.setDesiredDate(null);
-            order.setReceiveDate(null);
-            order.setCreatedBy("Khách không đăng nhập");
-            order.setNote(orderCutomerRequest.getNote());
-            order.setStatus(4);
-            Order orderAddCustomer = orderRepository.save(order);
-            // orderHistory
-            OrderHistory orderHistory = new OrderHistory();
-            orderHistory.setOrder(orderAddCustomer);
-            orderHistory.setCreatedTime(date);
-            orderHistory.setCreatedBy(order.getCreatedBy());
-            orderHistory.setNote("Khách Hàng Đặt Hàng");
-            orderHistory.setType("Created");
-            orderHistoryRepository.save(orderHistory);
-            // orderDetail
-//            Cart cart = cartRepository.findByAccount_Id(order.getAccount().getId());
-//            List<CartDetail> cartDetailList = cartDetailRepository.listCartDetailByStatus(cart.getId());
-            List<ShoeDetail> shoeDetailList = new ArrayList<>();
-            shoeDetailList = orderCutomerRequest.getShoeDetailListRequets();
-            for(ShoeDetail shoeDetail : shoeDetailList){
-                OrderDetail orderDetail = new OrderDetail();
-                ShoeDetail shoeDetail1 = shoeDetailRepository.findById(shoeDetail.getId()).get();
-                orderDetail.setShoeDetail(shoeDetail1);
-                orderDetail.setOrder(order);
-                orderDetail.setQuantity(shoeDetail.getQuantity());
-                orderDetail.setPrice(shoeDetail.getPriceInput());
-                orderDetail.setDiscount(BigDecimal.valueOf(0));
-                orderDetail.setStatus(1);
-                Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
-                orderDetailRepository.save(orderDetail);
-                shoeDetailRepository.updateSoLuong(quantityNew,shoeDetail.getId());
-            }
-            //check xem email đã có tài khoản hay chưa
-            Optional<Account> accountCheck = accountRepository.getOneByEmail(orderCutomerRequest.getEmail());
-            if(accountCheck.isPresent()){
-                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(4);
-                if(emailTemplateCheck.isPresent()){
-                    EmailTemplate emailTemplate = emailTemplateCheck.get();
-                    String to = orderCutomerRequest.getEmail();
-                    String subject = emailTemplate.getSubject();
-                    String mailType = "";
-                    String mailContent = emailTemplate.getMailContent();
-                    iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
-                }
-                else {
-                    String to = orderCutomerRequest.getEmail();
-                    String subject = "Xin chào bạn đến với store 2003SHOES";
-                    String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản đã được đăng ký với email này!";
-                    String mailContent = "Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu";
-                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
-                }
-                // lưu đơn hàng vào tài khoản đã có
-                Account account = accountCheck.get();
-                Order orderAccount = orderRepository.findById(order.getId()).get();
-                orderAccount.setAccount(account);
-                orderRepository.save(orderAccount);
+            if(orderCutomerRequest.getShoeDetailListRequets().isEmpty()){
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại, vui lòng chọn sản phẩm mua!");
             }
             else {
-                // tạo tài khoản
-                Account account = new Account();
-                Calendar calendar1 = Calendar.getInstance();
-                Date now = calendar1.getTime();
-                account.setName(orderCutomerRequest.getCustomerName());
-                account.setEmail(orderCutomerRequest.getEmail());
-                account.setCreatedAt(now);
-                account.setUpdatedAt(now);
-                account.setStatus(1);
-                account.setPassword(passwordEncoder.encode("123456"));
-                account.setRole(Role.builder().id(2).build());
-                account = accountRepository.save(account);
+                Date date = new Date();
+                Order order = new Order();
+                order.setCode(generateOrderCode());
+                if (orderCutomerRequest.getIdVoucher() != null) {
+                    VoucherOrder voucherOrder = voucherOrderRepository.findById(orderCutomerRequest.getIdVoucher()).get();
+                    order.setVoucherOrder(voucherOrder);
+                } else {
+                    order.setVoucherOrder(null);
+                }
+                order.setType("2");
+                order.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
+                order.setCustomerName(orderCutomerRequest.getCustomerName());
+                order.setAddress(orderCutomerRequest.getAddress());
+                order.setShipFee(orderCutomerRequest.getShipFee());
+                order.setMoneyReduce(orderCutomerRequest.getMoneyReduce());
+                order.setTotalMoney(orderCutomerRequest.getTotalMoney());
+                order.setCreatedDate(date);
+                order.setPayDate(date);
 
-                // tạo cart
-                Cart cart = new Cart();
-                cart.setAccount(account);
-                cart.setCreatedAt(now);
-                cart.setUpdatedAt(now);
-                cart.setStatus(1);
-                cartRepository.save(cart);
-                //
-                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(3);
-                if(emailTemplateCheck.isPresent()){
-                    EmailTemplate emailTemplate = emailTemplateCheck.get();
-                    String to = orderCutomerRequest.getEmail();
-                    String subject = emailTemplate.getSubject();
-                    String mailType = "";
-                    String mailContent = emailTemplate.getMailContent() + "123456";
-                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(date);
+
+                // Thêm 2 ngày vào ngày giao hàng
+//            calendar.add(Calendar.DAY_OF_MONTH, 2);
+//            Date shipDate = calendar.getTime();
+                order.setShipDate(null);
+
+                // Thêm 2 ngày nữa vào ngày mong muốn
+//            calendar.add(Calendar.DAY_OF_MONTH, 2);
+//            Date desiredDate = calendar.getTime();
+                order.setDesiredDate(null);
+                order.setReceiveDate(null);
+                order.setCreatedBy("Khách không đăng nhập");
+                order.setNote(orderCutomerRequest.getNote());
+                order.setStatus(4);
+                Order orderAddCustomer = orderRepository.save(order);
+                // orderHistory
+                OrderHistory orderHistory = new OrderHistory();
+                orderHistory.setOrder(orderAddCustomer);
+                orderHistory.setCreatedTime(date);
+                orderHistory.setCreatedBy(order.getCreatedBy());
+                orderHistory.setNote("Khách Hàng Đặt Hàng");
+                orderHistory.setType("Created");
+                orderHistoryRepository.save(orderHistory);
+                // orderDetail
+//            Cart cart = cartRepository.findByAccount_Id(order.getAccount().getId());
+//            List<CartDetail> cartDetailList = cartDetailRepository.listCartDetailByStatus(cart.getId());
+                List<ShoeDetail> shoeDetailList = new ArrayList<>();
+                shoeDetailList = orderCutomerRequest.getShoeDetailListRequets();
+                for (ShoeDetail shoeDetail : shoeDetailList) {
+                    OrderDetail orderDetail = new OrderDetail();
+                    ShoeDetail shoeDetail1 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+                    orderDetail.setShoeDetail(shoeDetail1);
+                    orderDetail.setOrder(order);
+                    orderDetail.setQuantity(shoeDetail.getQuantity());
+                    orderDetail.setPrice(shoeDetail.getPriceInput());
+                    orderDetail.setDiscount(BigDecimal.valueOf(0));
+                    orderDetail.setStatus(1);
+                    Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
+                    orderDetailRepository.save(orderDetail);
+                    shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
                 }
-                else {
-                    String to = orderCutomerRequest.getEmail();
-                    String subject = "Xin chào bạn đến với store 2003SHOES";
-                    String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản dưới đây";
-                    String mailContent = "Mật khẩu tài khoản của bạn là : 123456";
-                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                //check xem email đã có tài khoản hay chưa
+                Optional<Account> accountCheck = accountRepository.getOneByEmail(orderCutomerRequest.getEmail());
+                if (accountCheck.isPresent()) {
+                    Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(4);
+                    if (emailTemplateCheck.isPresent()) {
+                        EmailTemplate emailTemplate = emailTemplateCheck.get();
+                        String to = orderCutomerRequest.getEmail();
+                        String subject = emailTemplate.getSubject();
+                        String mailType = "";
+                        String mailContent = emailTemplate.getMailContent();
+                        iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                    } else {
+                        String to = orderCutomerRequest.getEmail();
+                        String subject = "Xin chào bạn đến với store 2003SHOES";
+                        String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản đã được đăng ký với email này!";
+                        String mailContent = "Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu";
+                        iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                    }
+                    // lưu đơn hàng vào tài khoản đã có
+                    Account account = accountCheck.get();
+                    Order orderAccount = orderRepository.findById(order.getId()).get();
+                    orderAccount.setAccount(account);
+                    orderRepository.save(orderAccount);
+                } else {
+                    // tạo tài khoản
+                    Account account = new Account();
+                    Calendar calendar1 = Calendar.getInstance();
+                    Date now = calendar1.getTime();
+                    account.setName(orderCutomerRequest.getCustomerName());
+                    account.setEmail(orderCutomerRequest.getEmail());
+                    account.setCreatedAt(now);
+                    account.setUpdatedAt(now);
+                    account.setStatus(1);
+                    account.setPassword(passwordEncoder.encode("123456"));
+                    account.setRole(Role.builder().id(2).build());
+                    account = accountRepository.save(account);
+
+                    // tạo cart
+                    Cart cart = new Cart();
+                    cart.setAccount(account);
+                    cart.setCreatedAt(now);
+                    cart.setUpdatedAt(now);
+                    cart.setStatus(1);
+                    cartRepository.save(cart);
+                    //
+                    Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(3);
+                    if (emailTemplateCheck.isPresent()) {
+                        EmailTemplate emailTemplate = emailTemplateCheck.get();
+                        String to = orderCutomerRequest.getEmail();
+                        String subject = emailTemplate.getSubject();
+                        String mailType = "";
+                        String mailContent = emailTemplate.getMailContent() + "123456";
+                        iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                    } else {
+                        String to = orderCutomerRequest.getEmail();
+                        String subject = "Xin chào bạn đến với store 2003SHOES";
+                        String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản dưới đây";
+                        String mailContent = "Mật khẩu tài khoản của bạn là : 123456";
+                        iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                    }
+                    // lưu đơn hàng vào tài khoản vừa tạo
+                    Order orderAccount = orderRepository.findById(order.getId()).get();
+                    orderAccount.setAccount(account);
+                    orderRepository.save(orderAccount);
                 }
-                // lưu đơn hàng vào tài khoản vừa tạo
-                Order orderAccount = orderRepository.findById(order.getId()).get();
-                orderAccount.setAccount(account);
-                orderRepository.save(orderAccount);
+                return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
             }
-            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
         } catch (Exception e) {
             e.printStackTrace();
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
