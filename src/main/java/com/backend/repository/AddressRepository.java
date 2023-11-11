@@ -25,5 +25,7 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
     List<Address> getAllAccountAndAddress(String defaultAddress);
 
     List<Address> findAddressesByAccount_Id(Long id);
+
+
 }
 
