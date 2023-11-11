@@ -4,21 +4,29 @@ import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.AccountRequest;
 import com.backend.dto.request.EmailRequest;
+import com.backend.dto.request.PasswordRequest;
 import com.backend.dto.request.RegisterRequest;
+import com.backend.dto.response.AccountPageResponse;
 import com.backend.dto.response.AccountResponse;
 import com.backend.dto.response.RegisterResponse;
+import com.backend.entity.Address;
 import com.backend.entity.Cart;
 import com.backend.entity.Role;
 import com.backend.entity.Account;
 import com.backend.repository.AccountRepository;
+import com.backend.repository.AddressRepository;
 import com.backend.repository.CartRepository;
 import com.backend.repository.RoleRepository;
 import com.backend.service.IAccountService;
 import com.backend.service.IEmailTemplateService;
 import com.backend.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -45,6 +53,9 @@ public class AccountServiceImpl implements IAccountService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private AddressRepository addressRepository;
 
     private ImageUploadService imageUploadService;
 
@@ -136,16 +147,22 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public ServiceResult<List<Account>> findAllAccount() {
+    public ServiceResult<AccountPageResponse> findAllAccount(int pageNo, int pageSize) {
+        Pageable pageable1 = PageRequest.of(pageNo,pageSize);
+        Page<Account> pageAccount = accountRepository.getAllAccount(pageable1);
+        List<Address> listAddress = addressRepository.findAll();
 
-        List<Account> account = accountRepository.getAllAccount();
+        AccountPageResponse accountPageResponse = new AccountPageResponse();
+        accountPageResponse.setAccounts(pageAccount.getContent());
+        accountPageResponse.setAddresses(listAddress);
+        accountPageResponse.setTotalPages(pageAccount.getTotalPages());
+        accountPageResponse.setTotalElements(pageAccount.getTotalElements());
+        accountPageResponse.setNumberOfElements(pageAccount.getNumberOfElements());
+        accountPageResponse.setSize(pageAccount.getSize());
+        accountPageResponse.setLast(pageAccount.isLast());
+        accountPageResponse.setFirst(pageAccount.isFirst());
 
-        if (account.size() < 0){
-            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
-        }else{
-            return new ServiceResult<>(AppConstant.SUCCESS,"success",account);
-        }
-
+        return new ServiceResult<>(AppConstant.SUCCESS,"success",accountPageResponse);
     }
 
     @Override
@@ -202,7 +219,6 @@ public class AccountServiceImpl implements IAccountService {
         }
 
         accountRepository.save(accountEmail);
-
         String to = accountEmail.getEmail();
         String subject = "Welcome to store bee shoe of group SD-66";
         String mailType = "chao mung nhan vien ";
@@ -211,6 +227,32 @@ public class AccountServiceImpl implements IAccountService {
         iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
 
         return new ServiceResult<>(AppConstant.SUCCESS,"success",accountEmail);
+    }
+
+    @Override
+    public ServiceResult<String> changePassword(PasswordRequest passwordRequest) {
+        Optional<Account> optionalAccount = accountRepository.findById(passwordRequest.getId());
+        if (optionalAccount.isPresent()) {
+            Account accountId = optionalAccount.get();
+            accountId.setPassword(passwordRequest.getYourOldPassword());
+            accountId.setPassword(passwordRequest.getNewPassword());
+            accountId.setPassword(passwordRequest.getEnterNewPassword());
+
+            if(passwordRequest.getYourOldPassword().equals(passwordRequest.getNewPassword())){
+                return new ServiceResult<>(AppConstant.SUCCESS,"fail","không được trùng với mật khẩu hiện tại");
+             } else if (!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
+                return new ServiceResult<>(AppConstant.SUCCESS,"fail","mật khẩu mới phải trùng với mật khẩu nhập lại");
+            } else if(passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
+                accountRepository.save(accountId);
+                return new ServiceResult<>(AppConstant.SUCCESS,"success","chu mung ban da doi mat khau thanh cong");
+            }else{
+                return new ServiceResult<>(AppConstant.SUCCESS,"fail","bạn nhập chưa đúng mật khẩu ");
+            }
+
+        }else{
+            return new ServiceResult<>(AppConstant.SUCCESS,"fail","doi mat khau that bai");
+        }
+
     }
 
 
