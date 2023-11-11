@@ -1,7 +1,8 @@
 package com.backend.repository;
 
 import com.backend.entity.Account;
-import com.backend.entity.Address;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,12 +23,13 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> searchNameStaff(String name);
 
 
-    @Query("select a from Account a where " +
-            " a.status = 1 ")
-    List<Account> getAllAccount();
-=======
+    @Query(value = "select * from account acc left join address ad on acc.id = ad.account_id\n" +
+            "\t\t\t\t\t\tleft join role r on acc.role_id = r.id", nativeQuery = true)
+    Page<Account> getAllAccount(Pageable pageable);
+
     @Query(value = "SELECT * FROM account \n" +
             "where account.email = ?1 and account.role_id = 2", nativeQuery = true)
     Optional<Account> getOneByEmail(String email);
+
 
 }
