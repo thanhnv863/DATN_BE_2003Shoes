@@ -471,7 +471,7 @@ public class OrderServiceImpl implements IOrderService {
                     orderDetail.setPrice(shoeDetail.getPriceInput());
                     orderDetail.setDiscount(BigDecimal.valueOf(0));
                     orderDetail.setStatus(1);
-                    Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
+                    Integer quantityNew = shoeDetail1.getQuantity() - orderDetail.getQuantity();
                     orderDetailRepository.save(orderDetail);
                     shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
                 }
