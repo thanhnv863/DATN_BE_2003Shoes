@@ -55,4 +55,5 @@ public class AccountController {
     public ResponseEntity<?> changePassword(@RequestBody PasswordRequest passwordRequest){
         return ResponseEntity.ok(iAccountService.changePassword(passwordRequest));
     }
+
 }
