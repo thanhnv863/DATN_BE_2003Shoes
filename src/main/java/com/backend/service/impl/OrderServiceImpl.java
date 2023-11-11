@@ -11,6 +11,7 @@ import com.backend.dto.response.OrderReponse;
 import com.backend.entity.Account;
 import com.backend.entity.Cart;
 import com.backend.entity.CartDetail;
+import com.backend.entity.EmailTemplate;
 import com.backend.entity.Order;
 import com.backend.entity.OrderDetail;
 import com.backend.entity.OrderHistory;
@@ -20,6 +21,7 @@ import com.backend.entity.VoucherOrder;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.CartDetailRepository;
 import com.backend.repository.CartRepository;
+import com.backend.repository.EmailRepository;
 import com.backend.repository.OrderCustomRepository;
 import com.backend.repository.OrderDetailRepository;
 import com.backend.repository.OrderHistoryRepository;
@@ -93,6 +95,9 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private IEmailTemplateService iEmailTemplateService;
+
+    @Autowired
+    private EmailRepository emailRepository;
 
     public OrderReponse convertPage(Object[] object) {
         OrderReponse orderReponse = new OrderReponse();
@@ -374,6 +379,23 @@ public class OrderServiceImpl implements IOrderService {
                 shoeDetailRepository.updateSoLuong(quantityNew,shoeDetail.getId());
                 cartDetailRepository.deleteCartDetailByStatus(cartDetail.getStatus());
             }
+            // gửi mail
+            Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(4);
+            if(emailTemplateCheckCustomer.isPresent()){
+                EmailTemplate emailTemplate = emailTemplateCheckCustomer.get();
+                String to = order.getAccount().getEmail();
+                String subject = emailTemplate.getSubject();
+                String mailType = "";
+                String mailContent = emailTemplate.getMailContent();
+                iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+            }
+            else {
+                String to = order.getAccount().getEmail();
+                String subject = "Xin chào bạn đến với store 2003SHOES";
+                String mailType = "";
+                String mailContent = "Cảm ơn bạn đã mua hàng. Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu!!!!!!!! ";
+                iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+            }
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
         } catch (Exception e) {
             e.printStackTrace();
@@ -448,11 +470,22 @@ public class OrderServiceImpl implements IOrderService {
             //check xem email đã có tài khoản hay chưa
             Optional<Account> accountCheck = accountRepository.getOneByEmail(orderCutomerRequest.getEmail());
             if(accountCheck.isPresent()){
-                String to = orderCutomerRequest.getEmail();
-                String subject = "Welcome to store 2003SHOES";
-                String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản đã được đăng ký với email này!";
-                String mailContent = "Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu";
-                iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
+                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(3);
+                if(emailTemplateCheck.isPresent()){
+                    EmailTemplate emailTemplate = emailTemplateCheck.get();
+                    String to = orderCutomerRequest.getEmail();
+                    String subject = emailTemplate.getSubject();
+                    String mailType = "";
+                    String mailContent = emailTemplate.getMailContent();
+                    iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
+                }
+                else {
+                    String to = orderCutomerRequest.getEmail();
+                    String subject = "Xin chào bạn đến với store 2003SHOES";
+                    String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản đã được đăng ký với email này!";
+                    String mailContent = "Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu";
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                }
                 // lưu đơn hàng vào tài khoản đã có
                 Account account = accountCheck.get();
                 Order orderAccount = orderRepository.findById(order.getId()).get();
@@ -481,11 +514,22 @@ public class OrderServiceImpl implements IOrderService {
                 cart.setStatus(1);
                 cartRepository.save(cart);
                 //
-                String to = orderCutomerRequest.getEmail();
-                String subject = "Welcome to store 2003SHOES";
-                String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản dưới đây";
-                String mailContent = "Mật khẩu tài khoản của bạn là : 123456";
-                iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(2);
+                if(emailTemplateCheck.isPresent()){
+                    EmailTemplate emailTemplate = emailTemplateCheck.get();
+                    String to = orderCutomerRequest.getEmail();
+                    String subject = emailTemplate.getSubject();
+                    String mailType = "";
+                    String mailContent = emailTemplate.getMailContent();
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                }
+                else {
+                    String to = orderCutomerRequest.getEmail();
+                    String subject = "Xin chào bạn đến với store 2003SHOES";
+                    String mailType = "Cảm ơn bạn đã mua hàng, bạn có thể xem lịch sử đơn hàng qua tài khoản dưới đây";
+                    String mailContent = "Mật khẩu tài khoản của bạn là : 123456";
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                }
                 // lưu đơn hàng vào tài khoản vừa tạo
                 Order orderAccount = orderRepository.findById(order.getId()).get();
                 orderAccount.setAccount(account);
