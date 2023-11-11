@@ -14,11 +14,11 @@ import lombok.Setter;
 @Builder
 public class EmailResponse {
     private Long id;
-    private Long accountId;
-    private String mailType;
+    private String subject;
+    private Integer mailType;
     private String mailContent;
 
-    public EmailResponse(String mailType, String mailContent) {
+    public EmailResponse(Integer mailType, String mailContent) {
         this.mailType = mailType;
         this.mailContent = mailContent;
     }

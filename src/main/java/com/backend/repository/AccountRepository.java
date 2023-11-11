@@ -22,10 +22,13 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             " a.name like concat('%', :name, '%')")
     List<Account> searchNameStaff(String name);
 
-
     @Query(value = "select * from account acc left join address ad on acc.id = ad.account_id\n" +
             "\t\t\t\t\t\tleft join role r on acc.role_id = r.id", nativeQuery = true)
     Page<Account> getAllAccount(Pageable pageable);
+
+    @Query("select a from Account a where " +
+            " a.status = 1 ")
+    List<Account> getAllAccount();
 
     @Query(value = "SELECT * FROM account \n" +
             "where account.email = ?1 and account.role_id = 2", nativeQuery = true)
