@@ -380,7 +380,7 @@ public class OrderServiceImpl implements IOrderService {
                 cartDetailRepository.deleteCartDetailByStatus(cartDetail.getStatus());
             }
             // gửi mail
-            Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(4);
+            Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
             if(emailTemplateCheckCustomer.isPresent()){
                 EmailTemplate emailTemplate = emailTemplateCheckCustomer.get();
                 String to = order.getAccount().getEmail();
@@ -470,7 +470,7 @@ public class OrderServiceImpl implements IOrderService {
             //check xem email đã có tài khoản hay chưa
             Optional<Account> accountCheck = accountRepository.getOneByEmail(orderCutomerRequest.getEmail());
             if(accountCheck.isPresent()){
-                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(3);
+                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(4);
                 if(emailTemplateCheck.isPresent()){
                     EmailTemplate emailTemplate = emailTemplateCheck.get();
                     String to = orderCutomerRequest.getEmail();
@@ -514,7 +514,7 @@ public class OrderServiceImpl implements IOrderService {
                 cart.setStatus(1);
                 cartRepository.save(cart);
                 //
-                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(2);
+                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(3);
                 if(emailTemplateCheck.isPresent()){
                     EmailTemplate emailTemplate = emailTemplateCheck.get();
                     String to = orderCutomerRequest.getEmail();
