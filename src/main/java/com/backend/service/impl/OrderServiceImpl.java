@@ -520,7 +520,7 @@ public class OrderServiceImpl implements IOrderService {
                     String to = orderCutomerRequest.getEmail();
                     String subject = emailTemplate.getSubject();
                     String mailType = "";
-                    String mailContent = emailTemplate.getMailContent();
+                    String mailContent = emailTemplate.getMailContent() + "123456";
                     iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
                 }
                 else {
