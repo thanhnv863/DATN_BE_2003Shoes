@@ -2,12 +2,9 @@ package com.backend.service.impl;
 
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
-import com.backend.dto.request.AddressRequest;
 import com.backend.dto.request.EmailRequest;
-import com.backend.dto.response.AddressResponse;
 import com.backend.dto.response.EmailResponse;
 import com.backend.entity.Account;
-import com.backend.entity.Address;
 import com.backend.entity.EmailTemplate;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.EmailRepository;
@@ -16,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,25 +35,17 @@ public class EmailTemplateServiceImpl implements IEmailTemplateService {
         EmailTemplate emailTemplate = new EmailTemplate();
         String result = validateEmail(emailRequest);
 
-        if(result != null){
-            return  result(result);
-        }else{
-            try{
-                Optional<Account> accountId = accountRepository.findById(emailRequest.getAccountId());
-                if(accountId.isPresent()){
-                    Account account = accountId.get();
-                    emailTemplate.setAccount(account);
-                    emailTemplate.setMailType(emailRequest.getMailType());
-                    emailTemplate.setMailContent(emailRequest.getMailContent());
-                }else{
-                    return new ServiceResult<>(AppConstant.FAIL,"Add fail",null);
-                }
-
+        if (result != null) {
+            return result(result);
+        } else {
+            try {
+                emailTemplate.setSubject(emailRequest.getSubject());
+                emailTemplate.setMailType(emailRequest.getMailType());
+                emailTemplate.setMailContent(emailRequest.getMailContent());
                 emailTemplate = emailRepository.save(emailTemplate);
                 EmailResponse convertEmailResponse = convertToResponse(emailTemplate);
-
                 return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertEmailResponse);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null);
             }
@@ -69,34 +57,30 @@ public class EmailTemplateServiceImpl implements IEmailTemplateService {
     @Override
     public ServiceResult<EmailTemplate> updateEmailTemplate(EmailRequest emailRequest) {
         Optional<EmailTemplate> emailId = emailRepository.findById(emailRequest.getId());
-        Optional<Account> accountId = accountRepository.findById(emailRequest.getAccountId());
-        Account account = accountId.get();
-
-        if (emailId.isPresent()){
+        if (emailId.isPresent()) {
             EmailTemplate emailExist = emailId.get();
             emailExist.setId(emailExist.getId());
-            emailExist.setAccount(account);
+            emailExist.setSubject(emailRequest.getSubject());
             emailExist.setMailType(emailRequest.getMailType());
             emailExist.setMailContent(emailRequest.getMailContent());
-
             EmailTemplate emailTemplate = emailRepository.save(emailExist);
 
-            return new ServiceResult<>(AppConstant.SUCCESS,"Success",emailTemplate);
+            return new ServiceResult<>(AppConstant.SUCCESS, "Success", emailTemplate);
         }
 
-        return new ServiceResult<>(AppConstant.BAD_REQUEST,"fail",null);
+        return new ServiceResult<>(AppConstant.BAD_REQUEST, "fail", null);
 
     }
 
     @Override
     public ServiceResult<List<EmailResponse>> getAllEmail() {
         List<EmailTemplate> emailTemplateList = emailRepository.findAll();
-        List<EmailResponse>emailResponses = new ArrayList<>();
+        List<EmailResponse> emailResponses = new ArrayList<>();
 
-        for (EmailTemplate emailTemplate: emailTemplateList){
+        for (EmailTemplate emailTemplate : emailTemplateList) {
             EmailResponse emailResponse = new EmailResponse();
             emailResponse.setId(emailTemplate.getId());
-            emailResponse.setAccountId(emailTemplate.getAccount().getId());
+            emailResponse.setSubject(emailTemplate.getSubject());
             emailResponse.setMailType(emailTemplate.getMailType());
             emailResponse.setMailContent(emailTemplate.getMailContent());
 
@@ -111,17 +95,17 @@ public class EmailTemplateServiceImpl implements IEmailTemplateService {
     @Override
     public ServiceResult<EmailTemplate> deleteEmail(EmailRequest emailRequest) {
         Optional<EmailTemplate> optionalEmail = emailRepository.findById(emailRequest.getId());
-        if (optionalEmail.isPresent()){
+        if (optionalEmail.isPresent()) {
             EmailTemplate emailTemplate = optionalEmail.get();
             emailRepository.save(emailTemplate);
-            return new ServiceResult<>(AppConstant.SUCCESS,"delete Success",null);
-        }else{
-            return new ServiceResult<>(AppConstant.FAIL,"Id not exist",null);
+            return new ServiceResult<>(AppConstant.SUCCESS, "delete Success", null);
+        } else {
+            return new ServiceResult<>(AppConstant.FAIL, "Id not exist", null);
         }
     }
 
     @Override
-    public void sendEmail(String to, String subject, String mailType,String mailContent) {
+    public void sendEmail(String to, String subject, String mailType, String mailContent) {
         SimpleMailMessage message = new SimpleMailMessage();
         EmailTemplate emailTemplate = new EmailTemplate();
 
@@ -140,7 +124,7 @@ public class EmailTemplateServiceImpl implements IEmailTemplateService {
         emailTemplate.setMailContent(emailRequest.getMailContent());
 
 
-          EmailResponse emailResponseConvert = EmailResponse.builder()
+        EmailResponse emailResponseConvert = EmailResponse.builder()
                 .mailType(emailTemplate.getMailType())
                 .mailContent(emailTemplate.getMailContent())
                 .build();
@@ -156,8 +140,8 @@ public class EmailTemplateServiceImpl implements IEmailTemplateService {
 
         List<String> errorMessages = new ArrayList<>();
 
-        if (emailRequest.getAccountId() == null){
-            errorMessages.add("id_account không được để trông");
+        if (emailRequest.getSubject() == null) {
+            errorMessages.add("Tiêu đề của email không được để trống");
         }
 
         if (errorMessages.size() > 0) {
@@ -169,9 +153,9 @@ public class EmailTemplateServiceImpl implements IEmailTemplateService {
 
 
     @Override
-    public EmailResponse convertToResponse(EmailTemplate emailTemplate){
+    public EmailResponse convertToResponse(EmailTemplate emailTemplate) {
         return EmailResponse.builder()
-                .accountId(emailTemplate.getAccount().getId())
+                .subject(emailTemplate.getSubject())
                 .mailType(emailTemplate.getMailType())
                 .mailContent(emailTemplate.getMailContent())
                 .build();
@@ -179,10 +163,8 @@ public class EmailTemplateServiceImpl implements IEmailTemplateService {
 
     @Override
     public ServiceResult<EmailResponse> result(String mess) {
-        return new ServiceResult<>(AppConstant.FAIL,mess,null);
+        return new ServiceResult<>(AppConstant.FAIL, mess, null);
     }
-
-
 
 
 }

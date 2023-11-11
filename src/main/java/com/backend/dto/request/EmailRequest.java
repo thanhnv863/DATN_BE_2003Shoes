@@ -15,11 +15,11 @@ import lombok.Setter;
 public class EmailRequest {
 
     private Long id;
-    private Long accountId;
-    private String mailType;
+    private String subject;
+    private Integer mailType;
     private String mailContent;
 
-    public EmailRequest(String mailType, String mailContent) {
+    public EmailRequest(Integer mailType, String mailContent) {
         this.mailType = mailType;
         this.mailContent = mailContent;
     }

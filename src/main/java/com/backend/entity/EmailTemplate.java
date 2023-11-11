@@ -27,12 +27,11 @@ public class EmailTemplate {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @JoinColumn(name = "subject")
+    private String subject;
 
     @Column(name = "mail_type")
-    private String mailType;
+    private Integer mailType;
 
     @Column(name = "mail_content")
     private String mailContent;
