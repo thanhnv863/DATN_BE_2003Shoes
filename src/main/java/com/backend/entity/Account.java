@@ -40,6 +40,9 @@ public class Account {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "code")
+    private String code;
+
     @Column(name = "email")
     private String email;
 
@@ -65,9 +68,10 @@ public class Account {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public Account(Long id, String name, String email, String password, Role role, Collection<? extends GrantedAuthority> authorities) {
+    public Account(Long id, String name ,String code , String email, String password, Role role, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
+        this.code = code;
         this.email = email;
         this.password = password;
         this.role = role;

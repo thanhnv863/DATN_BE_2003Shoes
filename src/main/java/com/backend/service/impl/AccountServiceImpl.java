@@ -3,16 +3,18 @@ package com.backend.service.impl;
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.AccountRequest;
-import com.backend.dto.request.EmailRequest;
 import com.backend.dto.request.PasswordRequest;
 import com.backend.dto.request.RegisterRequest;
+import com.backend.dto.request.account.SearchAccountRequest;
 import com.backend.dto.response.AccountPageResponse;
 import com.backend.dto.response.AccountResponse;
 import com.backend.dto.response.RegisterResponse;
+import com.backend.dto.response.account.AccountCustomResponse;
+import com.backend.entity.Account;
 import com.backend.entity.Address;
 import com.backend.entity.Cart;
 import com.backend.entity.Role;
-import com.backend.entity.Account;
+import com.backend.repository.AccountCustomRepository;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.AddressRepository;
 import com.backend.repository.CartRepository;
@@ -22,13 +24,14 @@ import com.backend.service.IEmailTemplateService;
 import com.backend.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -56,6 +59,9 @@ public class AccountServiceImpl implements IAccountService {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private AccountCustomRepository accountCustomRepository;
 
     private ImageUploadService imageUploadService;
 
@@ -88,9 +94,9 @@ public class AccountServiceImpl implements IAccountService {
         String to = registerRequest.getEmail();
         String subject = "Welcome to store 2003SHOES";
         String mailType = "chao mung nhan vien ";
-        String mailContent = "Mật khẩu tài khoản của bạn là  :"+registerRequest.getPassword();
+        String mailContent = "Mật khẩu tài khoản của bạn là  :" + registerRequest.getPassword();
 
-        iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
+        iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
         return new ServiceResult<>(AppConstant.SUCCESS,
                 "Registered Successfully",
                 registerResponse.builder()
@@ -116,12 +122,12 @@ public class AccountServiceImpl implements IAccountService {
         Account account = new Account();
         String result = validateStaff(accountRequest);
 
-        if(result != null){
+        if (result != null) {
             return result(result);
-        }else{
-            try{
+        } else {
+            try {
                 Optional<Role> optionalRole = roleRepository.findById(accountRequest.getRoleId());
-                if (optionalRole.isPresent()){
+                if (optionalRole.isPresent()) {
                     Role roleId = optionalRole.get();
                     account.setRole(roleId);
                     account.setName(accountRequest.getName());
@@ -129,8 +135,8 @@ public class AccountServiceImpl implements IAccountService {
                     account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
                     account.setAvatar(imageUploadService.uploadImageByName(accountRequest.getAvatar()));
                     account.setStatus(accountRequest.getStatus());
-                }else{
-                    return new ServiceResult<>(AppConstant.FAIL,"Add fail",null);
+                } else {
+                    return new ServiceResult<>(AppConstant.FAIL, "Add fail", null);
                 }
 
                 account = accountRepository.save(account);
@@ -138,9 +144,9 @@ public class AccountServiceImpl implements IAccountService {
 
                 return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertToResponses);
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
-                return new ServiceResult<>(AppConstant.BAD_REQUEST,e.getMessage(),null);
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null);
             }
 
         }
@@ -148,7 +154,7 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public ServiceResult<AccountPageResponse> findAllAccount(int pageNo, int pageSize) {
-        Pageable pageable1 = PageRequest.of(pageNo,pageSize);
+        Pageable pageable1 = PageRequest.of(pageNo, pageSize);
         Page<Account> pageAccount = accountRepository.getAllAccount(pageable1);
         List<Address> listAddress = addressRepository.findAll();
 
@@ -162,13 +168,13 @@ public class AccountServiceImpl implements IAccountService {
         accountPageResponse.setLast(pageAccount.isLast());
         accountPageResponse.setFirst(pageAccount.isFirst());
 
-        return new ServiceResult<>(AppConstant.SUCCESS,"success",accountPageResponse);
+        return new ServiceResult<>(AppConstant.SUCCESS, "success", accountPageResponse);
     }
 
     @Override
     public ServiceResult<Account> updateAccount(AccountRequest accountRequest) throws IOException {
         Optional<Account> optionalAccount = accountRepository.findById(accountRequest.getId());
-        if (optionalAccount.isPresent()){
+        if (optionalAccount.isPresent()) {
             Account accountId = optionalAccount.get();
             accountId.setId(accountId.getId());
             accountId.setName(accountRequest.getName());
@@ -178,22 +184,22 @@ public class AccountServiceImpl implements IAccountService {
 
             Account account = accountRepository.save(accountId);
 
-            return new ServiceResult<>(AppConstant.SUCCESS,"update success",account);
+            return new ServiceResult<>(AppConstant.SUCCESS, "update success", account);
 
-        }else{
-            return new ServiceResult<>(AppConstant.FAIL,"update fail",null);
+        } else {
+            return new ServiceResult<>(AppConstant.FAIL, "update fail", null);
         }
     }
 
     @Override
     public ServiceResult<Account> huyAccount(AccountRequest accountRequest) {
         Optional<Account> accountId = accountRepository.findById(accountRequest.getId());
-        if (accountId.isPresent()){
+        if (accountId.isPresent()) {
             Account account = accountId.get();
             accountRepository.save(account);
-            return new ServiceResult<>(AppConstant.SUCCESS,"delete Success",null);
-        }else{
-            return new ServiceResult<>(AppConstant.FAIL,"delete fail",null);
+            return new ServiceResult<>(AppConstant.SUCCESS, "delete Success", null);
+        } else {
+            return new ServiceResult<>(AppConstant.FAIL, "delete fail", null);
         }
     }
 
@@ -201,9 +207,9 @@ public class AccountServiceImpl implements IAccountService {
     public ServiceResult<List<Account>> searchNameAccount(String name) {
         List<Account> staffName = accountRepository.searchNameStaff(name);
 
-        if (staffName.isEmpty()){
+        if (staffName.isEmpty()) {
             return new ServiceResult<>(AppConstant.FAIL, "khong co nhan vien nay", null);
-        }else{
+        } else {
             return new ServiceResult<>(AppConstant.SUCCESS, "success", staffName);
         }
     }
@@ -214,7 +220,7 @@ public class AccountServiceImpl implements IAccountService {
         Account accountEmail = optionalAccount.get();
         String passNew = generateRandomPassword();
 
-        if (optionalAccount.isPresent()){
+        if (optionalAccount.isPresent()) {
             accountEmail.setPassword(passwordEncoder.encode(passNew));
         }
 
@@ -222,11 +228,11 @@ public class AccountServiceImpl implements IAccountService {
         String to = accountEmail.getEmail();
         String subject = "Welcome to store bee shoe of group SD-66";
         String mailType = "chao mung nhan vien ";
-        String mailContent = "mat khau acccount cua ban la :"+passNew;
+        String mailContent = "mat khau acccount cua ban la :" + passNew;
 
-        iEmailTemplateService.sendEmail(to,subject,mailType,mailContent);
+        iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
 
-        return new ServiceResult<>(AppConstant.SUCCESS,"success",accountEmail);
+        return new ServiceResult<>(AppConstant.SUCCESS, "success", accountEmail);
     }
 
     @Override
@@ -238,19 +244,19 @@ public class AccountServiceImpl implements IAccountService {
             accountId.setPassword(passwordRequest.getNewPassword());
             accountId.setPassword(passwordRequest.getEnterNewPassword());
 
-            if(passwordRequest.getYourOldPassword().equals(passwordRequest.getNewPassword())){
-                return new ServiceResult<>(AppConstant.SUCCESS,"fail","không được trùng với mật khẩu hiện tại");
-             } else if (!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
-                return new ServiceResult<>(AppConstant.SUCCESS,"fail","mật khẩu mới phải trùng với mật khẩu nhập lại");
-            } else if(passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
+            if (passwordRequest.getYourOldPassword().equals(passwordRequest.getNewPassword())) {
+                return new ServiceResult<>(AppConstant.SUCCESS, "fail", "không được trùng với mật khẩu hiện tại");
+            } else if (!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())) {
+                return new ServiceResult<>(AppConstant.SUCCESS, "fail", "mật khẩu mới phải trùng với mật khẩu nhập lại");
+            } else if (passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())) {
                 accountRepository.save(accountId);
-                return new ServiceResult<>(AppConstant.SUCCESS,"success","chu mung ban da doi mat khau thanh cong");
-            }else{
-                return new ServiceResult<>(AppConstant.SUCCESS,"fail","bạn nhập chưa đúng mật khẩu ");
+                return new ServiceResult<>(AppConstant.SUCCESS, "success", "chu mung ban da doi mat khau thanh cong");
+            } else {
+                return new ServiceResult<>(AppConstant.SUCCESS, "fail", "bạn nhập chưa đúng mật khẩu ");
             }
 
-        }else{
-            return new ServiceResult<>(AppConstant.SUCCESS,"fail","doi mat khau that bai");
+        } else {
+            return new ServiceResult<>(AppConstant.SUCCESS, "fail", "doi mat khau that bai");
         }
 
     }
@@ -270,22 +276,21 @@ public class AccountServiceImpl implements IAccountService {
     public String validateStaff(AccountRequest accountRequest) {
         List<String> errorMessages = new ArrayList<>();
 
-        if (accountRequest.getRoleId() == null){
+        if (accountRequest.getRoleId() == null) {
             errorMessages.add("không được để trông role");
         }
-        if(accountRequest.getName() == null){
+        if (accountRequest.getName() == null) {
             errorMessages.add("Name not null");
         }
-        if(accountRequest.getEmail() == null){
+        if (accountRequest.getEmail() == null) {
             errorMessages.add("email not null");
         }
-        if(accountRequest.getPassword() == null){
+        if (accountRequest.getPassword() == null) {
             errorMessages.add("password not null");
         }
-        if(accountRequest.getStatus() == null){
+        if (accountRequest.getStatus() == null) {
             errorMessages.add("status not null");
         }
-
 
 
         if (errorMessages.size() > 0) {
@@ -296,7 +301,7 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     public ServiceResult<AccountResponse> result(String mess) {
-        return new ServiceResult<>(AppConstant.FAIL,mess,null);
+        return new ServiceResult<>(AppConstant.FAIL, mess, null);
     }
 
     public String generateRandomPassword() {
@@ -313,4 +318,47 @@ public class AccountServiceImpl implements IAccountService {
         return password.toString();
     }
 
+    public AccountCustomResponse convertPage(Object[] object) {
+        AccountCustomResponse accountCustomResponse = new AccountCustomResponse();
+        accountCustomResponse.setId(((BigInteger) object[0]).longValue());
+        accountCustomResponse.setCode((String) object[1]);
+        accountCustomResponse.setName((String) object[2]);
+        accountCustomResponse.setEmail((String) object[3]);
+        accountCustomResponse.setAvatar((String) object[4]);
+        accountCustomResponse.setRoleId(((BigInteger) object[5]).longValue());
+        accountCustomResponse.setStatus((Integer) object[6]);
+        return accountCustomResponse;
+    }
+    @Override
+    public Page<AccountCustomResponse> searchAccount(SearchAccountRequest searchAccountRequest) {
+        Pageable pageable = PageRequest.of(searchAccountRequest.getPage(), searchAccountRequest.getSize());
+        if (searchAccountRequest.getName() != null) {
+            String name = searchAccountRequest.getName();
+            name = name.replaceAll("\\\\", "\\\\\\\\");
+            name = name.replaceAll("%", "\\\\%");
+            name = name.replaceAll("_", "\\\\_");
+            searchAccountRequest.setName(name);
+        }
+        if (searchAccountRequest.getEmail() != null) {
+            String email = searchAccountRequest.getEmail();
+            email = email.replaceAll("\\\\", "\\\\\\\\");
+            email = email.replaceAll("%", "\\\\%");
+            email = email.replaceAll("_", "\\\\_");
+            searchAccountRequest.setEmail(email);
+        }
+        Page<Object> objects = accountCustomRepository.doSearch(
+                pageable,
+                searchAccountRequest.getName(),
+                searchAccountRequest.getEmail(),
+                searchAccountRequest.getRole(),
+                searchAccountRequest.getStatusAccount()
+        );
+        List<AccountCustomResponse> list = new ArrayList<>();
+        for (Object object : objects) {
+            Object[] result = (Object[]) object;
+            AccountCustomResponse accountCustomResponse = convertPage(result);
+            list.add(accountCustomResponse);
+        }
+        return new PageImpl<>(list, pageable, objects.getTotalElements());
+    }
 }

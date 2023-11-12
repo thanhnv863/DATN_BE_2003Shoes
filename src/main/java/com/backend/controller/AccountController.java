@@ -1,9 +1,16 @@
 package com.backend.controller;
 
+import com.backend.ServiceResultReponse;
+import com.backend.config.AppConstant;
 import com.backend.dto.request.AccountRequest;
 import com.backend.dto.request.PasswordRequest;
+import com.backend.dto.request.SearchOrderRequest;
+import com.backend.dto.request.account.SearchAccountRequest;
+import com.backend.dto.response.OrderReponse;
+import com.backend.dto.response.account.AccountCustomResponse;
 import com.backend.service.IAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,5 +61,11 @@ public class AccountController {
     @PostMapping("/change-password-account")
     public ResponseEntity<?> changePassword(@RequestBody PasswordRequest passwordRequest){
         return ResponseEntity.ok(iAccountService.changePassword(passwordRequest));
+    }
+    @PostMapping("/get-all")
+    public ResponseEntity<?> getAllAccount(@RequestBody SearchAccountRequest searchAccountRequest) {
+        Page<AccountCustomResponse> page = iAccountService.searchAccount(searchAccountRequest);
+        return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
+//        return ResponseEntity.ok().body(page);
     }
 }
