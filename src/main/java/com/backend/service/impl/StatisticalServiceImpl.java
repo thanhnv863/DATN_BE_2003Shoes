@@ -49,20 +49,44 @@ public class StatisticalServiceImpl implements IStatistical {
         List<HangHoaBanChayTrongNam> result = new ArrayList<>();
         for (Object[] record: getHangHoa){
             HangHoaBanChayTrongNam hangHoaBanChayTrongNam = new HangHoaBanChayTrongNam();
-            hangHoaBanChayTrongNam.setTenSanPham((String) record[0]);
-            hangHoaBanChayTrongNam.setThang1((BigDecimal) record[1]);
-            hangHoaBanChayTrongNam.setThang2((BigDecimal) record[2]);
-            hangHoaBanChayTrongNam.setThang3((BigDecimal) record[3]);
-            hangHoaBanChayTrongNam.setThang4((BigDecimal) record[4]);
-            hangHoaBanChayTrongNam.setThang5((BigDecimal) record[5]);
-            hangHoaBanChayTrongNam.setThang6((BigDecimal) record[6]);
-            hangHoaBanChayTrongNam.setThang7((BigDecimal) record[7]);
-            hangHoaBanChayTrongNam.setThang8((BigDecimal) record[8]);
-            hangHoaBanChayTrongNam.setThang9((BigDecimal) record[9]);
-            hangHoaBanChayTrongNam.setThang10((BigDecimal) record[10]);
-            hangHoaBanChayTrongNam.setThang11((BigDecimal) record[11]);
-            hangHoaBanChayTrongNam.setThang12((BigDecimal) record[12]);
-            hangHoaBanChayTrongNam.setTongSoLuong((BigDecimal) record[13]);
+
+            hangHoaBanChayTrongNam.setValue1("thang1") ;
+            hangHoaBanChayTrongNam.setThang1((BigDecimal) record[0]);
+
+            hangHoaBanChayTrongNam.setValue2("thang2");
+            hangHoaBanChayTrongNam.setThang2((BigDecimal) record[1]);
+
+            hangHoaBanChayTrongNam.setValue3("thang3");
+            hangHoaBanChayTrongNam.setThang3((BigDecimal) record[2]);
+
+            hangHoaBanChayTrongNam.setValue4("thang4");
+            hangHoaBanChayTrongNam.setThang4((BigDecimal) record[3]);
+
+            hangHoaBanChayTrongNam.setValue5("thang5");
+            hangHoaBanChayTrongNam.setThang5((BigDecimal) record[4]);
+
+            hangHoaBanChayTrongNam.setValue6("thang6");
+            hangHoaBanChayTrongNam.setThang6((BigDecimal) record[5]);
+
+            hangHoaBanChayTrongNam.setValue7("thang7");
+            hangHoaBanChayTrongNam.setThang7((BigDecimal) record[6]);
+
+            hangHoaBanChayTrongNam.setValue8("thang8");
+            hangHoaBanChayTrongNam.setThang8((BigDecimal) record[7]);
+
+            hangHoaBanChayTrongNam.setValue9("thang9");
+            hangHoaBanChayTrongNam.setThang9((BigDecimal) record[8]);
+
+            hangHoaBanChayTrongNam.setValue10("thang10");
+            hangHoaBanChayTrongNam.setThang10((BigDecimal) record[9]);
+
+            hangHoaBanChayTrongNam.setValue11("thang11");
+            hangHoaBanChayTrongNam.setThang11((BigDecimal) record[10]);
+
+            hangHoaBanChayTrongNam.setValue12("thang12");
+            hangHoaBanChayTrongNam.setThang12((BigDecimal) record[11]);
+
+            hangHoaBanChayTrongNam.setTongSoLuong((BigDecimal) record[12]);
 
             result.add(hangHoaBanChayTrongNam);
         }
