@@ -33,6 +33,7 @@ import com.backend.service.IOrderService;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
@@ -57,6 +58,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -626,6 +629,9 @@ public class OrderServiceImpl implements IOrderService {
         centerAlignmentStyle.setBorderTop(BorderStyle.THIN);
         centerAlignmentStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
         //
+        CellStyle dateCellStyle = workbook.createCellStyle();
+        DataFormat dateFormat = workbook.createDataFormat();
+        dateCellStyle.setDataFormat(dateFormat.getFormat("dd/MM/yyyy"));
 
         List<OrderReponse> orderReponsesList = this.searchOrderExport(searchOrderRequest);
         int rowNum = 3;
@@ -648,7 +654,11 @@ public class OrderServiceImpl implements IOrderService {
                 type = "";
             }
             row.createCell(5).setCellValue(type);
-            row.createCell(6).setCellValue(orderReponse.getCreatedDate());
+
+            Cell createDate = row.createCell(6);
+            createDate.setCellValue(orderReponse.getCreatedDate());
+            createDate.setCellStyle(dateCellStyle);
+
             if (orderReponse.getStatus() == 0) {
                 status = "Hóa đơn chờ";
             } else if (orderReponse.getStatus() == 1) {
