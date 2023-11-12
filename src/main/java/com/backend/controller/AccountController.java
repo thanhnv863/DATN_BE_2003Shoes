@@ -62,6 +62,7 @@ public class AccountController {
     public ResponseEntity<?> changePassword(@RequestBody PasswordRequest passwordRequest){
         return ResponseEntity.ok(iAccountService.changePassword(passwordRequest));
     }
+
     @PostMapping("/get-all")
     public ResponseEntity<?> getAllAccount(@RequestBody SearchAccountRequest searchAccountRequest) {
         Page<AccountCustomResponse> page = iAccountService.searchAccount(searchAccountRequest);

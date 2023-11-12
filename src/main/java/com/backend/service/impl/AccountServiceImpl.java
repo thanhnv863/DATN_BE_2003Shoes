@@ -238,27 +238,32 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public ServiceResult<String> changePassword(PasswordRequest passwordRequest) {
         Optional<Account> optionalAccount = accountRepository.findById(passwordRequest.getId());
+
         if (optionalAccount.isPresent()) {
             Account accountId = optionalAccount.get();
-            accountId.setPassword(passwordRequest.getYourOldPassword());
-            accountId.setPassword(passwordRequest.getNewPassword());
-            accountId.setPassword(passwordRequest.getEnterNewPassword());
+            if (passwordRequest.getYourOldPassword().equals(accountId.getPassword())){
+                accountId.setPassword(passwordEncoder.encode(passwordRequest.getEnterNewPassword()));
 
-            if (passwordRequest.getYourOldPassword().equals(passwordRequest.getNewPassword())) {
-                return new ServiceResult<>(AppConstant.SUCCESS, "fail", "không được trùng với mật khẩu hiện tại");
-            } else if (!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())) {
-                return new ServiceResult<>(AppConstant.SUCCESS, "fail", "mật khẩu mới phải trùng với mật khẩu nhập lại");
-            } else if (passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())) {
-                accountRepository.save(accountId);
-                return new ServiceResult<>(AppConstant.SUCCESS, "success", "chu mung ban da doi mat khau thanh cong");
-            } else {
-                return new ServiceResult<>(AppConstant.SUCCESS, "fail", "bạn nhập chưa đúng mật khẩu ");
+                if(passwordRequest.getYourOldPassword().equals(passwordRequest.getNewPassword())){
+                    return new ServiceResult<>(AppConstant.SUCCESS,"fail","Không được trùng với mật khẩu hiện tại");
+
+                } else if (!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
+                    return new ServiceResult<>(AppConstant.SUCCESS,"fail","Mật khẩu mới phải trùng với mật khẩu nhập lại");
+
+                } else if(passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
+
+                    accountRepository.save(accountId);
+
+                    return new ServiceResult<>(AppConstant.SUCCESS,"success","Chúc mừng bạn đã đổi mật khẩu thành công");
+                }else{
+                    return new ServiceResult<>(AppConstant.SUCCESS,"fail","Bạn nhập chưa đúng mật khẩu ");
+                }
+            } else{
+                return new ServiceResult<>(AppConstant.SUCCESS,"fail","Mật khẩu cũ không trùng với mật khẩu của tài khoản");
             }
-
-        } else {
-            return new ServiceResult<>(AppConstant.SUCCESS, "fail", "doi mat khau that bai");
+        }else{
+            return new ServiceResult<>(AppConstant.SUCCESS,"fail","Đổi mật khẩu thất bại");
         }
-
     }
 
 
