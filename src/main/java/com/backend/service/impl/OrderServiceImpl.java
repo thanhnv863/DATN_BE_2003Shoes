@@ -286,6 +286,7 @@ public class OrderServiceImpl implements IOrderService {
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 0L, null, "Mã không tồn tại");
         }
     }
+
     @Override
     public ServiceResultReponse<?> getOrderByStatus(Integer status) {
         List<Object> objectList = orderRepository.listOrderByStatus(status);
@@ -300,13 +301,15 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     //customer
     @Override
     public List<Order> listAllByCustomer(SearchOrderCutomerRequest searchOrderCutomerRequest) {
         return orderRepository.listOrderCustomer(searchOrderCutomerRequest.getIdAccount());
     }
+
     @Override
-    public ServiceResultReponse<Order> customerAddOrder(OrderCutomerRequest orderCutomerRequest){
+    public ServiceResultReponse<Order> customerAddOrder(OrderCutomerRequest orderCutomerRequest) {
         try {
             Date date = new Date();
             Order order = new Order();
@@ -327,10 +330,9 @@ public class OrderServiceImpl implements IOrderService {
             // check xem có sản phẩm mua không!
             Cart cart = cartRepository.findByAccount_Id(order.getAccount().getId());
             List<CartDetail> cartDetailList = cartDetailRepository.listCartDetailByStatus(cart.getId());
-            if(cartDetailList.isEmpty()){
+            if (cartDetailList.isEmpty()) {
                 return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại, vui lòng chọn sản phẩm mua!");
-            }
-            else {
+            } else {
 //            order.setUpdatedBy(order.getUpdatedBy());
                 order.setType("2");
                 order.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
@@ -406,13 +408,13 @@ public class OrderServiceImpl implements IOrderService {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
         }
     }
+
     @Override
-    public ServiceResultReponse<Order> customerNoLoginAddOrder(OrderCutomerRequest orderCutomerRequest){
+    public ServiceResultReponse<Order> customerNoLoginAddOrder(OrderCutomerRequest orderCutomerRequest) {
         try {
-            if(orderCutomerRequest.getShoeDetailListRequets().isEmpty()){
+            if (orderCutomerRequest.getShoeDetailListRequets().isEmpty()) {
                 return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại, vui lòng chọn sản phẩm mua!");
-            }
-            else {
+            } else {
                 Date date = new Date();
                 Order order = new Order();
                 order.setCode(generateOrderCode());
@@ -547,6 +549,7 @@ public class OrderServiceImpl implements IOrderService {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
         }
     }
+
     @Override
     public List<OrderReponse> searchOrderExport(SearchOrderRequest searchOrderRequest) {
         if (searchOrderRequest.getCustomer() != null) {
@@ -632,49 +635,50 @@ public class OrderServiceImpl implements IOrderService {
             row.createCell(1).setCellValue(orderReponse.getCode());
             row.createCell(2).setCellValue(orderReponse.getCustomerName());
             row.createCell(3).setCellValue(orderReponse.getPhoneNumber());
-            if(orderReponse.getTotalMoney() != null) {
+            if (orderReponse.getTotalMoney() != null) {
                 BigDecimal totalMoney = orderReponse.getTotalMoney();
                 row.createCell(4).setCellValue(totalMoney.toString());
             }
-            if(orderReponse.getType() != null) {
+            if (orderReponse.getType() != null) {
                 if (orderReponse.getType().equals("1")) {
                     type = "Tại quầy";
                 } else
                     type = "Online";
-            }else{
+            } else {
                 type = "";
             }
             row.createCell(5).setCellValue(type);
             row.createCell(6).setCellValue(orderReponse.getCreatedDate());
-            if (orderReponse.getStatus()== 0) {
+            if (orderReponse.getStatus() == 0) {
                 status = "Hóa đơn chờ";
-            } else if(orderReponse.getStatus() == 1) {
+            } else if (orderReponse.getStatus() == 1) {
                 status = "Chờ thanh toán";
-            }else if(orderReponse.getStatus() == 2) {
+            } else if (orderReponse.getStatus() == 2) {
                 status = "Đã thanh toán";
-            }else if(orderReponse.getStatus() == 3) {
+            } else if (orderReponse.getStatus() == 3) {
                 status = "Đã hủy";
-            }else if(orderReponse.getStatus() == 4) {
+            } else if (orderReponse.getStatus() == 4) {
                 status = "Chờ xác nhận";
-            }else if(orderReponse.getStatus() == 5) {
+            } else if (orderReponse.getStatus() == 5) {
+                status = "Đã xác nhận";
+            } else if (orderReponse.getStatus() == 6) {
                 status = "Chờ giao hàng";
-            }else if(orderReponse.getStatus() == 6){
-                status = "Đơn hàng thành công";
-            }else{
+            } else if (orderReponse.getStatus() == 7) {
+                status = "Đã bàn giao";
+            } else if (orderReponse.getStatus() == 8) {
+                status = "Hoàn thành";
+            } else {
                 status = "";
             }
             row.createCell(7).setCellValue(status);
-//
-//            Cell cell7 = row.createCell(7);
-//            cell7.setCellValue(subjectDTO.getDescription());
-//            cell7.setCellStyle(centerAlignmentStyle); // Áp dụng căn giữa cho cell7
 
-            for (int i = 0; i <= 3; i++) {
+            for (int i = 0; i <= 7; i++) {
                 Cell cell = row.getCell(i);
                 if (cell == null) {
                     cell = row.createCell(i);
                 }
-                cell.setCellStyle(cellStyle);
+//                cell.setCellValue(cell.getStringCellValue());
+                cell.setCellStyle(centerAlignmentStyle);
             }
         }
         sheet.autoSizeColumn(0);
