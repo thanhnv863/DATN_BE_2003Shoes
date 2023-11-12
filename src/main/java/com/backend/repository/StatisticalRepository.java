@@ -25,7 +25,6 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
     List<Object[]> findByHoaDonHuy(Integer ngayTao, Integer trangThai);
 
     @Query(value = "select \n" +
-            "\ts.name as 'Tên sản phẩm', \n" +
             "    CASE WHEN month(oh.created_time) = 1 THEN sum(od.quantity) ELSE 0 END AS 'tháng 1',\n" +
             "    CASE WHEN month(oh.created_time) = 2 THEN sum(od.quantity) ELSE 0 END AS 'tháng 2',\n" +
             "    CASE WHEN month(oh.created_time) = 3 THEN sum(od.quantity) ELSE 0 END AS 'tháng 3',\n" +
@@ -44,8 +43,7 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "             join order_history oh on od.order_id = oh.order_id\n" +
             "             join shoe s on sd.shoe_id = s.id\n" +
             "            where YEAR(oh.created_time) = :nam\t\n" +
-            "            group by s.name, month(oh.created_time)\n" +
-            "            order by s.name",nativeQuery = true)
+            "            group by month(oh.created_time)\n",nativeQuery = true)
     List<Object[]> findByHangHoaBanChayTrongNam(Integer nam);
 
     @Query(value = "select \n" +
@@ -65,4 +63,5 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "        GROUP BY month(mo.create_date)\n" +
             "        ORDER BY Thang", nativeQuery = true)
     List<Object[]> doanhThuTrongThang(Integer thang);
+
 }
