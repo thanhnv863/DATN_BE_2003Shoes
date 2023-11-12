@@ -17,6 +17,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.DataValidation;
 import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
@@ -998,6 +999,10 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         cellStyle.setRightBorderColor(IndexedColors.BLACK.getIndex());
         cellStyle.setBorderTop(BorderStyle.THIN);
         cellStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        // formatDate
+        CellStyle dateCellStyle = workbook.createCellStyle();
+        DataFormat dateFormat = workbook.createDataFormat();
+        dateCellStyle.setDataFormat(dateFormat.getFormat("dd/MM/yyyy"));
 
         // set style căn giữa
         CellStyle centerAlignmentStyle = workbook.createCellStyle();
@@ -1038,8 +1043,13 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             }else{
                 row.createCell(6).setCellValue("");
             }
-            row.createCell(7).setCellValue(voucherOrderResponse.getStartDate());
-            row.createCell(8).setCellValue(voucherOrderResponse.getEndDate());
+            Cell startDateCell = row.createCell(7);
+            startDateCell.setCellValue(voucherOrderResponse.getStartDate());
+            startDateCell.setCellStyle(dateCellStyle);
+
+            Cell endDateCell = row.createCell(8);
+            endDateCell.setCellValue(voucherOrderResponse.getEndDate());
+            endDateCell.setCellStyle(dateCellStyle);
             if (voucherOrderResponse.getStatus()== 0) {
                 status = "Chờ kích hoạt";
             } else if(voucherOrderResponse.getStatus() == 1) {
