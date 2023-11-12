@@ -4,9 +4,11 @@ import com.backend.ServiceResult;
 import com.backend.dto.request.AccountRequest;
 import com.backend.dto.request.PasswordRequest;
 import com.backend.dto.request.RegisterRequest;
+import com.backend.dto.request.account.SearchAccountRequest;
 import com.backend.dto.response.AccountPageResponse;
 import com.backend.dto.response.AccountResponse;
 import com.backend.dto.response.RegisterResponse;
+import com.backend.dto.response.account.AccountCustomResponse;
 import com.backend.entity.Account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +36,6 @@ public interface IAccountService {
     ServiceResult<Account> findByEmailAccount(String email);
 
     ServiceResult<String> changePassword(PasswordRequest passwordRequest);
+
+    Page<AccountCustomResponse> searchAccount(SearchAccountRequest searchAccountRequest);
 }
