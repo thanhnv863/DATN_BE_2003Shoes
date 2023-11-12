@@ -167,7 +167,6 @@ public class AddressServiceImpl implements IAddressService {
 
 
 
-
     @Override
     public String validateAddress(AddressRequest addressRequest) {
         List<String> errorMessages = new ArrayList<>();
@@ -233,6 +232,5 @@ public class AddressServiceImpl implements IAddressService {
     public ServiceResult<AddressResponse> result(String mess) {
         return new ServiceResult<>(AppConstant.FAIL,mess,null);
     }
-
 
 }
