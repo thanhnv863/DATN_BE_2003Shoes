@@ -49,14 +49,20 @@ public class AddressServiceImpl implements IAddressService {
                    address.setProvince(addressRequest.getProvince());
                    address.setNote(addressRequest.getNote());
                    address.setDefaultAddress(addressRequest.getDefaultAddress());
+
+                   if(account.isPresent() && address.getDefaultAddress().equals("0")){
+                       return new ServiceResult<>(AppConstant.SUCCESS, "Add that bai chi duoc 1 dia chi mac dinh", null);
+                   }
+
+                   address = addressRepository.save(address);
+                   AddressResponse convertAddressResponse = convertToResponse(address);
+
+                   return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertAddressResponse);
+
                }else{
                   return new ServiceResult<>(AppConstant.FAIL,"Add fail",null);
                }
 
-               address = addressRepository.save(address);
-               AddressResponse convertAddressResponse = convertToResponse(address);
-
-               return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertAddressResponse);
            }catch (Exception e){
                e.printStackTrace();
                return new ServiceResult<>(AppConstant.BAD_REQUEST,e.getMessage(),null);
@@ -124,13 +130,6 @@ public class AddressServiceImpl implements IAddressService {
         List<Address> customerId = addressRepository.findAddressesByAccount_Id(id);
 
         return new ServiceResult<>(AppConstant.SUCCESS,"success",customerId);
-
-//        if (customerId.isPresent()) {
-//            Address getCustomer = customerId.get();
-//            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, getCustomer, "success");
-//        }else {
-//            return new ServiceResultReponse<>(AppConstant.FAIL,0L, null,"Customer not exists");
-//        }
 
     }
 
