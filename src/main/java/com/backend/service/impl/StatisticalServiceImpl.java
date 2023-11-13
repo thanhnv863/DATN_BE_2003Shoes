@@ -5,7 +5,7 @@ import com.backend.config.AppConstant;
 import com.backend.dto.statistical.DataItem;
 import com.backend.dto.statistical.DoanhThuTrongNgay;
 import com.backend.dto.statistical.DoanhThuTrongThang;
-import com.backend.dto.statistical.HangHoaBanChayTrongNam;
+import com.backend.dto.statistical.SoHangHoaTrongThang;
 import com.backend.dto.statistical.HoaDonHuy;
 import com.backend.repository.StatisticalRepository;
 import com.backend.service.IStatistical;
@@ -25,18 +25,73 @@ public class StatisticalServiceImpl implements IStatistical {
     private StatisticalRepository statisticalRepository;
 
     @Override
-    public ServiceResult<List<HoaDonHuy>> findHoaDonHuy(Integer ngayTao, Integer trangThai) {
-        List<Object[]> soHoaDonHuy = statisticalRepository.findByHoaDonHuy(ngayTao,trangThai);
+    public ServiceResult<List<DataItem>> findHoaDon(Integer thang) {
+        List<Object[]> soHoaDonHuy = statisticalRepository.findByHoaDon(thang);
         List<HoaDonHuy> hoaDonHuyList = new ArrayList<>();
+        List<DataItem> dataItems = new ArrayList<>();
+
         for(Object[] hoaDon: soHoaDonHuy){
             HoaDonHuy hoaDonHuy = new HoaDonHuy();
-            hoaDonHuy.setNgay((BigInteger) hoaDon[0]);
-            hoaDonHuy.setSoHoaDonHuy((BigInteger) hoaDon[1]);
+
+            DataItem data1 = new DataItem();
+            data1.setType("hoaDonCho");
+            hoaDonHuy.setHoaDonCho((BigDecimal) hoaDon[0]);
+            data1.setValues(hoaDonHuy.getHoaDonCho());
+
+            DataItem data2 = new DataItem();
+            data2.setType("choThanhToan");
+            hoaDonHuy.setChoThanhToan((BigDecimal) hoaDon[1]);
+            data2.setValues(hoaDonHuy.getChoThanhToan());
+
+            DataItem data3 = new DataItem();
+            data3.setType("daThanhToan");
+            hoaDonHuy.setDaThanhToan((BigDecimal) hoaDon[2]);
+            data3.setValues(hoaDonHuy.getDaThanhToan());
+
+            DataItem data4 = new DataItem();
+            data4.setType("daHuy");
+            hoaDonHuy.setDaHuy((BigDecimal) hoaDon[3]);
+            data4.setValues(hoaDonHuy.getDaHuy());
+
+            DataItem data5 = new DataItem();
+            data5.setType("choXacNhan");
+            hoaDonHuy.setChoXacNhan((BigDecimal) hoaDon[4]);
+            data5.setValues(hoaDonHuy.getChoXacNhan());
+
+            DataItem data6 = new DataItem();
+            data6.setType("daXacNhan");
+            hoaDonHuy.setDaXacNhan((BigDecimal) hoaDon[5]);
+            data6.setValues(hoaDonHuy.getDaXacNhan());
+
+            DataItem data7 = new DataItem();
+            data7.setType("choGiaoHang");
+            hoaDonHuy.setChoGiaoHang((BigDecimal) hoaDon[6]);
+            data7.setValues(hoaDonHuy.getChoGiaoHang());
+
+            DataItem data8 = new DataItem();
+            data8.setType("daBanGiao");
+            hoaDonHuy.setDaBanGiao((BigDecimal) hoaDon[7]);
+            data8.setValues(hoaDonHuy.getDaBanGiao());
+
+            DataItem data9 = new DataItem();
+            data9.setType("hoanThanh");
+            hoaDonHuy.setHoanThanh((BigDecimal) hoaDon[8]);
+            data9.setValues(hoaDonHuy.getHoanThanh());
+
             hoaDonHuyList.add(hoaDonHuy);
+            dataItems.add(data1);
+            dataItems.add(data2);
+            dataItems.add(data3);
+            dataItems.add(data4);
+            dataItems.add(data5);
+            dataItems.add(data6);
+            dataItems.add(data7);
+            dataItems.add(data8);
+            dataItems.add(data9);
         }
 
         if (hoaDonHuyList.size() > 0){
-            return new ServiceResult<>(AppConstant.SUCCESS,"get success",hoaDonHuyList);
+            return new ServiceResult<>(AppConstant.SUCCESS,"get success",dataItems);
         }else{
             return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co hoa don",null);
         }
@@ -47,85 +102,85 @@ public class StatisticalServiceImpl implements IStatistical {
     @Override
     public ServiceResult<List<DataItem>> thongKeSanPhamBanChayTrongNam(Integer nam) {
         List<Object[]> getHangHoa = statisticalRepository.findByHangHoaBanChayTrongNam(nam);
-        List<HangHoaBanChayTrongNam> result = new ArrayList<>();
+        List<SoHangHoaTrongThang> result = new ArrayList<>();
         List<DataItem> dataItems = new ArrayList<>();
 
         for (Object[] record: getHangHoa){
-            HangHoaBanChayTrongNam hangHoaBanChayTrongNam = new HangHoaBanChayTrongNam();
+            SoHangHoaTrongThang soHangHoaTrongThang = new SoHangHoaTrongThang();
 
             DataItem data1 = new DataItem();
-            hangHoaBanChayTrongNam.setValue1("thang1") ;
-            data1.setThang(hangHoaBanChayTrongNam.getValue1());
-            hangHoaBanChayTrongNam.setThang1((BigDecimal) record[0]);
-            data1.setValues(hangHoaBanChayTrongNam.getThang1());
+            soHangHoaTrongThang.setValue1("thang1") ;
+            data1.setType(soHangHoaTrongThang.getValue1());
+            soHangHoaTrongThang.setThang1((BigDecimal) record[0]);
+            data1.setValues(soHangHoaTrongThang.getThang1());
 
             DataItem data2 = new DataItem();
-            hangHoaBanChayTrongNam.setValue2("thang2");
-            data2.setThang(hangHoaBanChayTrongNam.getValue2());
-            hangHoaBanChayTrongNam.setThang2((BigDecimal) record[1]);
-            data2.setValues(hangHoaBanChayTrongNam.getThang2());
+            soHangHoaTrongThang.setValue2("thang2");
+            data2.setType(soHangHoaTrongThang.getValue2());
+            soHangHoaTrongThang.setThang2((BigDecimal) record[1]);
+            data2.setValues(soHangHoaTrongThang.getThang2());
 
             DataItem data3 = new DataItem();
-            hangHoaBanChayTrongNam.setValue3("thang3");
-            data3.setThang(hangHoaBanChayTrongNam.getValue3());
-            hangHoaBanChayTrongNam.setThang3((BigDecimal) record[2]);
-            data3.setValues(hangHoaBanChayTrongNam.getThang3());
+            soHangHoaTrongThang.setValue3("thang3");
+            data3.setType(soHangHoaTrongThang.getValue3());
+            soHangHoaTrongThang.setThang3((BigDecimal) record[2]);
+            data3.setValues(soHangHoaTrongThang.getThang3());
 
             DataItem data4 = new DataItem();
-            hangHoaBanChayTrongNam.setValue4("thang4");
-            data4.setThang(hangHoaBanChayTrongNam.getValue4());
-            hangHoaBanChayTrongNam.setThang4((BigDecimal) record[3]);
-            data4.setValues(hangHoaBanChayTrongNam.getThang4());
+            soHangHoaTrongThang.setValue4("thang4");
+            data4.setType(soHangHoaTrongThang.getValue4());
+            soHangHoaTrongThang.setThang4((BigDecimal) record[3]);
+            data4.setValues(soHangHoaTrongThang.getThang4());
 
             DataItem data5 = new DataItem();
-            hangHoaBanChayTrongNam.setValue5("thang5");
-            data5.setThang(hangHoaBanChayTrongNam.getValue5());
-            hangHoaBanChayTrongNam.setThang5((BigDecimal) record[4]);
-            data5.setValues(hangHoaBanChayTrongNam.getThang5());
+            soHangHoaTrongThang.setValue5("thang5");
+            data5.setType(soHangHoaTrongThang.getValue5());
+            soHangHoaTrongThang.setThang5((BigDecimal) record[4]);
+            data5.setValues(soHangHoaTrongThang.getThang5());
 
             DataItem data6 = new DataItem();
-            hangHoaBanChayTrongNam.setValue6("thang6");
-            data6.setThang(hangHoaBanChayTrongNam.getValue6());
-            hangHoaBanChayTrongNam.setThang6((BigDecimal) record[5]);
-            data6.setValues(hangHoaBanChayTrongNam.getThang6());
+            soHangHoaTrongThang.setValue6("thang6");
+            data6.setType(soHangHoaTrongThang.getValue6());
+            soHangHoaTrongThang.setThang6((BigDecimal) record[5]);
+            data6.setValues(soHangHoaTrongThang.getThang6());
 
             DataItem data7 = new DataItem();
-            hangHoaBanChayTrongNam.setValue7("thang7");
-            data7.setThang(hangHoaBanChayTrongNam.getValue7());
-            hangHoaBanChayTrongNam.setThang7((BigDecimal) record[6]);
-            data7.setValues(hangHoaBanChayTrongNam.getThang7());
+            soHangHoaTrongThang.setValue7("thang7");
+            data7.setType(soHangHoaTrongThang.getValue7());
+            soHangHoaTrongThang.setThang7((BigDecimal) record[6]);
+            data7.setValues(soHangHoaTrongThang.getThang7());
 
             DataItem data8 = new DataItem();
-            hangHoaBanChayTrongNam.setValue8("thang8");
-            data8.setThang(hangHoaBanChayTrongNam.getValue8());
-            hangHoaBanChayTrongNam.setThang8((BigDecimal) record[7]);
-            data8.setValues(hangHoaBanChayTrongNam.getThang8());
+            soHangHoaTrongThang.setValue8("thang8");
+            data8.setType(soHangHoaTrongThang.getValue8());
+            soHangHoaTrongThang.setThang8((BigDecimal) record[7]);
+            data8.setValues(soHangHoaTrongThang.getThang8());
 
             DataItem data9 = new DataItem();
-            hangHoaBanChayTrongNam.setValue9("thang9");
-            data9.setThang(hangHoaBanChayTrongNam.getValue9());
-            hangHoaBanChayTrongNam.setThang9((BigDecimal) record[8]);
-            data9.setValues(hangHoaBanChayTrongNam.getThang9());
+            soHangHoaTrongThang.setValue9("thang9");
+            data9.setType(soHangHoaTrongThang.getValue9());
+            soHangHoaTrongThang.setThang9((BigDecimal) record[8]);
+            data9.setValues(soHangHoaTrongThang.getThang9());
 
             DataItem data10 = new DataItem();
-            hangHoaBanChayTrongNam.setValue10("thang10");
-            data10.setThang(hangHoaBanChayTrongNam.getValue10());
-            hangHoaBanChayTrongNam.setThang10((BigDecimal) record[9]);
-            data10.setValues(hangHoaBanChayTrongNam.getThang10());
+            soHangHoaTrongThang.setValue10("thang10");
+            data10.setType(soHangHoaTrongThang.getValue10());
+            soHangHoaTrongThang.setThang10((BigDecimal) record[9]);
+            data10.setValues(soHangHoaTrongThang.getThang10());
 
             DataItem data11 = new DataItem();
-            hangHoaBanChayTrongNam.setValue11("thang11");
-            data11.setThang(hangHoaBanChayTrongNam.getValue11());
-            hangHoaBanChayTrongNam.setThang11((BigDecimal) record[10]);
-            data11.setValues(hangHoaBanChayTrongNam.getThang11());
+            soHangHoaTrongThang.setValue11("thang11");
+            data11.setType(soHangHoaTrongThang.getValue11());
+            soHangHoaTrongThang.setThang11((BigDecimal) record[10]);
+            data11.setValues(soHangHoaTrongThang.getThang11());
 
             DataItem data12 = new DataItem();
-            hangHoaBanChayTrongNam.setValue12("thang12");
-            data12.setThang(hangHoaBanChayTrongNam.getValue12());
-            hangHoaBanChayTrongNam.setThang12((BigDecimal) record[11]);
-            data12.setValues(hangHoaBanChayTrongNam.getThang12());
+            soHangHoaTrongThang.setValue12("thang12");
+            data12.setType(soHangHoaTrongThang.getValue12());
+            soHangHoaTrongThang.setThang12((BigDecimal) record[11]);
+            data12.setValues(soHangHoaTrongThang.getThang12());
 
-            result.add(hangHoaBanChayTrongNam);
+            result.add(soHangHoaTrongThang);
             dataItems.add(data1);
             dataItems.add(data2);
             dataItems.add(data3);

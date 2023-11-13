@@ -21,10 +21,9 @@ public class StatisticalController {
 //        return ResponseEntity.ok(iAddressService.searchNameClient(name));
 //    }
 
-    @GetMapping("/hoadonhuy")
-    public ResponseEntity<?> getHoaDonHuy(@RequestParam("ngayTao") Integer ngayTao,
-                                          @RequestParam("trangThai") Integer trangThai){
-        return ResponseEntity.ok(iStatistical.findHoaDonHuy(ngayTao,trangThai));
+    @GetMapping("/hoadoncho")
+    public ResponseEntity<?> getHoaDonHuy(@RequestParam("thang") Integer thang){
+        return ResponseEntity.ok(iStatistical.findHoaDon(thang));
     }
 
     @GetMapping("/sanphambanchaytrongnam")
