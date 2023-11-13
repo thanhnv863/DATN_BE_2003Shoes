@@ -220,6 +220,8 @@ public class OrderServiceImpl implements IOrderService {
             if (orderRequetUpdate.getIdVoucher() != null) {
                 VoucherOrder voucherOrder = voucherOrderRepository.findById(orderRequetUpdate.getIdVoucher()).get();
                 orderGet.setVoucherOrder(voucherOrder);
+                voucherOrder.setQuantity(voucherOrder.getQuantity() - 1);
+                voucherOrderRepository.save(voucherOrder);
             } else {
                 orderGet.setVoucherOrder(null);
             }
@@ -320,6 +322,8 @@ public class OrderServiceImpl implements IOrderService {
             if (orderCutomerRequest.getIdVoucher() != null) {
                 VoucherOrder voucherOrder = voucherOrderRepository.findById(orderCutomerRequest.getIdVoucher()).get();
                 order.setVoucherOrder(voucherOrder);
+                voucherOrder.setQuantity(voucherOrder.getQuantity() - 1);
+                voucherOrderRepository.save(voucherOrder);
             } else {
                 order.setVoucherOrder(null);
             }
@@ -424,6 +428,8 @@ public class OrderServiceImpl implements IOrderService {
                 if (orderCutomerRequest.getIdVoucher() != null) {
                     VoucherOrder voucherOrder = voucherOrderRepository.findById(orderCutomerRequest.getIdVoucher()).get();
                     order.setVoucherOrder(voucherOrder);
+                    voucherOrder.setQuantity(voucherOrder.getQuantity() - 1);
+                    voucherOrderRepository.save(voucherOrder);
                 } else {
                     order.setVoucherOrder(null);
                 }
