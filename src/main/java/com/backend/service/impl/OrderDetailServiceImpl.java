@@ -73,7 +73,7 @@ public class OrderDetailServiceImpl implements IOrderDetailSerivice {
                     orderDetail.setQuantity(orderDetailRequest.getQuantity());
                     orderDetail.setPrice(orderDetailRequest.getPrice());
                     orderDetail.setDiscount(orderDetailRequest.getDiscount());
-                    orderDetail.setStatus(orderDetailRequest.getStatus());
+                    orderDetail.setStatus(0);
                     OrderDetail orderDetail1 = orderDetailRepository.save(orderDetail);
                     OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
                     return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetailRequest1, "Thêm orderDetail thành công");
