@@ -25,25 +25,23 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
     List<Object[]> findByHoaDonHuy(Integer ngayTao, Integer trangThai);
 
     @Query(value = "select \n" +
-            "    CASE WHEN month(oh.created_time) = 1 THEN sum(od.quantity) ELSE 0 END AS 'tháng 1',\n" +
-            "    CASE WHEN month(oh.created_time) = 2 THEN sum(od.quantity) ELSE 0 END AS 'tháng 2',\n" +
-            "    CASE WHEN month(oh.created_time) = 3 THEN sum(od.quantity) ELSE 0 END AS 'tháng 3',\n" +
-            "    CASE WHEN month(oh.created_time) = 4 THEN sum(od.quantity) ELSE 0 END AS 'tháng 4',\n" +
-            "    CASE WHEN month(oh.created_time) = 5 THEN sum(od.quantity) ELSE 0 END AS 'tháng 5',\n" +
-            "    CASE WHEN month(oh.created_time) = 6 THEN sum(od.quantity) ELSE 0 END AS 'tháng 6',\n" +
-            "    CASE WHEN month(oh.created_time) = 7 THEN sum(od.quantity) ELSE 0 END AS 'tháng 7',\n" +
-            "    CASE WHEN month(oh.created_time) = 8 THEN sum(od.quantity) ELSE 0 END AS 'tháng 8',\n" +
-            "    CASE WHEN month(oh.created_time) = 9 THEN sum(od.quantity) ELSE 0 END AS 'tháng 9',\n" +
-            "    CASE WHEN month(oh.created_time) = 10 THEN sum(od.quantity) ELSE 0 END AS 'tháng 10',\n" +
-            "    CASE WHEN month(oh.created_time) = 11 THEN sum(od.quantity) ELSE 0 END AS 'tháng 11',\n" +
-            "    CASE WHEN month(oh.created_time) = 12 THEN sum(od.quantity) ELSE 0 END AS 'tháng 12',\n" +
+            "    CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity) ELSE 0 END AS 'tháng 1',\n" +
+            "    CASE WHEN month(mo.pay_date) = 2 THEN sum(od.quantity) ELSE 0 END AS 'tháng 2',\n" +
+            "    CASE WHEN month(mo.pay_date) = 3 THEN sum(od.quantity) ELSE 0 END AS 'tháng 3',\n" +
+            "    CASE WHEN month(mo.pay_date) = 4 THEN sum(od.quantity) ELSE 0 END AS 'tháng 4',\n" +
+            "    CASE WHEN month(mo.pay_date) = 5 THEN sum(od.quantity) ELSE 0 END AS 'tháng 5',\n" +
+            "    CASE WHEN month(mo.pay_date) = 6 THEN sum(od.quantity) ELSE 0 END AS 'tháng 6',\n" +
+            "    CASE WHEN month(mo.pay_date) = 7 THEN sum(od.quantity) ELSE 0 END AS 'tháng 7',\n" +
+            "    CASE WHEN month(mo.pay_date) = 8 THEN sum(od.quantity) ELSE 0 END AS 'tháng 8',\n" +
+            "    CASE WHEN month(mo.pay_date) = 9 THEN sum(od.quantity) ELSE 0 END AS 'tháng 9',\n" +
+            "    CASE WHEN month(mo.pay_date) = 10 THEN sum(od.quantity) ELSE 0 END AS 'tháng 10',\n" +
+            "    CASE WHEN month(mo.pay_date) = 11 THEN sum(od.quantity) ELSE 0 END AS 'tháng 11',\n" +
+            "    CASE WHEN month(mo.pay_date) = 12 THEN sum(od.quantity) ELSE 0 END AS 'tháng 12',\n" +
             "\tcoalesce(sum(od.quantity), 0) as 'Tổng số lượng'\n" +
             " from order_detail od \n" +
-            "\t\t\t join shoe_detail sd on od.shoe_detail_id = sd.id\n" +
-            "             join order_history oh on od.order_id = oh.order_id\n" +
-            "             join shoe s on sd.shoe_id = s.id\n" +
-            "            where YEAR(oh.created_time) = :nam\t\n" +
-            "            group by month(oh.created_time)\n",nativeQuery = true)
+            "\t\t\tleft join my_order mo on mo.id = od.order_id\n" +
+            "            where YEAR(mo.pay_date) = :nam and od.status=1\n" +
+            "            group by month(mo.pay_date)",nativeQuery = true)
     List<Object[]> findByHangHoaBanChayTrongNam(Integer nam);
 
     @Query(value = "select \n" +
