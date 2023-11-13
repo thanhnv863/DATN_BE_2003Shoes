@@ -11,18 +11,18 @@ import java.util.List;
 @Repository
 public interface StatisticalRepository extends JpaRepository<Order,Long> {
 
-//    @Query("select a from Address a where " +
-//            " a.name like concat('%', :name, '%')")
-//    List<Address> searchNameClient(String name);
-
-    @Query(value = "select \n" +
-            "\tday(mo.create_date) as Ngay,\n" +
-            "    COUNT(*) as soHoaDonHuy\n" +
-            " from my_order mo \n" +
-            "\t\twhere day(mo.create_date) = :ngayTao and status = :trangThai\n" +
-            "        GROUP BY day(mo.create_date) \n" +
-            "        ORDER BY Ngay",nativeQuery = true)
-    List<Object[]> findByHoaDonHuy(Integer ngayTao, Integer trangThai);
+    @Query(value = "select sum(mo.status = 0) as hoaDonCho,\n" +
+            "\t\tsum(mo.status = 1) as choThanhToan,\n" +
+            "        sum(mo.status = 2) as daThanhToan,\n" +
+            "        sum(mo.status = 3) as dahuy,\n" +
+            "        sum(mo.status = 4) as choXacNhan,\n" +
+            "        sum(mo.status = 5) as daXacNhan,\n" +
+            "        sum(mo.status = 6) as choGiaoHang,\n" +
+            "        sum(mo.status = 7) as daBanGiao,\n" +
+            "        sum(mo.status = 8) as hoanThanh\n" +
+            "\t\tfrom my_order mo \n" +
+            "\t\twhere month(mo.create_date) = :thang ",nativeQuery = true)
+    List<Object[]> findByHoaDon(Integer thang);
 
     @Query(value = "select \n" +
             "    CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity) ELSE 0 END AS 'tháng 1',\n" +
