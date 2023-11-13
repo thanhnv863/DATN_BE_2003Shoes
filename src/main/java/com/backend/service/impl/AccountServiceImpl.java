@@ -299,10 +299,11 @@ public class AccountServiceImpl implements IAccountService {
         Optional<Account> accountId = accountRepository.findById(accountRequest.getId());
         if (accountId.isPresent()) {
             Account account = accountId.get();
+            account.setStatus(0);
             accountRepository.save(account);
-            return new ServiceResult<>(AppConstant.SUCCESS, "delete Success", null);
+            return new ServiceResult<>(AppConstant.SUCCESS, "huy account Success", null);
         } else {
-            return new ServiceResult<>(AppConstant.FAIL, "delete fail", null);
+            return new ServiceResult<>(AppConstant.FAIL, "huy account fail", null);
         }
     }
 

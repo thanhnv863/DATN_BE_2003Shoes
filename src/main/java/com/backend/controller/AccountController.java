@@ -43,7 +43,7 @@ public class AccountController {
         return ResponseEntity.ok(iAccountService.updateAccount(accountRequest));
     }
 
-    @PostMapping("/delete-account")
+    @PostMapping("/huy-account")
     public ResponseEntity<?> deleteStaff(@RequestBody AccountRequest accountRequest){
         return ResponseEntity.ok(iAccountService.huyAccount(accountRequest));
     }
