@@ -13,11 +13,13 @@ import com.backend.dto.response.account.AccountCustomResponse;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
 import com.backend.entity.Cart;
+import com.backend.entity.EmailTemplate;
 import com.backend.entity.Role;
 import com.backend.repository.AccountCustomRepository;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.AddressRepository;
 import com.backend.repository.CartRepository;
+import com.backend.repository.EmailRepository;
 import com.backend.repository.RoleRepository;
 import com.backend.service.IAccountService;
 import com.backend.service.IEmailTemplateService;
@@ -63,6 +65,8 @@ public class AccountServiceImpl implements IAccountService {
     @Autowired
     private AccountCustomRepository accountCustomRepository;
 
+    @Autowired
+    private EmailRepository emailRepository;
     private ImageUploadService imageUploadService;
 
     public AccountServiceImpl(ImageUploadService imageUploadService) {
@@ -71,38 +75,85 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public ServiceResult<RegisterResponse> register(RegisterRequest registerRequest) {
-        Account account = new Account();
-
-        Calendar calendar = Calendar.getInstance();
-        Date now = calendar.getTime();
-        account.setName(registerRequest.getName());
-        account.setEmail(registerRequest.getEmail());
-        account.setCreatedAt(now);
-        account.setUpdatedAt(now);
-        account.setStatus(1);
-        account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        account.setRole(Role.builder().id(registerRequest.getIdRole()).build());
-        account = accountRepository.save(account);
-        Cart cart = new Cart();
-        cart.setAccount(account);
-        cart.setCreatedAt(now);
-        cart.setUpdatedAt(now);
-        cart.setStatus(1);
-        cartRepository.save(cart);
-        RegisterResponse registerResponse = new RegisterResponse();
-
-        String to = registerRequest.getEmail();
-        String subject = "Welcome to store 2003SHOES";
-        String mailType = "chao mung nhan vien ";
-        String mailContent = "Mật khẩu tài khoản của bạn là  :" + registerRequest.getPassword();
-
-        iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
-        return new ServiceResult<>(AppConstant.SUCCESS,
-                "Registered Successfully",
-                registerResponse.builder()
-                        .email(account.getEmail())
-                        .name(account.getName())
-                        .build());
+        Optional<Account> accountcheck = accountRepository.findByEmail(registerRequest.getEmail());
+        if (accountcheck.isPresent()) {
+            return new ServiceResult<>(AppConstant.SUCCESS,
+                    "Email đã tồn tại",
+                    null);
+        } else {
+            Account account = new Account();
+            Calendar calendar = Calendar.getInstance();
+            Date now = calendar.getTime();
+            account.setName(registerRequest.getName());
+            account.setEmail(registerRequest.getEmail());
+            account.setCreatedAt(now);
+            account.setUpdatedAt(now);
+            account.setStatus(1);
+            account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+            account.setRole(Role.builder().id(registerRequest.getIdRole()).build());
+            account = accountRepository.save(account);
+            RegisterResponse registerResponse = new RegisterResponse();
+            // role 2 là khach hang
+            if (account.getRole().getId() == 2) {
+                Account accountUpdateCode = accountRepository.findById(account.getId()).get();
+                List<Account> listKhachHang = accountRepository.getListByRole(accountUpdateCode.getRole().getId());
+                int nextMaKhachHang = listKhachHang.size();
+                String maKhachHang = "KH" + String.format("%09d", nextMaKhachHang);
+                accountUpdateCode.setCode(maKhachHang);
+                accountRepository.save(accountUpdateCode);
+                Cart cart = new Cart();
+                cart.setAccount(accountUpdateCode);
+                cart.setCreatedAt(now);
+                cart.setUpdatedAt(now);
+                cart.setStatus(1);
+                cartRepository.save(cart);
+                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(2);
+                if (emailTemplateCheck.isPresent()) {
+                    EmailTemplate emailTemplate = emailTemplateCheck.get();
+                    String to = account.getEmail();
+                    String subject = emailTemplate.getSubject();
+                    String mailType = "";
+                    String mailContent = emailTemplate.getMailContent() + registerRequest.getPassword();
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                } else {
+                    String to = account.getEmail();
+                    String subject = "Xin chào bạn đến với store 2003SHOES";
+                    String mailType = "";
+                    String mailContent = "Mật khẩu của bạn là: " + registerRequest.getPassword();
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                }
+            }
+            // role 3 là nhan vien
+            else if (account.getRole().getId() == 3) {
+                Account accountUpdateCode = accountRepository.findById(account.getId()).get();
+                List<Account> listKhachHang = accountRepository.getListByRole(accountUpdateCode.getRole().getId());
+                int nextMaNhanVien = listKhachHang.size();
+                String maNhanVien = "NV" + String.format("%09d", nextMaNhanVien);
+                accountUpdateCode.setCode(maNhanVien);
+                accountRepository.save(accountUpdateCode);
+                Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(1);
+                if (emailTemplateCheck.isPresent()) {
+                    EmailTemplate emailTemplate = emailTemplateCheck.get();
+                    String to = account.getEmail();
+                    String subject = emailTemplate.getSubject();
+                    String mailType = "";
+                    String mailContent = emailTemplate.getMailContent() + registerRequest.getPassword();
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                } else {
+                    String to = account.getEmail();
+                    String subject = "Chúc mừng đã trở thành nhân viên của store 2003Shoesto store 2003SHOES";
+                    String mailType = "";
+                    String mailContent = "Mật khẩu của bạn là: " + registerRequest.getPassword();
+                    iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                }
+            }
+            return new ServiceResult<>(AppConstant.SUCCESS,
+                    "Registered Successfully",
+                    registerResponse.builder()
+                            .email(account.getEmail())
+                            .name(account.getName())
+                            .build());
+        }
     }
 
     @Override
@@ -121,29 +172,81 @@ public class AccountServiceImpl implements IAccountService {
     public ServiceResult<AccountResponse> addAccount(AccountRequest accountRequest) {
         Account account = new Account();
         String result = validateStaff(accountRequest);
-
         if (result != null) {
             return result(result);
         } else {
             try {
                 Optional<Role> optionalRole = roleRepository.findById(accountRequest.getRoleId());
                 if (optionalRole.isPresent()) {
+                    Calendar calendar = Calendar.getInstance();
+                    Date now = calendar.getTime();
                     Role roleId = optionalRole.get();
                     account.setRole(roleId);
+                    account.setCreatedAt(now);
                     account.setName(accountRequest.getName());
                     account.setEmail(accountRequest.getEmail());
                     account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
                     account.setAvatar(imageUploadService.uploadImageByName(accountRequest.getAvatar()));
                     account.setStatus(accountRequest.getStatus());
+                    if (account.getRole().getId() == 2) {
+                        Account accountUpdateCode = accountRepository.findById(account.getId()).get();
+                        List<Account> listKhachHang = accountRepository.getListByRole(accountUpdateCode.getRole().getId());
+                        int nextMaKhachHang = listKhachHang.size();
+                        String maKhachHang = "KH" + String.format("%09d", nextMaKhachHang);
+                        accountUpdateCode.setCode(maKhachHang);
+                        accountRepository.save(accountUpdateCode);
+                        Cart cart = new Cart();
+                        cart.setAccount(accountUpdateCode);
+                        cart.setCreatedAt(now);
+                        cart.setUpdatedAt(now);
+                        cart.setStatus(1);
+                        cartRepository.save(cart);
+                        Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(2);
+                        if (emailTemplateCheck.isPresent()) {
+                            EmailTemplate emailTemplate = emailTemplateCheck.get();
+                            String to = account.getEmail();
+                            String subject = emailTemplate.getSubject();
+                            String mailType = "";
+                            String mailContent = emailTemplate.getMailContent() + accountRequest.getPassword();
+                            iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                        } else {
+                            String to = account.getEmail();
+                            String subject = "Xin chào bạn đến với store 2003SHOES";
+                            String mailType = "";
+                            String mailContent = "Mật khẩu của bạn là: " + accountRequest.getPassword();
+                            iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                        }
+                    }
+                    // role 3 là nhan vien
+                    else if (account.getRole().getId() == 3) {
+                        Account accountUpdateCode = accountRepository.findById(account.getId()).get();
+                        List<Account> listKhachHang = accountRepository.getListByRole(accountUpdateCode.getRole().getId());
+                        int nextMaNhanVien = listKhachHang.size();
+                        String maNhanVien = "NV" + String.format("%09d", nextMaNhanVien);
+                        accountUpdateCode.setCode(maNhanVien);
+                        accountRepository.save(accountUpdateCode);
+                        Optional<EmailTemplate> emailTemplateCheck = emailRepository.checkSendMail(1);
+                        if (emailTemplateCheck.isPresent()) {
+                            EmailTemplate emailTemplate = emailTemplateCheck.get();
+                            String to = account.getEmail();
+                            String subject = emailTemplate.getSubject();
+                            String mailType = "";
+                            String mailContent = emailTemplate.getMailContent() + accountRequest.getPassword();
+                            iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                        } else {
+                            String to = account.getEmail();
+                            String subject = "Chúc mừng đã trở thành nhân viên của store 2003Shoesto store 2003SHOES";
+                            String mailType = "";
+                            String mailContent = "Mật khẩu của bạn là: " + accountRequest.getPassword();
+                            iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+                        }
+                    }
                 } else {
                     return new ServiceResult<>(AppConstant.FAIL, "Add fail", null);
                 }
-
                 account = accountRepository.save(account);
                 AccountResponse convertToResponses = convertToResponse(account);
-
-                return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertToResponses);
-
+                return new ServiceResult<>(AppConstant.SUCCESS, "Thêm thành công", convertToResponses);
             } catch (Exception e) {
                 e.printStackTrace();
                 return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null);
@@ -241,28 +344,28 @@ public class AccountServiceImpl implements IAccountService {
 
         if (optionalAccount.isPresent()) {
             Account accountId = optionalAccount.get();
-            if (passwordRequest.getYourOldPassword().equals(accountId.getPassword())){
+            if (passwordRequest.getYourOldPassword().equals(accountId.getPassword())) {
                 accountId.setPassword(passwordEncoder.encode(passwordRequest.getEnterNewPassword()));
 
-                if(passwordRequest.getYourOldPassword().equals(passwordRequest.getNewPassword())){
-                    return new ServiceResult<>(AppConstant.SUCCESS,"fail","Không được trùng với mật khẩu hiện tại");
+                if (passwordRequest.getYourOldPassword().equals(passwordRequest.getNewPassword())) {
+                    return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Không được trùng với mật khẩu hiện tại");
 
-                } else if (!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
-                    return new ServiceResult<>(AppConstant.SUCCESS,"fail","Mật khẩu mới phải trùng với mật khẩu nhập lại");
+                } else if (!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())) {
+                    return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Mật khẩu mới phải trùng với mật khẩu nhập lại");
 
-                } else if(passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
+                } else if (passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())) {
 
                     accountRepository.save(accountId);
 
-                    return new ServiceResult<>(AppConstant.SUCCESS,"success","Chúc mừng bạn đã đổi mật khẩu thành công");
-                }else{
-                    return new ServiceResult<>(AppConstant.SUCCESS,"fail","Bạn nhập chưa đúng mật khẩu ");
+                    return new ServiceResult<>(AppConstant.SUCCESS, "success", "Chúc mừng bạn đã đổi mật khẩu thành công");
+                } else {
+                    return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Bạn nhập chưa đúng mật khẩu ");
                 }
-            } else{
-                return new ServiceResult<>(AppConstant.SUCCESS,"fail","Mật khẩu cũ không trùng với mật khẩu của tài khoản");
+            } else {
+                return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Mật khẩu cũ không trùng với mật khẩu của tài khoản");
             }
-        }else{
-            return new ServiceResult<>(AppConstant.SUCCESS,"fail","Đổi mật khẩu thất bại");
+        } else {
+            return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Đổi mật khẩu thất bại");
         }
     }
 
@@ -334,6 +437,7 @@ public class AccountServiceImpl implements IAccountService {
         accountCustomResponse.setStatus((Integer) object[6]);
         return accountCustomResponse;
     }
+
     @Override
     public Page<AccountCustomResponse> searchAccount(SearchAccountRequest searchAccountRequest) {
         Pageable pageable = PageRequest.of(searchAccountRequest.getPage(), searchAccountRequest.getSize());

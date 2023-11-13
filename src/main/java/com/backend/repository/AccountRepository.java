@@ -34,5 +34,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             "where account.email = ?1 and account.role_id = 2", nativeQuery = true)
     Optional<Account> getOneByEmail(String email);
 
-
+    @Query(value = "SELECT * FROM account \n" +
+            "where account.role_id = ?1", nativeQuery = true)
+    List<Account> getListByRole(Integer role);
 }
