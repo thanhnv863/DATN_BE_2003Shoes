@@ -62,4 +62,15 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "        ORDER BY Thang", nativeQuery = true)
     List<Object[]> doanhThuTrongThang(Integer thang);
 
+
+    @Query(value = "SELECT s.name ,count(s.name) as soLuong\n" +
+            " FROM db_datn.my_order mo\n" +
+            "\tleft join order_detail od on mo.id = od.order_id\n" +
+            "    left join shoe_detail sd on sd.id = od.shoe_detail_id\n" +
+            "    left join shoe s on s.id = sd.shoe_id\n" +
+            "    where month(mo.pay_date) = :thang and year(mo.pay_date) = :nam\n" +
+            "    group by s.name\n" +
+            "    order by soLuong desc\n" +
+            "    limit 5;",nativeQuery = true)
+    List<Object[]> sanPhamBanChayTheoThangNam(Integer thang,Integer nam);
 }
