@@ -229,35 +229,5 @@ public class StatisticalServiceImpl implements IStatistical {
         }
     }
 
-    @Override
-    public ServiceResult<List<DoanhThuTrongNgay>> doanhThuTrongNgay(Integer ngay) {
-        List<Object[]> getHangHoa = statisticalRepository.doanhThuTrongNgay(ngay);
-        List<DoanhThuTrongNgay> result = new ArrayList<>();
-
-        for(Object[] record: getHangHoa){
-            DoanhThuTrongNgay doanhThuTrongNgay = new DoanhThuTrongNgay();
-            doanhThuTrongNgay.setNgay((BigInteger) record[0]);
-            doanhThuTrongNgay.setTongTien((BigDecimal) record[1] == null ? BigDecimal.valueOf(0)  : (BigDecimal) record[1]);
-            result.add(doanhThuTrongNgay);
-        }
-
-        return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
-    }
-
-    @Override
-    public ServiceResult<List<DoanhThuTrongThang>> doanhThuTrongThang(Integer thang) {
-        List<Object[]> getHangHoa = statisticalRepository.doanhThuTrongThang(thang);
-        List<DoanhThuTrongThang> result = new ArrayList<>();
-
-        for(Object[] record: getHangHoa){
-            DoanhThuTrongThang doanhThuTrongThang = new DoanhThuTrongThang();
-            doanhThuTrongThang.setThang((BigInteger) record[0]);
-            doanhThuTrongThang.setTongTien((BigDecimal) record[1] == null ? BigDecimal.valueOf(0)  : (BigDecimal) record[1]);
-            result.add(doanhThuTrongThang);
-        }
-
-        return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
-    }
-
 
 }
