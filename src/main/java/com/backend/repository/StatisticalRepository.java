@@ -1,11 +1,11 @@
 package com.backend.repository;
 
-import com.backend.entity.Address;
 import com.backend.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -21,8 +21,8 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "        sum(mo.status = 7) as daBanGiao,\n" +
             "        sum(mo.status = 8) as hoanThanh\n" +
             "\t\tfrom my_order mo \n" +
-            "\t\twhere month(mo.create_date) = :thang ",nativeQuery = true)
-    List<Object[]> findByHoaDon(Integer thang);
+            "\t\twhere mo.create_date between :ngayBatDau and :ngayKetThuc",nativeQuery = true)
+    List<Object[]> findByHoaDon(Date ngayBatDau, Date ngayKetThuc);
 
     @Query(value = "select \n" +
             "    CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity) ELSE 0 END AS 'tháng 1',\n" +
@@ -44,33 +44,16 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "            group by month(mo.pay_date)",nativeQuery = true)
     List<Object[]> findByHangHoaBanChayTrongNam(Integer nam);
 
-    @Query(value = "select \n" +
-            "\tday(mo.create_date) as Ngay,\n" +
-            "    sum(mo.total_money) as tongTien\n" +
-            " from my_order mo \n" +
-            "\t\twhere day(mo.create_date) = :ngay\n" +
-            "        GROUP BY day(mo.create_date)\n" +
-            "        ORDER BY Ngay",nativeQuery = true)
-    List<Object[]> doanhThuTrongNgay(Integer ngay);
-
-    @Query(value = "select \n" +
-            "\tmonth(mo.create_date) as Thang,\n" +
-            "    sum(mo.total_money) as tongTien\n" +
-            " from my_order mo \n" +
-            "\t\twhere month(mo.create_date) = :thang\n" +
-            "        GROUP BY month(mo.create_date)\n" +
-            "        ORDER BY Thang", nativeQuery = true)
-    List<Object[]> doanhThuTrongThang(Integer thang);
-
-
     @Query(value = "SELECT s.name ,count(s.name) as soLuong\n" +
             " FROM db_datn.my_order mo\n" +
             "\tleft join order_detail od on mo.id = od.order_id\n" +
             "    left join shoe_detail sd on sd.id = od.shoe_detail_id\n" +
             "    left join shoe s on s.id = sd.shoe_id\n" +
-            "    where month(mo.pay_date) = :thang and year(mo.pay_date) = :nam\n" +
+            "    where mo.pay_date between :ngayBatDau and :ngayKetThuc\n" +
             "    group by s.name\n" +
             "    order by soLuong desc\n" +
             "    limit 5;",nativeQuery = true)
-    List<Object[]> sanPhamBanChayTheoThangNam(Integer thang,Integer nam);
+    List<Object[]> sanPhamBanChayTheoThangNam(Date ngayBatDau,Date ngayKetThuc);
+
+
 }

@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -26,8 +27,8 @@ public class StatisticalServiceImpl implements IStatistical {
     private StatisticalRepository statisticalRepository;
 
     @Override
-    public ServiceResult<List<DataItem>> findHoaDon(Integer thang) {
-        List<Object[]> soHoaDonHuy = statisticalRepository.findByHoaDon(thang);
+    public ServiceResult<List<DataItem>> findHoaDon(Date ngayBatDau, Date ngayKetThuc) {
+        List<Object[]> soHoaDonHuy = statisticalRepository.findByHoaDon(ngayBatDau, ngayKetThuc);
         List<HoaDonHuy> hoaDonHuyList = new ArrayList<>();
         List<DataItem> dataItems = new ArrayList<>();
 
@@ -209,8 +210,8 @@ public class StatisticalServiceImpl implements IStatistical {
     }
 
     @Override
-    public ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>> sanPhamBanChay(Integer thang, Integer nam) {
-        List<Object[]> topSanPhamBanChay = statisticalRepository.sanPhamBanChayTheoThangNam(thang, nam);
+    public ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>> sanPhamBanChay(Date ngayBatDau,Date ngayKetThuc) {
+        List<Object[]> topSanPhamBanChay = statisticalRepository.sanPhamBanChayTheoThangNam(ngayBatDau, ngayKetThuc);
         List<Top5SanPhamBanChayTrongThangVaNam> result = new ArrayList<>();
 
         for (Object[] record: topSanPhamBanChay){
@@ -226,36 +227,6 @@ public class StatisticalServiceImpl implements IStatistical {
         }else{
             return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
         }
-    }
-
-    @Override
-    public ServiceResult<List<DoanhThuTrongNgay>> doanhThuTrongNgay(Integer ngay) {
-        List<Object[]> getHangHoa = statisticalRepository.doanhThuTrongNgay(ngay);
-        List<DoanhThuTrongNgay> result = new ArrayList<>();
-
-        for(Object[] record: getHangHoa){
-            DoanhThuTrongNgay doanhThuTrongNgay = new DoanhThuTrongNgay();
-            doanhThuTrongNgay.setNgay((BigInteger) record[0]);
-            doanhThuTrongNgay.setTongTien((BigDecimal) record[1] == null ? BigDecimal.valueOf(0)  : (BigDecimal) record[1]);
-            result.add(doanhThuTrongNgay);
-        }
-
-        return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
-    }
-
-    @Override
-    public ServiceResult<List<DoanhThuTrongThang>> doanhThuTrongThang(Integer thang) {
-        List<Object[]> getHangHoa = statisticalRepository.doanhThuTrongThang(thang);
-        List<DoanhThuTrongThang> result = new ArrayList<>();
-
-        for(Object[] record: getHangHoa){
-            DoanhThuTrongThang doanhThuTrongThang = new DoanhThuTrongThang();
-            doanhThuTrongThang.setThang((BigInteger) record[0]);
-            doanhThuTrongThang.setTongTien((BigDecimal) record[1] == null ? BigDecimal.valueOf(0)  : (BigDecimal) record[1]);
-            result.add(doanhThuTrongThang);
-        }
-
-        return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
     }
 
 
