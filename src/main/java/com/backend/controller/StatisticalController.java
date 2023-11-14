@@ -40,4 +40,10 @@ public class StatisticalController {
     public ResponseEntity<?> getDoanhThuTrongThang(@RequestParam("thang") Integer thang){
         return ResponseEntity.ok(iStatistical.doanhThuTrongThang(thang));
     }
+
+    @GetMapping("/top5SanPhamBanChay")
+    public ResponseEntity<?> top5SanPhamBanChay(@RequestParam("thang") Integer thang,
+                                                @RequestParam("nam") Integer nam){
+        return ResponseEntity.ok(iStatistical.sanPhamBanChay(thang, nam));
+    }
 }

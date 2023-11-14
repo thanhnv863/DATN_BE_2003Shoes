@@ -7,6 +7,7 @@ import com.backend.dto.statistical.DoanhThuTrongNgay;
 import com.backend.dto.statistical.DoanhThuTrongThang;
 import com.backend.dto.statistical.SoHangHoaTrongThang;
 import com.backend.dto.statistical.HoaDonHuy;
+import com.backend.dto.statistical.Top5SanPhamBanChayTrongThangVaNam;
 import com.backend.repository.StatisticalRepository;
 import com.backend.service.IStatistical;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -202,6 +203,26 @@ public class StatisticalServiceImpl implements IStatistical {
 
         if(result.size() > 0){
             return new ServiceResult<>(AppConstant.SUCCESS,"get success",dataItems);
+        }else{
+            return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
+        }
+    }
+
+    @Override
+    public ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>> sanPhamBanChay(Integer thang, Integer nam) {
+        List<Object[]> topSanPhamBanChay = statisticalRepository.sanPhamBanChayTheoThangNam(thang, nam);
+        List<Top5SanPhamBanChayTrongThangVaNam> result = new ArrayList<>();
+
+        for (Object[] record: topSanPhamBanChay){
+            Top5SanPhamBanChayTrongThangVaNam top5SanPhamBanChayTrongThangVaNam = new Top5SanPhamBanChayTrongThangVaNam();
+            top5SanPhamBanChayTrongThangVaNam.setTenSanPham( (String) record[0]);
+            top5SanPhamBanChayTrongThangVaNam.setSoLuong((BigInteger) record[1]);
+            result.add(top5SanPhamBanChayTrongThangVaNam);
+
+        }
+
+        if(result.size() > 0){
+            return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
         }else{
             return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
         }
