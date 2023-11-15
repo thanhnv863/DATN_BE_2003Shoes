@@ -49,6 +49,7 @@ public class RefreshTokenService {
         cookie.setPath("/");
         response.addCookie(cookie);
     }
+
     public String getRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

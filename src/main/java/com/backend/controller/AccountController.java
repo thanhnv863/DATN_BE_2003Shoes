@@ -29,7 +29,7 @@ public class AccountController {
     private IAccountService iAccountService;
 
     @PostMapping("/new-account")
-    public ResponseEntity<?> addNewStaff(@RequestBody AccountRequest accountRequest){
+    public ResponseEntity<?> addNewAccount(@RequestBody AccountRequest accountRequest){
         return ResponseEntity.ok(iAccountService.addAccount(accountRequest));
     }
 
@@ -39,22 +39,22 @@ public class AccountController {
     }
 
     @PostMapping("/update-account")
-    public ResponseEntity<?> updateStaff(@RequestBody AccountRequest accountRequest) throws IOException {
+    public ResponseEntity<?> updateAccount(@RequestBody AccountRequest accountRequest) throws IOException {
         return ResponseEntity.ok(iAccountService.updateAccount(accountRequest));
     }
 
     @PostMapping("/huy-account")
-    public ResponseEntity<?> deleteStaff(@RequestBody AccountRequest accountRequest){
+    public ResponseEntity<?> deleteAccount(@RequestBody AccountRequest accountRequest){
         return ResponseEntity.ok(iAccountService.huyAccount(accountRequest));
     }
 
     @GetMapping("/name-account")
-    public ResponseEntity<?> searchNameStaff(@RequestParam("name") String name){
+    public ResponseEntity<?> searchNameAccount(@RequestParam("name") String name){
         return ResponseEntity.ok(iAccountService.searchNameAccount(name));
     }
 
-    @GetMapping("/get-email-account")
-    public ResponseEntity<?> getEmailStaff(String email){
+    @GetMapping("/forgotpassword")
+    public ResponseEntity<?> forgotPassword(String email){
        return ResponseEntity.ok(iAccountService.findByEmailAccount(email));
     }
 

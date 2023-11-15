@@ -43,20 +43,9 @@ public class AddressController {
         return ResponseEntity.ok(iAddressService.deleteAddress(addressRequest));
     }
 
-    @GetMapping("/addressname")
-    public ResponseEntity<?> addressName(@RequestParam("name") String name){
-        return ResponseEntity.ok(iAddressService.searchNameClient(name));
+    @GetMapping("/addressbyaccountid/{id}")
+    public ResponseEntity<?> addressByAccountId(@PathVariable("id") Long id){
+        return ResponseEntity.ok(iAddressService.getAllAddressAndAccount(id));
     }
-
-    @GetMapping("/addressandaccount")
-    public ResponseEntity<?> addressAndAccount(@RequestParam("defaultAddress") String defaultAddress){
-        return ResponseEntity.ok(iAddressService.getAllAccountAndAddress(defaultAddress));
-    }
-
-    @GetMapping("/getcustomer/{id}")
-    public ResponseEntity<?> getCustomer(@PathVariable("id") Long id){
-        return ResponseEntity.ok(iAddressService.getCustomer(id));
-    }
-
 
 }
