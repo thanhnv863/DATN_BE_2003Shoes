@@ -12,7 +12,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class HangHoaBanChayTrongNam {
+public class SoHangHoaTrongThang {
     private String value1;
     private BigDecimal thang1;
 
