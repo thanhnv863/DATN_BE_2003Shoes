@@ -32,4 +32,8 @@ public class AddressRequest {
     private String note;
 
     private String defaultAddress;
+
+    public AddressRequest(Long accountId) {
+        this.accountId = accountId;
+    }
 }

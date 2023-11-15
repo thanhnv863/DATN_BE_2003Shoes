@@ -23,11 +23,7 @@ public interface IAddressService {
 
     ServiceResult<Address> deleteAddress(AddressRequest addressRequest);
 
-    ServiceResult<List<Address>> searchNameClient(String name);
-
-    ServiceResult<List<Address>> getAllAccountAndAddress(String defaultAddress);
-
-    ServiceResult<List<Address>> getCustomer(Long id);
+    ServiceResult<List<AddressResponse>> getAllAddressAndAccount(Long id);
 
 
 }

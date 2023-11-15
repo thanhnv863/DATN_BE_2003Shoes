@@ -22,4 +22,17 @@ public class AddressResponse {
     private Integer province;
     private String note;
     private String defaultAddress;
+
+    public AddressResponse(Long accountId, String name, String phoneNumber, String specificAddress,
+                           String ward, Integer district, Integer province, String note, String defaultAddress) {
+        this.accountId = accountId;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.specificAddress = specificAddress;
+        this.ward = ward;
+        this.district = district;
+        this.province = province;
+        this.note = note;
+        this.defaultAddress = defaultAddress;
+    }
 }

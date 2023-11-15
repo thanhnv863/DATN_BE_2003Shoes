@@ -1,13 +1,11 @@
 package com.backend.service.impl;
 
 import com.backend.ServiceResult;
-import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.AddressRequest;
 import com.backend.dto.response.AddressResponse;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
-import com.backend.entity.VoucherOrder;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.AddressRepository;
 import com.backend.service.IAddressService;
@@ -26,7 +24,6 @@ public class AddressServiceImpl implements IAddressService {
 
     @Autowired
     private AccountRepository accountRepository;
-
 
     @Override
     public ServiceResult<AddressResponse> addAddress(AddressRequest addressRequest) {
@@ -126,31 +123,28 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
-    public ServiceResult<List<Address>> getCustomer(Long id) {
-        List<Address> customerId = addressRepository.findAddressesByAccount_Id(id);
+    public ServiceResult<List<AddressResponse>> getAllAddressAndAccount(Long id) {
+        List<Address> addressList = addressRepository.findAddressesByAccount_Id(id);
+        List<AddressResponse> addressResponsesList = new ArrayList<>();
 
-        return new ServiceResult<>(AppConstant.SUCCESS,"success",customerId);
+        for (Address address: addressList){
+            AddressResponse addressResponse = new AddressResponse();
 
+            addressResponse.setAccountId(address.getAccount().getId());
+            addressResponse.setName(address.getName());
+            addressResponse.setPhoneNumber(address.getPhoneNumber());
+            addressResponse.setSpecificAddress(address.getSpecificAddress());
+            addressResponse.setWard(address.getWard());
+            addressResponse.setDistrict(address.getDistrict());
+            addressResponse.setProvince(address.getProvince());
+            addressResponse.setNote(address.getNote());
+            addressResponse.setDefaultAddress(address.getDefaultAddress());
+
+            addressResponsesList.add(addressResponse);
+        }
+
+        return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
     }
-
-    @Override
-    public ServiceResult<List<Address>> getAllAccountAndAddress(String defaultAddress) {
-        List<Address> addressList = addressRepository.getAllAccountAndAddress(defaultAddress);
-
-        return new ServiceResult<>(AppConstant.SUCCESS,
-                "Successfully retrieved",
-                addressList);
-    }
-
-
-
-    @Override
-    public ServiceResult<List<Address>> searchNameClient(String name) {
-        List<Address> addressName = addressRepository.searchNameClient(name);
-        return new ServiceResult<>(AppConstant.SUCCESS,"success",addressName);
-    }
-
-
 
     @Override
     public ServiceResult<Address> deleteAddress(AddressRequest addressRequest) {
@@ -231,5 +225,4 @@ public class AddressServiceImpl implements IAddressService {
     public ServiceResult<AddressResponse> result(String mess) {
         return new ServiceResult<>(AppConstant.FAIL,mess,null);
     }
-
 }
