@@ -3,10 +3,10 @@ package com.backend.service.impl;
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.dto.statistical.DataItem;
-import com.backend.dto.statistical.DoanhThuTrongNgay;
-import com.backend.dto.statistical.DoanhThuTrongThang;
-import com.backend.dto.statistical.SoHangHoaTrongThang;
+import com.backend.dto.statistical.DataItemDoanhThu;
 import com.backend.dto.statistical.HoaDonHuy;
+import com.backend.dto.statistical.SoHangHoaTrongThang;
+import com.backend.dto.statistical.ThongKeDoanhThu;
 import com.backend.dto.statistical.Top5SanPhamBanChayTrongThangVaNam;
 import com.backend.repository.StatisticalRepository;
 import com.backend.service.IStatistical;
@@ -212,6 +212,71 @@ public class StatisticalServiceImpl implements IStatistical {
     }
 
     @Override
+    public ServiceResult<List<DataItemDoanhThu>> thongKeDoanhThu(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang) {
+        List<Object[]> getThongKe = statisticalRepository.thongKeDoanhThu(ngayBatDau, ngayKetThuc, typeBanHang);
+        List<ThongKeDoanhThu> result = new ArrayList<>();
+        List<DataItemDoanhThu> dataItems = new ArrayList<>();
+
+
+        for (Object[] records: getThongKe){
+            ThongKeDoanhThu thongKeDoanhThu = new ThongKeDoanhThu();
+
+            DataItemDoanhThu dataItemDoanhThu1 = new DataItemDoanhThu();
+            thongKeDoanhThu.setNam1((Integer) records[0]);
+            dataItemDoanhThu1.setYear(thongKeDoanhThu.getNam1());
+            thongKeDoanhThu.setTongTien1((BigDecimal) records[1]);
+            dataItemDoanhThu1.setValue(thongKeDoanhThu.getTongTien1());
+            thongKeDoanhThu.setSoLuong1((BigDecimal) records[2]);
+            dataItemDoanhThu1.setCount(thongKeDoanhThu.getSoLuong1());
+
+            DataItemDoanhThu dataItemDoanhThu2 = new DataItemDoanhThu();
+            thongKeDoanhThu.setNam2((Integer) records[3]);
+            dataItemDoanhThu2.setYear(thongKeDoanhThu.getNam2());
+            thongKeDoanhThu.setTongTien2((BigDecimal) records[4]);
+            dataItemDoanhThu2.setValue(thongKeDoanhThu.getTongTien2());
+            thongKeDoanhThu.setSoLuong2((BigDecimal) records[5]);
+            dataItemDoanhThu2.setCount(thongKeDoanhThu.getSoLuong2());
+
+            DataItemDoanhThu dataItemDoanhThu3 = new DataItemDoanhThu();
+            thongKeDoanhThu.setNam3((Integer) records[6]);
+            dataItemDoanhThu3.setYear(thongKeDoanhThu.getNam3());
+            thongKeDoanhThu.setTongTien3((BigDecimal) records[7]);
+            dataItemDoanhThu3.setValue(thongKeDoanhThu.getTongTien3());
+            thongKeDoanhThu.setSoLuong3((BigDecimal) records[8]);
+            dataItemDoanhThu3.setCount(thongKeDoanhThu.getSoLuong3());
+
+            DataItemDoanhThu dataItemDoanhThu4 = new DataItemDoanhThu();
+            thongKeDoanhThu.setNam4((Integer) records[9]);
+            dataItemDoanhThu4.setYear(thongKeDoanhThu.getNam4());
+            thongKeDoanhThu.setTongTien4((BigDecimal) records[10]);
+            dataItemDoanhThu4.setValue(thongKeDoanhThu.getTongTien4());
+            thongKeDoanhThu.setSoLuong4((BigDecimal) records[11]);
+            dataItemDoanhThu4.setCount(thongKeDoanhThu.getSoLuong4());
+
+            DataItemDoanhThu dataItemDoanhThu5 = new DataItemDoanhThu();
+            thongKeDoanhThu.setNam5((Integer) records[12]);
+            dataItemDoanhThu5.setYear(thongKeDoanhThu.getNam5());
+            thongKeDoanhThu.setTongTien5((BigDecimal) records[13]);
+            dataItemDoanhThu5.setValue(thongKeDoanhThu.getTongTien5());
+            thongKeDoanhThu.setSoLuong5((BigDecimal) records[14]);
+            dataItemDoanhThu5.setCount(thongKeDoanhThu.getTongTien5());
+
+            result.add(thongKeDoanhThu);
+            dataItems.add(dataItemDoanhThu1);
+            dataItems.add(dataItemDoanhThu2);
+            dataItems.add(dataItemDoanhThu3);
+            dataItems.add(dataItemDoanhThu4);
+            dataItems.add(dataItemDoanhThu5);
+        }
+
+        if(result.size() > 0){
+            return new ServiceResult<>(AppConstant.SUCCESS,"get success",dataItems);
+        }else{
+            return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
+        }
+    }
+
+    @Override
     public ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>> sanPhamBanChay(Date ngayBatDau,Date ngayKetThuc) {
         List<Object[]> topSanPhamBanChay = statisticalRepository.sanPhamBanChayTheoThangNam(ngayBatDau, ngayKetThuc);
         List<Top5SanPhamBanChayTrongThangVaNam> result = new ArrayList<>();
@@ -230,6 +295,8 @@ public class StatisticalServiceImpl implements IStatistical {
             return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
         }
     }
+
+
 
 
 }
