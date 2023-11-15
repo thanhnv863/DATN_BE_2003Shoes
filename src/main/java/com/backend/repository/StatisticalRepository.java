@@ -55,5 +55,27 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "    limit 5;",nativeQuery = true)
     List<Object[]> sanPhamBanChayTheoThangNam(Date ngayBatDau,Date ngayKetThuc);
 
+    @Query(value = "SELECT \n" +
+            "\tYEAR(mo.pay_date) - 1 AS ResultString1,\n" +
+            "\tCASE WHEN year(mo.pay_date) = year(mo.pay_date) - 1 THEN sum(mo.total_money) ELSE 0 END AS 'nam 2022',\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date) - 1 THEN sum(od.quantity) ELSE 0 END AS 'soLuong1',\n" +
+            "    YEAR(mo.pay_date) AS ResultString2,\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date)  THEN sum(mo.total_money) ELSE 0 END AS 'nam 2023',\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date) THEN sum(od.quantity) ELSE 0 END AS 'soLuong2',\n" +
+            "\tYEAR(mo.pay_date) + 1 AS ResultString3,\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date) + 1  THEN sum(mo.total_money) ELSE 0 END AS 'nam 2024',\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date) + 1 THEN sum(od.quantity) ELSE 0 END AS 'soLuong3',\n" +
+            "    YEAR(mo.pay_date) + 2 AS ResultString4,\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date) + 2  THEN sum(mo.total_money) ELSE 0 END AS 'nam 2025',\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date) + 2 THEN sum(od.quantity) ELSE 0 END AS 'soLuong4',\n" +
+            "    YEAR(mo.pay_date) + 3 AS ResultString5,\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date) + 3  THEN sum(mo.total_money) ELSE 0 END AS 'nam 2026',\n" +
+            "    CASE WHEN year(mo.pay_date) = year(mo.pay_date) + 3 THEN sum(od.quantity) ELSE 0 END AS 'soLuong5'\n" +
+            "\tfrom db_datn.my_order mo \n" +
+            "    left join order_detail od on mo.id = od.order_id\n" +
+            "    where mo.pay_date between :ngayBatDau and :ngayKetThuc \n" +
+            "\t\tand mo.status = 2 and mo.type = :typeBanHang and od.status = 1\n" +
+            "    group by mo.status and mo.type and od.quantity",nativeQuery = true)
+    List<Object[]> thongKeDoanhThu(Date ngayBatDau,Date ngayKetThuc, Integer typeBanHang);
 
 }

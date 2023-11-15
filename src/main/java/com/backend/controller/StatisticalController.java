@@ -35,4 +35,11 @@ public class StatisticalController {
         return ResponseEntity.ok(iStatistical.sanPhamBanChay(ngayBatDau, ngayKetThuc));
     }
 
+    @GetMapping("/thongkedoanhthu")
+    public ResponseEntity<?> thongKeDoanhTHu(@RequestParam("ngayBatDau") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayBatDau,
+                                             @RequestParam("ngayKetThuc") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayKetThuc,
+                                             @RequestParam("typeBanHang") Integer typeBanHang){
+        return ResponseEntity.ok(iStatistical.thongKeDoanhThu(ngayBatDau, ngayKetThuc, typeBanHang));
+    }
+
 }
