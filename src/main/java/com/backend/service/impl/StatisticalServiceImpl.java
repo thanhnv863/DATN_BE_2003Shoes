@@ -4,6 +4,7 @@ import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.dto.statistical.DataItem;
 import com.backend.dto.statistical.DataItemDoanhThu;
+import com.backend.dto.statistical.DoanhThuTheoNgay;
 import com.backend.dto.statistical.HoaDonHuy;
 import com.backend.dto.statistical.SoHangHoaTrongThang;
 import com.backend.dto.statistical.ThongKeDoanhThu;
@@ -271,6 +272,25 @@ public class StatisticalServiceImpl implements IStatistical {
 
         if(result.size() > 0){
             return new ServiceResult<>(AppConstant.SUCCESS,"get success",dataItems);
+        }else{
+            return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
+        }
+    }
+
+    @Override
+    public ServiceResult<List<DoanhThuTheoNgay>> doanhThuTheoNgay(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang) {
+        List<Object[]> listDoanhThu = statisticalRepository.doanhThuTheoNgay(ngayBatDau, ngayKetThuc,typeBanHang);
+        List<DoanhThuTheoNgay> result = new ArrayList<>();
+
+        for (Object[] record: listDoanhThu){
+            DoanhThuTheoNgay doanhThuTheoNgay = new DoanhThuTheoNgay();
+            doanhThuTheoNgay.setTongTien((BigDecimal) record[0]);
+
+            result.add(doanhThuTheoNgay);
+        }
+
+        if(result.size() > 0){
+            return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
         }else{
             return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
         }
