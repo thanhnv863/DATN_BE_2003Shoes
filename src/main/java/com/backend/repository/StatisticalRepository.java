@@ -81,7 +81,7 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
     @Query(value = "SELECT \n" +
             "\t sum(mo.total_money) as tongTien\n" +
             "\tfrom db_datn.my_order mo \n" +
-            "    where mo.pay_date between :ngayBatDau and :ngayKetThuc and mo.status = 2\n" +
+            "    where mo.pay_date between :ngayBatDau and :ngayKetThuc and mo.status = 8\n" +
             "\t\tand mo.type = :typeBanHang",nativeQuery = true)
     List<Object[]> doanhThuTheoNgay(Date ngayBatDau,Date ngayKetThuc, Integer typeBanHang);
 }
