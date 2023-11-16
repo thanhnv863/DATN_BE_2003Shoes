@@ -3,6 +3,7 @@ package com.backend.service;
 import com.backend.ServiceResult;
 import com.backend.dto.statistical.DataItem;
 import com.backend.dto.statistical.DataItemDoanhThu;
+import com.backend.dto.statistical.DoanhThuTheoNgay;
 import com.backend.dto.statistical.ThongKeDoanhThu;
 import com.backend.dto.statistical.Top5SanPhamBanChayTrongThangVaNam;
 
@@ -14,4 +15,5 @@ public interface IStatistical {
     ServiceResult<List<DataItem>> thongKeSanPhamBanChayTrongNam(Integer nam);
     ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>>  sanPhamBanChay(Date ngayBatDau,Date ngayKetThuc);
     ServiceResult<List<DataItemDoanhThu>> thongKeDoanhThu(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang);
+    ServiceResult<List<DoanhThuTheoNgay>> doanhThuTheoNgay(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang);
 }
