@@ -16,6 +16,8 @@ import com.backend.service.IStatistical;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -29,12 +31,14 @@ public class StatisticalServiceImpl implements IStatistical {
     @Autowired
     private StatisticalRepository statisticalRepository;
 
+    @Autowired
+    private EntityManager entityManager;
+
     @Override
     public ServiceResult<List<DataItem>> findHoaDon(Date ngayBatDau, Date ngayKetThuc) {
         List<Object[]> soHoaDonHuy = statisticalRepository.findByHoaDon(ngayBatDau, ngayKetThuc);
         List<HoaDonHuy> hoaDonHuyList = new ArrayList<>();
         List<DataItem> dataItems = new ArrayList<>();
-
 
         for(Object[] hoaDon: soHoaDonHuy){
             HoaDonHuy hoaDonHuy = new HoaDonHuy();
@@ -216,6 +220,39 @@ public class StatisticalServiceImpl implements IStatistical {
 
     @Override
     public ServiceResult<List<DataItemDoanhThu>> thongKeDoanhThu(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("select \n" +
+                "\t\t\t    CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang1',\n" +
+                "                CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang1',\n" +
+                "                CASE WHEN month(mo.pay_date) = 2 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang2',\n" +
+                "                CASE WHEN month(mo.pay_date) = 2 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang2',\n" +
+                "                CASE WHEN month(mo.pay_date) = 3 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang3',\n" +
+                "                CASE WHEN month(mo.pay_date) = 3 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang3',\n" +
+                "                CASE WHEN month(mo.pay_date) = 4 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang4',\n" +
+                "                CASE WHEN month(mo.pay_date) = 4 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang4',\n" +
+                "                CASE WHEN month(mo.pay_date) = 5 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang5',\n" +
+                "                CASE WHEN month(mo.pay_date) = 5 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang5',\n" +
+                "                CASE WHEN month(mo.pay_date) = 6 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang6',\n" +
+                "                CASE WHEN month(mo.pay_date) = 6 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang6',\n" +
+                "                CASE WHEN month(mo.pay_date) = 7 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang7',\n" +
+                "                CASE WHEN month(mo.pay_date) = 7 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang7',\n" +
+                "                CASE WHEN month(mo.pay_date) = 8 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang8',\n" +
+                "                CASE WHEN month(mo.pay_date) = 8 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang8',\n" +
+                "                CASE WHEN month(mo.pay_date) = 9 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang9',\n" +
+                "                CASE WHEN month(mo.pay_date) = 9 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang9',\n" +
+                "                CASE WHEN month(mo.pay_date) = 10 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang10',\n" +
+                "                CASE WHEN month(mo.pay_date) = 10 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang10',\n" +
+                "                CASE WHEN month(mo.pay_date) = 11 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang11',\n" +
+                "                CASE WHEN month(mo.pay_date) = 11 THEN sum(od.quantity) ELSE 0 END AS 'soLuong11',\n" +
+                "                CASE WHEN month(mo.pay_date) = 12 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang12',\n" +
+                "                CASE WHEN month(mo.pay_date) = 12 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang12'");
+        sql.append("from my_order mo");
+        sql.append("left join payment_method pm on mo.id = pm.order_id");
+        sql.append("left join order_detail od on mo.id = od.order_id");
+        sql.append("where YEAR(mo.pay_date) = :nam and mo.status = 2 and (:typeBanHang is null or mo.type = :typeBanHang)");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("typeBanHang", typeBanHang);
+
         List<Object[]> getThongKe = statisticalRepository.thongKeDoanhThuTheoNam(ngayBatDau, ngayKetThuc, typeBanHang);
         List<ThongKeDoanhThu> result = new ArrayList<>();
         List<DataItemDoanhThu> dataItems = new ArrayList<>();
