@@ -45,6 +45,11 @@ public class OrderControllerCustomer {
         return ResponseEntity.ok().body(iOrderService.customerAddOrder(orderCutomerRequest));
     }
 
+    @PostMapping("/save-by-now")
+    public ResponseEntity<?> addByNow(@RequestBody OrderCutomerRequest orderCutomerRequest) {
+        return ResponseEntity.ok().body(iOrderService.customerByNow(orderCutomerRequest));
+    }
+
     @GetMapping("/detail/{idOrder}")
     public ResponseEntity<?> getDetail(@RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo, @PathVariable("idOrder") Long idOrder) {
         return ResponseEntity.ok().body(iOrderDetailSerivice.getAllOrderByOrderId(pageNo, idOrder));

@@ -34,6 +34,9 @@ public interface IOrderService {
 
     ServiceResultReponse<Order> customerAddOrder(OrderCutomerRequest orderCutomerRequest);
 
+    // customer by now
+    ServiceResultReponse<Order> customerByNow(OrderCutomerRequest orderCutomerRequest);
+
     // customer no login
     ServiceResultReponse<Order> customerNoLoginAddOrder(OrderCutomerRequest orderCutomerRequest);
 
