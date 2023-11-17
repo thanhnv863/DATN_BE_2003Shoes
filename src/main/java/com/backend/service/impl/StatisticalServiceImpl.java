@@ -4,7 +4,9 @@ import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.dto.statistical.DataItem;
 import com.backend.dto.statistical.DataItemDoanhThu;
+import com.backend.dto.statistical.DataItemDoanhThuThang;
 import com.backend.dto.statistical.DoanhThuTheoNgay;
+import com.backend.dto.statistical.DoanhThuTheoThang;
 import com.backend.dto.statistical.HoaDonHuy;
 import com.backend.dto.statistical.SoHangHoaTrongThang;
 import com.backend.dto.statistical.ThongKeDoanhThu;
@@ -214,7 +216,7 @@ public class StatisticalServiceImpl implements IStatistical {
 
     @Override
     public ServiceResult<List<DataItemDoanhThu>> thongKeDoanhThu(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang) {
-        List<Object[]> getThongKe = statisticalRepository.thongKeDoanhThu(ngayBatDau, ngayKetThuc, typeBanHang);
+        List<Object[]> getThongKe = statisticalRepository.thongKeDoanhThuTheoNam(ngayBatDau, ngayKetThuc, typeBanHang);
         List<ThongKeDoanhThu> result = new ArrayList<>();
         List<DataItemDoanhThu> dataItems = new ArrayList<>();
 
@@ -278,6 +280,121 @@ public class StatisticalServiceImpl implements IStatistical {
     }
 
     @Override
+    public ServiceResult<List<DataItemDoanhThuThang>> doanhThuTheoThang(Integer nam, Integer typeBanHang) {
+        List<Object[]> listDoanhThu = statisticalRepository.doanhThuTheoThang(nam, typeBanHang);
+        List<DoanhThuTheoThang> result = new ArrayList<>();
+        List<DataItemDoanhThuThang> dataItems = new ArrayList<>();
+
+        for (Object[] record: listDoanhThu){
+            DoanhThuTheoThang doanhThuTheoThang = new DoanhThuTheoThang();
+
+            DataItemDoanhThuThang dataItemDoanhThu1 = new DataItemDoanhThuThang();
+            dataItemDoanhThu1.setTime("Thang1");
+            doanhThuTheoThang.setTotalThang1((BigDecimal) record[0]);
+            dataItemDoanhThu1.setValue(doanhThuTheoThang.getTotalThang1());
+            doanhThuTheoThang.setSoLuongThang1((BigDecimal) record[1]);
+            dataItemDoanhThu1.setCount(doanhThuTheoThang.getSoLuongThang1());
+
+            DataItemDoanhThuThang dataItemDoanhThu2 = new DataItemDoanhThuThang();
+            dataItemDoanhThu2.setTime("Thang2");
+            doanhThuTheoThang.setTotalThang2((BigDecimal) record[2]);
+            dataItemDoanhThu2.setValue(doanhThuTheoThang.getTotalThang2());
+            doanhThuTheoThang.setSoLuongThang2((BigDecimal) record[3]);
+            dataItemDoanhThu2.setCount(doanhThuTheoThang.getSoLuongThang2());
+
+            DataItemDoanhThuThang dataItemDoanhThu3 = new DataItemDoanhThuThang();
+            dataItemDoanhThu3.setTime("Thang3");
+            doanhThuTheoThang.setTotalThang3((BigDecimal) record[4]);
+            dataItemDoanhThu3.setValue(doanhThuTheoThang.getTotalThang3());
+            doanhThuTheoThang.setSoLuongThang3((BigDecimal) record[5]);
+            dataItemDoanhThu3.setCount(doanhThuTheoThang.getSoLuongThang3());
+
+            DataItemDoanhThuThang dataItemDoanhThu4 = new DataItemDoanhThuThang();
+            dataItemDoanhThu4.setTime("Thang4");
+            doanhThuTheoThang.setTotalThang4((BigDecimal) record[6]);
+            dataItemDoanhThu4.setValue(doanhThuTheoThang.getTotalThang4());
+            doanhThuTheoThang.setSoLuongThang4((BigDecimal) record[7]);
+            dataItemDoanhThu4.setCount(doanhThuTheoThang.getSoLuongThang4());
+
+            DataItemDoanhThuThang dataItemDoanhThu5 = new DataItemDoanhThuThang();
+            dataItemDoanhThu5.setTime("Thang5");
+            doanhThuTheoThang.setTotalThang5((BigDecimal) record[8]);
+            dataItemDoanhThu5.setValue(doanhThuTheoThang.getTotalThang5());
+            doanhThuTheoThang.setSoLuongThang5((BigDecimal) record[9]);
+            dataItemDoanhThu5.setCount(doanhThuTheoThang.getSoLuongThang5());
+
+            DataItemDoanhThuThang dataItemDoanhThu6 = new DataItemDoanhThuThang();
+            dataItemDoanhThu6.setTime("Thang6");
+            doanhThuTheoThang.setTotalThang6((BigDecimal) record[10]);
+            dataItemDoanhThu6.setValue(doanhThuTheoThang.getTotalThang6());
+            doanhThuTheoThang.setSoLuongThang6((BigDecimal) record[11]);
+            dataItemDoanhThu6.setCount(doanhThuTheoThang.getSoLuongThang6());
+
+            DataItemDoanhThuThang dataItemDoanhThu7 = new DataItemDoanhThuThang();
+            dataItemDoanhThu7.setTime("Thang7");
+            doanhThuTheoThang.setTotalThang7((BigDecimal) record[12]);
+            dataItemDoanhThu7.setValue(doanhThuTheoThang.getTotalThang7());
+            doanhThuTheoThang.setSoLuongThang7((BigDecimal) record[13]);
+            dataItemDoanhThu7.setCount(doanhThuTheoThang.getSoLuongThang7());
+
+            DataItemDoanhThuThang dataItemDoanhThu8 = new DataItemDoanhThuThang();
+            dataItemDoanhThu8.setTime("Thang8");
+            doanhThuTheoThang.setTotalThang8((BigDecimal) record[14]);
+            dataItemDoanhThu8.setValue(doanhThuTheoThang.getTotalThang8());
+            doanhThuTheoThang.setSoLuongThang8((BigDecimal) record[15]);
+            dataItemDoanhThu8.setCount(doanhThuTheoThang.getSoLuongThang8());
+
+            DataItemDoanhThuThang dataItemDoanhThu9 = new DataItemDoanhThuThang();
+            dataItemDoanhThu9.setTime("Thang9");
+            doanhThuTheoThang.setTotalThang9((BigDecimal) record[16]);
+            dataItemDoanhThu9.setValue(doanhThuTheoThang.getTotalThang9());
+            doanhThuTheoThang.setSoLuongThang9((BigDecimal) record[17]);
+            dataItemDoanhThu9.setCount(doanhThuTheoThang.getSoLuongThang9());
+
+            DataItemDoanhThuThang dataItemDoanhThu10 = new DataItemDoanhThuThang();
+            dataItemDoanhThu10.setTime("Thang10");
+            doanhThuTheoThang.setTotalThang10((BigDecimal) record[18]);
+            dataItemDoanhThu10.setValue(doanhThuTheoThang.getTotalThang10());
+            doanhThuTheoThang.setSoLuongThang10((BigDecimal) record[19]);
+            dataItemDoanhThu10.setCount(doanhThuTheoThang.getSoLuongThang10());
+
+            DataItemDoanhThuThang dataItemDoanhThu11 = new DataItemDoanhThuThang();
+            dataItemDoanhThu11.setTime("Thang11");
+            doanhThuTheoThang.setTotalThang11((BigDecimal) record[20]);
+            dataItemDoanhThu11.setValue(doanhThuTheoThang.getTotalThang11());
+            doanhThuTheoThang.setSoLuongThang11((BigDecimal) record[21]);
+            dataItemDoanhThu11.setCount(doanhThuTheoThang.getSoLuongThang11());
+
+            DataItemDoanhThuThang dataItemDoanhThu12 = new DataItemDoanhThuThang();
+            dataItemDoanhThu12.setTime("Thang12");
+            doanhThuTheoThang.setTotalThang12((BigDecimal) record[22]);
+            dataItemDoanhThu12.setValue(doanhThuTheoThang.getTotalThang12());
+            doanhThuTheoThang.setSoLuongThang12((BigDecimal) record[23]);
+            dataItemDoanhThu12.setCount(doanhThuTheoThang.getSoLuongThang12());
+
+            result.add(doanhThuTheoThang);
+            dataItems.add(dataItemDoanhThu1);
+            dataItems.add(dataItemDoanhThu2);
+            dataItems.add(dataItemDoanhThu3);
+            dataItems.add(dataItemDoanhThu4);
+            dataItems.add(dataItemDoanhThu5);
+            dataItems.add(dataItemDoanhThu6);
+            dataItems.add(dataItemDoanhThu7);
+            dataItems.add(dataItemDoanhThu8);
+            dataItems.add(dataItemDoanhThu9);
+            dataItems.add(dataItemDoanhThu10);
+            dataItems.add(dataItemDoanhThu11);
+            dataItems.add(dataItemDoanhThu12);
+        }
+
+        if(result.size() > 0){
+            return new ServiceResult<>(AppConstant.SUCCESS,"get success",dataItems);
+        }else{
+            return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
+        }
+    }
+
+    @Override
     public ServiceResult<List<DoanhThuTheoNgay>> doanhThuTheoNgay(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang) {
         List<Object[]> listDoanhThu = statisticalRepository.doanhThuTheoNgay(ngayBatDau, ngayKetThuc,typeBanHang);
         List<DoanhThuTheoNgay> result = new ArrayList<>();
@@ -289,12 +406,15 @@ public class StatisticalServiceImpl implements IStatistical {
             result.add(doanhThuTheoNgay);
         }
 
+
         if(result.size() > 0){
             return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
         }else{
             return new ServiceResult<>(AppConstant.NOT_FOUND,"khong co san pham nao",null);
         }
     }
+
+
 
     @Override
     public ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>> sanPhamBanChay(Date ngayBatDau,Date ngayKetThuc) {
