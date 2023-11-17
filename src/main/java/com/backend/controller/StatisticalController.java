@@ -49,4 +49,10 @@ public class StatisticalController {
         return ResponseEntity.ok(iStatistical.doanhThuTheoNgay(ngayBatDau, ngayKetThuc, typeBanHang));
     }
 
+    @GetMapping("/doanhthutheothang")
+    public ResponseEntity<?> doanhThuTheoThang(@RequestParam("nam") Integer nam,
+                                               @RequestParam(value = "typeBanHang",defaultValue = "") Integer typeBanHang){
+        return ResponseEntity.ok(iStatistical.doanhThuTheoThang(nam, typeBanHang));
+    }
+
 }
