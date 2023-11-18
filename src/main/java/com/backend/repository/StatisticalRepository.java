@@ -113,7 +113,7 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "             from my_order mo \n" +
             "             left join payment_method pm on mo.id = pm.order_id\n" +
             "             left join order_detail od on mo.id = od.order_id\n" +
-            "                       where YEAR(mo.pay_date) = :nam and mo.status = 2 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
+            "                       where YEAR(mo.pay_date) = :nam and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
     List<Object[]> doanhThuTheoThang(Integer nam, Integer typeBanHang);
 
 }
