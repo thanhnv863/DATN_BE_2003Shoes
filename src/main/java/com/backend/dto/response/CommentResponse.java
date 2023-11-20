@@ -18,6 +18,7 @@ public class CommentResponse {
     private Long id;
     private String nameAccount;
 //    private String nameShoeDetail;
+    private Integer start;
     private String content;
 
     @JsonSerialize(using = DateTimeSerializer.class)

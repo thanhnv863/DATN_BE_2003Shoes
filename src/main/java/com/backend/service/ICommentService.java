@@ -12,4 +12,6 @@ public interface ICommentService {
     Page<CommentResponse> searchComment(SearchCommentRequest commentRequest);
 
     ServiceResultReponse<?> add(CommentRequest commentRequest);
+
+    ServiceResultReponse<?> checkCommentIsPresent(CommentRequest commentRequest);
 }

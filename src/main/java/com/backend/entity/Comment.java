@@ -36,9 +36,19 @@ public class Comment {
     @JoinColumn(name = "shoe_detail_id")
     private ShoeDetail shoeDetail;
 
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    @Column(name = "stars")
+    private Integer stars;
+
     @Column(name = "content")
     private String content;
 
     @Column(name = "date")
     private Date date;
+
+    @Column(name = "status")
+    private Integer status;
 }

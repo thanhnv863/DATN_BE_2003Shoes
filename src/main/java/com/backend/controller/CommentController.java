@@ -22,8 +22,8 @@ public class CommentController {
     private ICommentService iCommentService;
 
     @PostMapping("/get-all")
-    public ResponseEntity<?> getAllComment(@RequestBody SearchCommentRequest searchAccountRequest) {
-        Page<CommentResponse> page = iCommentService.searchComment(searchAccountRequest);
+    public ResponseEntity<?> getAllComment(@RequestBody SearchCommentRequest searchCommentRequest) {
+        Page<CommentResponse> page = iCommentService.searchComment(searchCommentRequest);
         return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
 //        return ResponseEntity.ok().body(page);
     }
@@ -31,5 +31,10 @@ public class CommentController {
     @PostMapping("/save")
     public ResponseEntity<?> addComment(@RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok().body(iCommentService.add(commentRequest));
+    }
+
+    @PostMapping("/get-one")
+    public ResponseEntity<?> getOneComment(@RequestBody CommentRequest commentRequest) {
+        return ResponseEntity.ok().body(iCommentService.checkCommentIsPresent(commentRequest));
     }
 }

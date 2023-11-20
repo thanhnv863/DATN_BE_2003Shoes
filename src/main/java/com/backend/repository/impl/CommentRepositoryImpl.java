@@ -19,7 +19,7 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
     @Override
     public Page<Object> doSearch(Pageable pageable, Long idShoeDetail) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT a.id,b.name, a.content, a.date");
+        sql.append("SELECT a.id,b.name, a.stars, a.content, a.date");
         sql.append("  FROM comment as a");
         sql.append(" join account as b on a.account_id = b.id");
         sql.append(" join shoe_detail as c on c.id = a.shoe_detail_id");

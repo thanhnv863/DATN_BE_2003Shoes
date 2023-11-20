@@ -12,7 +12,9 @@ import lombok.Setter;
 @Setter
 @Builder
 public class CommentRequest {
+    private Long idOrder;
     private Long idAccount;
     private Long idShoeDetail;
+    private Integer stars;
     private String content;
 }
