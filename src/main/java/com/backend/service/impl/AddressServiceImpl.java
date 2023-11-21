@@ -47,14 +47,14 @@ public class AddressServiceImpl implements IAddressService {
                    address.setNote(addressRequest.getNote());
                    address.setDefaultAddress(addressRequest.getDefaultAddress());
 
-                   if(account.isPresent() && address.getDefaultAddress().equals("0")){
-                       return new ServiceResult<>(AppConstant.SUCCESS, "Add that bai chi duoc 1 dia chi mac dinh", null);
-                   }
+//                   if(address.getDefaultAddress().equals("0")){
+//                       return new ServiceResult<>(AppConstant.SUCCESS, "Add that bai chi duoc 1 dia chi mac dinh", null);
+//                   }
 
-                   address = addressRepository.save(address);
-                   AddressResponse convertAddressResponse = convertToResponse(address);
+                       address = addressRepository.save(address);
+                       AddressResponse convertAddressResponse = convertToResponse(address);
 
-                   return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertAddressResponse);
+                       return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertAddressResponse);
 
                }else{
                   return new ServiceResult<>(AppConstant.FAIL,"Add fail",null);
