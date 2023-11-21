@@ -27,6 +27,8 @@ public class AccountRequest {
 
     private Integer status;
 
+    private String code;
+
     public AccountRequest(String name, String email, String password, String avatar) {
         this.name = name;
         this.email = email;

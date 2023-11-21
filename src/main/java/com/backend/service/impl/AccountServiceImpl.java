@@ -29,6 +29,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -69,6 +73,9 @@ public class AccountServiceImpl implements IAccountService {
     private EmailRepository emailRepository;
     private ImageUploadService imageUploadService;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     public AccountServiceImpl(ImageUploadService imageUploadService) {
         this.imageUploadService = imageUploadService;
     }
@@ -76,12 +83,15 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public ServiceResult<RegisterResponse> register(RegisterRequest registerRequest) {
         Optional<Account> accountcheck = accountRepository.findByEmail(registerRequest.getEmail());
+        Optional<Role> optionalRole = roleRepository.findById(registerRequest.getIdRole());
+
         if (accountcheck.isPresent()) {
             return new ServiceResult<>(AppConstant.SUCCESS,
                     "Email đã tồn tại",
                     null);
         } else {
             Account account = new Account();
+            Role roleId = optionalRole.get();
             Calendar calendar = Calendar.getInstance();
             Date now = calendar.getTime();
             account.setName(registerRequest.getName());
@@ -90,7 +100,7 @@ public class AccountServiceImpl implements IAccountService {
             account.setUpdatedAt(now);
             account.setStatus(1);
             account.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-            account.setRole(Role.builder().id(registerRequest.getIdRole()).build());
+            account.setRole(roleId);
             account = accountRepository.save(account);
             RegisterResponse registerResponse = new RegisterResponse();
             // role 2 là khach hang
@@ -188,6 +198,7 @@ public class AccountServiceImpl implements IAccountService {
                     account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
                     account.setAvatar(imageUploadService.uploadImageByName(accountRequest.getAvatar()));
                     account.setStatus(accountRequest.getStatus());
+                    accountRepository.save(account);
                     if (account.getRole().getId() == 2) {
                         Account accountUpdateCode = accountRepository.findById(account.getId()).get();
                         List<Account> listKhachHang = accountRepository.getListByRole(accountUpdateCode.getRole().getId());
@@ -345,24 +356,21 @@ public class AccountServiceImpl implements IAccountService {
 
         if (optionalAccount.isPresent()) {
             Account accountId = optionalAccount.get();
-            if (passwordRequest.getYourOldPassword().equals(accountId.getPassword())) {
-                accountId.setPassword(passwordEncoder.encode(passwordRequest.getEnterNewPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(accountId.getEmail(), passwordRequest.getYourOldPassword()));
 
-                if (passwordRequest.getYourOldPassword().equals(passwordRequest.getNewPassword())) {
-                    return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Không được trùng với mật khẩu hiện tại");
+            if (authentication.isAuthenticated()) {
+                System.out.println("da vao");
 
-                } else if (!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())) {
-                    return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Mật khẩu mới phải trùng với mật khẩu nhập lại");
-
-                } else if (passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())) {
-
-                    accountRepository.save(accountId);
-
-                    return new ServiceResult<>(AppConstant.SUCCESS, "success", "Chúc mừng bạn đã đổi mật khẩu thành công");
-                } else {
-                    return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Bạn nhập chưa đúng mật khẩu ");
+                if(!passwordRequest.getNewPassword().equals(passwordRequest.getEnterNewPassword())){
+                    return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Mật khẩu nhập lại phải trùng nhau");
                 }
-            } else {
+
+                accountId.setPassword(passwordEncoder.encode(passwordRequest.getEnterNewPassword()));
+                accountRepository.save(accountId);
+                return new ServiceResult<>(AppConstant.SUCCESS, "success", "Bạn đã đổi mật khẩu thành công");
+            }
+
+            else {
                 return new ServiceResult<>(AppConstant.SUCCESS, "fail", "Mật khẩu cũ không trùng với mật khẩu của tài khoản");
             }
         } else {
