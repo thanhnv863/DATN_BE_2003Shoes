@@ -558,7 +558,91 @@ public class OrderServiceImpl implements IOrderService {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
         }
     }
+    @Override
+    public ServiceResultReponse<Order> customerByNow(OrderCutomerRequest orderCutomerRequest){
+        try {
+            Date date = new Date();
+            Order order = new Order();
+            order.setCode(generateOrderCode());
+            if (orderCutomerRequest.getIdVoucher() != null) {
+                VoucherOrder voucherOrder = voucherOrderRepository.findById(orderCutomerRequest.getIdVoucher()).get();
+                order.setVoucherOrder(voucherOrder);
+                voucherOrder.setQuantity(voucherOrder.getQuantity() - 1);
+                voucherOrderRepository.save(voucherOrder);
+            } else {
+                order.setVoucherOrder(null);
+            }
+            //
+            if (orderCutomerRequest.getIdAccount() != null) {
+                Account account = accountRepository.findById(orderCutomerRequest.getIdAccount()).get();
+                order.setAccount(account);
+            } else {
+                order.setAccount(null);
+            }
+            order.setType("2");
+            order.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
+            order.setCustomerName(orderCutomerRequest.getCustomerName());
+            order.setAddress(orderCutomerRequest.getAddress());
+            order.setShipFee(orderCutomerRequest.getShipFee());
+            order.setMoneyReduce(orderCutomerRequest.getMoneyReduce());
+            order.setTotalMoney(orderCutomerRequest.getTotalMoney());
+            order.setCreatedDate(date);
+            order.setPayDate(date);
 
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+
+            order.setShipDate(null);
+            order.setDesiredDate(null);
+            order.setReceiveDate(null);
+            order.setCreatedBy(order.getAccount().getName());
+            order.setNote(orderCutomerRequest.getNote());
+            order.setStatus(4);
+            Order orderAddCustomer = orderRepository.save(order);
+            // orderHistory
+            OrderHistory orderHistory = new OrderHistory();
+            orderHistory.setOrder(orderAddCustomer);
+            orderHistory.setCreatedTime(date);
+            orderHistory.setCreatedBy(order.getCreatedBy());
+            orderHistory.setNote("Khách Hàng Đặt Hàng");
+            orderHistory.setType("Created");
+            orderHistoryRepository.save(orderHistory);
+            List<ShoeDetail> shoeDetailList = new ArrayList<>();
+            shoeDetailList = orderCutomerRequest.getShoeDetailListRequets();
+            for (ShoeDetail shoeDetail : shoeDetailList) {
+                OrderDetail orderDetail = new OrderDetail();
+                ShoeDetail shoeDetail1 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+                orderDetail.setShoeDetail(shoeDetail1);
+                orderDetail.setOrder(order);
+                orderDetail.setQuantity(shoeDetail.getQuantity());
+                orderDetail.setPrice(shoeDetail.getPriceInput());
+                orderDetail.setDiscount(BigDecimal.valueOf(0));
+                orderDetail.setStatus(1);
+                Integer quantityNew = shoeDetail1.getQuantity() - orderDetail.getQuantity();
+                orderDetailRepository.save(orderDetail);
+                shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+            }
+            Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
+            if (emailTemplateCheckCustomer.isPresent()) {
+                EmailTemplate emailTemplate = emailTemplateCheckCustomer.get();
+                String to = order.getAccount().getEmail();
+                String subject = emailTemplate.getSubject();
+                String mailType = "";
+                String mailContent = emailTemplate.getMailContent();
+                iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+            } else {
+                String to = order.getAccount().getEmail();
+                String subject = "Xin chào bạn đến với store 2003SHOES";
+                String mailType = "";
+                String mailContent = "Cảm ơn bạn đã mua hàng. Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu!!!!!!!! ";
+                iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
+            }
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
+        }
+    }
     @Override
     public List<OrderReponse> searchOrderExport(SearchOrderRequest searchOrderRequest) {
         if (searchOrderRequest.getCustomer() != null) {

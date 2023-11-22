@@ -45,7 +45,7 @@ public class VNPayController {
 //        model.addAttribute("transactionId", transactionId);
 
         if (paymentStatus == 1){
-            String redirectUrl = "http://localhost:3000/order" +
+            String redirectUrl = "http://localhost:3000/order-checking" +
                     "?orderId=" + URLEncoder.encode(orderInfo, StandardCharsets.UTF_8.toString()) +
                     "&totalPrice=" + URLEncoder.encode(totalPrice, StandardCharsets.UTF_8.toString()) +
                     "&paymentTime=" + URLEncoder.encode(paymentTime, StandardCharsets.UTF_8.toString()) +
@@ -53,7 +53,7 @@ public class VNPayController {
 
             response.sendRedirect(redirectUrl);
         }else {
-            response.sendRedirect( "http://localhost:3000/order?transactionId=0");
+            response.sendRedirect( "http://localhost:3000/order-checking?transactionId=0");
         }
 //
     }
