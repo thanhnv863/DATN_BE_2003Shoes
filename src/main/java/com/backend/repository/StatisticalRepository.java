@@ -55,6 +55,7 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "    limit 5;",nativeQuery = true)
     List<Object[]> sanPhamBanChayTheoThangNam(Date ngayBatDau,Date ngayKetThuc);
 
+    // thống kê doanh thu theo năm
     @Query(value = "SELECT \n" +
             "\tYEAR(mo.pay_date) - 1 AS ResultString1,\n" +
             "\tCASE WHEN year(mo.pay_date) = year(mo.pay_date) - 1 THEN sum(mo.total_money) ELSE 0 END AS 'nam 2022',\n" +
@@ -78,13 +79,16 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "    group by mo.status and mo.type and od.quantity",nativeQuery = true)
     List<Object[]> thongKeDoanhThuTheoNam(Date ngayBatDau,Date ngayKetThuc, Integer typeBanHang);
 
+    // doanh thu và số lượng hàng hóa theo ngày
     @Query(value = "SELECT \n" +
-            "\t sum(mo.total_money) as tongTien\n" +
-            "\tfrom db_datn.my_order mo \n" +
-            "    where mo.pay_date between :ngayBatDau and :ngayKetThuc and mo.status = 8\n" +
-            "\t\tand mo.type = :typeBanHang",nativeQuery = true)
-    List<Object[]> doanhThuTheoNgay(Date ngayBatDau,Date ngayKetThuc, Integer typeBanHang);
+            "\t\tCASE WHEN date(mo.pay_date) = CURDATE() THEN sum(od.quantity * od.price) ELSE 0 END AS 'tongTien' ,\n" +
+            "\t\tCASE WHEN date(mo.pay_date) = CURDATE() THEN sum(od.quantity) ELSE 0 END AS 'SoLuong'\n" +
+            "\t\tfrom db_datn.my_order mo \n" +
+            "\t\tjoin order_detail od on mo.id = od.order_id\n" +
+            "        where date(mo.pay_date) = CURDATE() and mo.status = 8 and type = :typeBanHang",nativeQuery = true)
+    List<Object[]> doanhThuTheoNgay(Integer typeBanHang);
 
+    // doanh thu theo tháng, chọn năm hiện ra 12 tháng
     @Query(value = "select \n" +
             "                CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang1',\n" +
             "                CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang1',\n" +

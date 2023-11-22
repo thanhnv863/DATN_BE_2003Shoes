@@ -432,13 +432,14 @@ public class StatisticalServiceImpl implements IStatistical {
     }
 
     @Override
-    public ServiceResult<List<DoanhThuTheoNgay>> doanhThuTheoNgay(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang) {
-        List<Object[]> listDoanhThu = statisticalRepository.doanhThuTheoNgay(ngayBatDau, ngayKetThuc,typeBanHang);
+    public ServiceResult<List<DoanhThuTheoNgay>> doanhThuTheoNgay(Integer typeBanHang) {
+        List<Object[]> listDoanhThu = statisticalRepository.doanhThuTheoNgay(typeBanHang);
         List<DoanhThuTheoNgay> result = new ArrayList<>();
 
         for (Object[] record: listDoanhThu){
             DoanhThuTheoNgay doanhThuTheoNgay = new DoanhThuTheoNgay();
             doanhThuTheoNgay.setTongTien((BigDecimal) record[0]);
+            doanhThuTheoNgay.setSoLuongHangHoa((BigDecimal) record[1]);
 
             result.add(doanhThuTheoNgay);
         }

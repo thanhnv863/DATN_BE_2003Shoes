@@ -43,10 +43,8 @@ public class StatisticalController {
     }
 
     @GetMapping("/doanhthutheongay")
-    public ResponseEntity<?> doanhThuTheoNgay(@RequestParam("ngayBatDau") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayBatDau,
-                                              @RequestParam("ngayKetThuc") @DateTimeFormat(pattern = "yyyy-MM-dd") Date ngayKetThuc,
-                                              @RequestParam("typeBanHang") Integer typeBanHang){
-        return ResponseEntity.ok(iStatistical.doanhThuTheoNgay(ngayBatDau, ngayKetThuc, typeBanHang));
+    public ResponseEntity<?> doanhThuTheoNgay(@RequestParam("typeBanHang") Integer typeBanHang){
+        return ResponseEntity.ok(iStatistical.doanhThuTheoNgay(typeBanHang));
     }
 
     @GetMapping("/doanhthutheothang")
