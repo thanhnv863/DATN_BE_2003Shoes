@@ -81,11 +81,11 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
 
     // doanh thu và số lượng hàng hóa theo ngày
     @Query(value = "SELECT \n" +
-            "\t\tCASE WHEN date(mo.pay_date) = CURDATE() THEN sum(od.quantity * od.price) ELSE 0 END AS 'tongTien' ,\n" +
-            "\t\tCASE WHEN date(mo.pay_date) = CURDATE() THEN sum(od.quantity) ELSE 0 END AS 'SoLuong'\n" +
+            "\t\tCASE WHEN date(mo.pay_date) = '2023-11-17' THEN sum(od.quantity * od.price) ELSE 0 END AS 'tongTien' ,\n" +
+            "\t\tCASE WHEN date(mo.pay_date) = '2023-11-17' THEN sum(od.quantity) ELSE 0 END AS 'SoLuong'\n" +
             "\t\tfrom db_datn.my_order mo \n" +
             "\t\tjoin order_detail od on mo.id = od.order_id\n" +
-            "        where date(mo.pay_date) = CURDATE() and mo.status = 8 and type = :typeBanHang",nativeQuery = true)
+            "        where date(mo.pay_date) = '2023-11-17' and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
     List<Object[]> doanhThuTheoNgay(Integer typeBanHang);
 
     // doanh thu theo tháng, chọn năm hiện ra 12 tháng

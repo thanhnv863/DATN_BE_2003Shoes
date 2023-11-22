@@ -43,7 +43,7 @@ public class StatisticalController {
     }
 
     @GetMapping("/doanhthutheongay")
-    public ResponseEntity<?> doanhThuTheoNgay(@RequestParam("typeBanHang") Integer typeBanHang){
+    public ResponseEntity<?> doanhThuTheoNgay(@RequestParam(value = "typeBanHang",defaultValue = "") Integer typeBanHang){
         return ResponseEntity.ok(iStatistical.doanhThuTheoNgay(typeBanHang));
     }
 
