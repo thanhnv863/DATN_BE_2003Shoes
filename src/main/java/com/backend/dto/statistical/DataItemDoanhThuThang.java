@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class DataItemDoanhThuThang {
 
     private String time;
-    private BigDecimal value;
-    private BigDecimal count;
+    private BigDecimal tien;
+    private BigDecimal soLuong;
 
 }
