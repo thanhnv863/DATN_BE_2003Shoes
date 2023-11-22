@@ -14,4 +14,5 @@ import java.math.BigDecimal;
 public class DoanhThuTheoNgay {
 
     private BigDecimal tongTien;
+    private BigDecimal soLuongHangHoa;
 }
