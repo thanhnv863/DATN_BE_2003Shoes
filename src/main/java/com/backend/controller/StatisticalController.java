@@ -53,4 +53,9 @@ public class StatisticalController {
         return ResponseEntity.ok(iStatistical.doanhThuTheoThang(nam, typeBanHang));
     }
 
+    @GetMapping("/so-luong-hang-hoa-ban-theo-nam")
+    public ResponseEntity<?> soHangHoaTheoNam(@RequestParam("nam") Integer nam){
+        return ResponseEntity.ok(iStatistical.soHangHoaBanDuocTrongNam(nam));
+    }
+
 }

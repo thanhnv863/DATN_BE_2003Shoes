@@ -120,4 +120,23 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "                       where YEAR(mo.pay_date) = :nam and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
     List<Object[]> doanhThuTheoThang(Integer nam, Integer typeBanHang);
 
+    // số lượng sản phẩm bán được trong năm
+    @Query(value = "select \n" +
+            "                            CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang1',\n" +
+            "                           CASE WHEN month(mo.pay_date) = 2 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang2',          \n" +
+            "                           CASE WHEN month(mo.pay_date) = 3 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang3',\n" +
+            "                           CASE WHEN month(mo.pay_date) = 4 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang4',\n" +
+            "                            CASE WHEN month(mo.pay_date) = 5 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang5',\n" +
+            "                            CASE WHEN month(mo.pay_date) = 6 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang6',\n" +
+            "                            CASE WHEN month(mo.pay_date) = 7 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang7',\n" +
+            "                            CASE WHEN month(mo.pay_date) = 8 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang8',\n" +
+            "                            CASE WHEN month(mo.pay_date) = 9 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang9',\n" +
+            "                           CASE WHEN month(mo.pay_date) = 10 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang10',\n" +
+            "                            CASE WHEN month(mo.pay_date) = 11 THEN sum(od.quantity) ELSE 0 END AS 'soLuong11',\n" +
+            "                            CASE WHEN month(mo.pay_date) = 12 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang12'\n" +
+            "                         from my_order mo \n" +
+            "                         left join payment_method pm on mo.id = pm.order_id\n" +
+            "                        left join order_detail od on mo.id = od.order_id\n" +
+            "                                  where YEAR(mo.pay_date) = :nam and mo.status = 8 ",nativeQuery = true)
+    List<Object[]> soLuongSanPhamBanTheoNam(Integer nam);
 }

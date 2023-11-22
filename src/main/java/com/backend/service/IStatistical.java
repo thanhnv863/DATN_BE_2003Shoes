@@ -18,4 +18,5 @@ public interface IStatistical {
     ServiceResult<List<DataItemDoanhThu>> thongKeDoanhThu(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang);
     ServiceResult<List<DoanhThuTheoNgay>> doanhThuTheoNgay( Integer typeBanHang);
     ServiceResult<List<DataItemDoanhThuThang>> doanhThuTheoThang(Integer nam, Integer typeBanHang);
+    ServiceResult<List<DataItem>> soHangHoaBanDuocTrongNam(Integer nam);
 }
