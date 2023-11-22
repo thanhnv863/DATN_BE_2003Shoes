@@ -95,6 +95,7 @@ public class ColorServiceImpl implements IColorService {
                 ColorResponse.builder()
                         .id(color.getId())
                         .name(color.getName())
+                        .status(color.getStatus())
                         .build()).collect(Collectors.toList());
     }
 }
