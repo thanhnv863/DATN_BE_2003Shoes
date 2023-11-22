@@ -13,6 +13,6 @@ import java.util.List;
 public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long> {
 
     @Query(value = "SELECT s.* FROM order_history as s " +
-            " where s.order_id = :idOrder order by s.created_time desc", nativeQuery = true)
+            " where s.order_id = :idOrder order by s.created_time ", nativeQuery = true)
     List<OrderHistory> getListOrderHistoryByOrder(@Param("idOrder") Long idOrder);
 }
