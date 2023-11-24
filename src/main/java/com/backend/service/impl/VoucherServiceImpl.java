@@ -292,9 +292,17 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         if (optionalVoucherHoaDon.isPresent()) {
             VoucherOrder voucherHoaDon = optionalVoucherHoaDon.get();
             try {
-                voucherHoaDon.setUpdateAt(currentDateTime);
-                voucherHoaDon.setStatus(3);
-                voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
+                    if (voucherHoaDon.getStatus() == 0) {
+                        voucherHoaDon.setUpdateAt(currentDateTime);
+                        voucherHoaDon.setStatus(3);
+                        voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
+                    } else if (voucherHoaDon.getStatus() == 1) {
+                        throw new RuntimeException("Voucher đang kích hoạt và không thể chuyển sang huỷ kích hoạt");
+                    } else if (voucherHoaDon.getStatus() == 2) {
+                        throw new RuntimeException("Voucher đã hết hạn và không thể chuyển sang huỷ kích hoạt");
+                    } else {
+                        throw new RuntimeException("Trạng thái không hợp lệ");
+                    }
                 //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
                 return new ServiceResult<>(AppConstant.SUCCESS, "Delete thành công", voucherHoaDon);
             } catch (Exception e) {
