@@ -20,6 +20,8 @@ public interface IVoucherOrderService {
 
     ServiceResult<VoucherOrder> updateVoucher(VoucherOrderRequest voucherOrderRequest);
 
+    ServiceResult<VoucherOrder> updateStatusVoucherCancelFromWait(VoucherOrderRequest voucherOrderRequest);
+
     void updateVoucherStatus();
 
     VoucherOrderResponse convertPage(Object[] object);

@@ -54,6 +54,11 @@ public class VoucherOrderController {
         return ResponseEntity.ok(voucherOrderService.updateVoucher(voucherOrderRequest));
     }
 
+    @PostMapping("/updateStatusVoucherOrderCancelFromWait")
+    public ResponseEntity<?> updateStatusVoucherOrderCancelFromWait(@RequestBody VoucherOrderRequest voucherOrderRequest) {
+        return ResponseEntity.ok(voucherOrderService.updateStatusVoucherCancelFromWait(voucherOrderRequest));
+    }
+
     @PostMapping("/deleteVoucherOrder")
     public ResponseEntity<?> deleteVoucherOrder(@RequestBody VoucherOrderRequest voucherOrderRequest) {
         return ResponseEntity.ok(voucherOrderService.deleteVoucher(voucherOrderRequest));
