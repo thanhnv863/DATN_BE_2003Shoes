@@ -224,6 +224,46 @@ public class VoucherServiceImpl implements IVoucherOrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ServiceResult<VoucherOrder> updateStatusVoucherCancelFromWait(VoucherOrderRequest voucherOrderRequest) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        Optional<VoucherOrder> optionalVoucherHoaDon = voucherOrderRepository.findById(voucherOrderRequest.getId());
+        if (optionalVoucherHoaDon.isPresent()) {
+            VoucherOrder voucherHoaDon = optionalVoucherHoaDon.get();
+            try {
+                if (voucherHoaDon.getStatus() == 3) {
+                    // Kiểm tra xem ngày bắt đầu và ngày kết thúc có phù hợp không
+                    LocalDateTime startDate = voucherHoaDon.getStartDate();
+                    LocalDateTime endDate = voucherHoaDon.getEndDate();
+                    LocalDateTime currentDate = currentDateTime;
+
+                    if (startDate != null && endDate != null && currentDate.isAfter(startDate) && currentDate.isBefore(endDate)) {
+                        voucherHoaDon.setUpdateAt(currentDateTime);
+                        voucherHoaDon.setStatus(0);
+                        voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
+                        return new ServiceResult<>(AppConstant.SUCCESS, "Cập nhật trạng thái voucher thành công", voucherHoaDon);
+                    } else {
+                        // Ngày hiện tại không nằm trong khoảng thời gian phù hợp
+                        throw new RuntimeException("Ngày hiện tại không nằm trong khoảng thời gian phù hợp");
+                    }
+                } else {
+                    throw new RuntimeException("Trạng thái không hợp lệ");
+                }
+                //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
+                //return new ServiceResult<>(AppConstant.SUCCESS, "Cập nhật trạng thái voucher thành công", voucherHoaDon);
+            } catch (Exception e) {
+                // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
+                //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null); // hoặc xử lý lỗi một cách thích hợp dựa trên nhu cầu của bạn
+            }
+
+        } else {
+            return new ServiceResult<>(AppConstant.FAIL, "Id không tồn tại", null);
+        }
+    }
+
+    @Override
     @Scheduled(fixedRate = 1800000)
     public void updateVoucherStatus() {
         List<VoucherOrder> vouchers = voucherOrderRepository.findAll();
@@ -304,7 +344,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                         throw new RuntimeException("Trạng thái không hợp lệ");
                     }
                 //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
-                return new ServiceResult<>(AppConstant.SUCCESS, "Delete thành công", voucherHoaDon);
+                return new ServiceResult<>(AppConstant.SUCCESS, "Huỷ kích hoạt voucher thành công", voucherHoaDon);
             } catch (Exception e) {
                 // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
                 //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
