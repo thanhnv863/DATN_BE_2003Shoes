@@ -480,4 +480,15 @@ public class AccountServiceImpl implements IAccountService {
         }
         return new PageImpl<>(list, pageable, objects.getTotalElements());
     }
+
+    @Override
+    public ServiceResult<Account> getOneAccount(Long id) {
+        Optional<Account> optionalAccount = accountRepository.findById(id);
+        Account accountId = optionalAccount.get();
+        if (optionalAccount.isPresent()){
+            return new ServiceResult<>(AppConstant.SUCCESS,"Success",accountId);
+        }else{
+            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
+        }
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,5 +69,10 @@ public class AccountController {
         Page<AccountCustomResponse> page = iAccountService.searchAccount(searchAccountRequest);
         return ResponseEntity.ok().body(new ServiceResultReponse<>(AppConstant.SUCCESS, page.getTotalElements(), page.getContent(), "Lấy danh sách thành công "));
 //        return ResponseEntity.ok().body(page);
+    }
+
+    @GetMapping("/get-one-account/{id}")
+    public ResponseEntity<?> getOneAccount(@PathVariable("id") Long id){
+        return ResponseEntity.ok(iAccountService.getOneAccount(id));
     }
 }

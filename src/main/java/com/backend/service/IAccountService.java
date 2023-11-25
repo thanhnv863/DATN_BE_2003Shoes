@@ -38,4 +38,6 @@ public interface IAccountService {
     ServiceResult<String> changePassword(PasswordRequest passwordRequest);
 
     Page<AccountCustomResponse> searchAccount(SearchAccountRequest searchAccountRequest);
+
+    ServiceResult<Account> getOneAccount(Long id);
 }
