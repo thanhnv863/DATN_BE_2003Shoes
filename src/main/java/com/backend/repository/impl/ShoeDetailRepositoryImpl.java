@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Repository
 public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
-    @Autowired
+    @PersistenceContext
     EntityManager entityManager;
 
     @Override
@@ -280,6 +281,24 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
             query.setParameter("status",status);
         }
 
+        List<Object> results = query.getResultList();
+        return results;
+    }
+
+    @Override
+    public List<Object> getListSizeByShoeNameId(Integer id) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT MIN(size.name) AS size_name, MIN(sd.shoe_id) AS shoe_id, MIN(sd.code) AS code, MIN(sd.id) AS idSD");
+        sql.append("  FROM shoe_detail sd");
+        sql.append(" INNER JOIN size ON sd.size_id = size.id");
+        sql.append(" INNER JOIN shoe ON sd.shoe_id = shoe.id");
+        sql.append(" WHERE 1 = 1");
+        sql.append(" AND (:idShoe IS NULL OR shoe.id = :idShoe)");
+        sql.append(" GROUP BY size.name");
+        sql.append(" ORDER BY size_name ASC;");
+
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("idShoe", id);
         List<Object> results = query.getResultList();
         return results;
     }
