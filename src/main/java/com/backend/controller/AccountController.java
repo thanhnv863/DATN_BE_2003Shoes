@@ -75,4 +75,9 @@ public class AccountController {
     public ResponseEntity<?> getOneAccount(@PathVariable("id") Long id){
         return ResponseEntity.ok(iAccountService.getOneAccount(id));
     }
+
+    @PostMapping("/kich-hoat-account")
+    public ResponseEntity<?> kichHoatAccount(@RequestBody AccountRequest accountRequest){
+        return ResponseEntity.ok(iAccountService.kichHoatAccount(accountRequest));
+    }
 }

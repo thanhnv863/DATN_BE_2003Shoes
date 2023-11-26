@@ -37,4 +37,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query(value = "SELECT * FROM account \n" +
             "where account.role_id = ?1", nativeQuery = true)
     List<Account> getListByRole(Integer role);
+
+
 }

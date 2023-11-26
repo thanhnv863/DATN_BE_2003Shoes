@@ -3,6 +3,7 @@ package com.backend.service.impl;
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.AddressRequest;
+import com.backend.dto.request.account.AccountAddress;
 import com.backend.dto.response.AddressResponse;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
@@ -12,7 +13,11 @@ import com.backend.service.IAddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,24 +128,33 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
-    public ServiceResult<List<AddressResponse>> getAllAddressAndAccount(Long id) {
-        List<Address> addressList = addressRepository.findAddressesByAccount_Id(id);
-        List<AddressResponse> addressResponsesList = new ArrayList<>();
+    public ServiceResult<List<AccountAddress>> getAllAddressAndAccount(Long id) {
+        List<Object[]> addressList = addressRepository.getAllAccountAndAddress(id);
+        List<AccountAddress> addressResponsesList = new ArrayList<>();
 
-        for (Address address: addressList){
-            AddressResponse addressResponse = new AddressResponse();
 
-            addressResponse.setAccountId(address.getAccount().getId());
-            addressResponse.setName(address.getName());
-            addressResponse.setPhoneNumber(address.getPhoneNumber());
-            addressResponse.setSpecificAddress(address.getSpecificAddress());
-            addressResponse.setWard(address.getWard());
-            addressResponse.setDistrict(address.getDistrict());
-            addressResponse.setProvince(address.getProvince());
-            addressResponse.setNote(address.getNote());
-            addressResponse.setDefaultAddress(address.getDefaultAddress());
+        for (Object[] record: addressList){
+            AccountAddress accountAddress = new AccountAddress();
 
-            addressResponsesList.add(addressResponse);
+            accountAddress.setIdAccount( (BigInteger) record[0]);
+            accountAddress.setIdRole((BigInteger) record[1]);
+            accountAddress.setNameAccount((String) record[2]);
+            accountAddress.setCode((String) record[3]);
+            accountAddress.setPassword((String) record[4]);
+            accountAddress.setAvatar((String) record[5]);
+            accountAddress.setFormattedDatesCreateTime((Timestamp) record[6]);
+            accountAddress.setFormattedDatesUpdateTime((Timestamp) record[7]);
+            accountAddress.setStatus((Integer) record[8]);
+            accountAddress.setNameAddress((String) record[9]);
+            accountAddress.setPhoneNumber((String) record[10]);
+            accountAddress.setSpecificAddress((String) record[11]);
+            accountAddress.setWard((String) record[12]);
+            accountAddress.setDistrict((Integer) record[13]);
+            accountAddress.setProvince((Integer) record[14]);
+            accountAddress.setNote((String) record[15]);
+            accountAddress.setDefaultAddress((String) record[16]);
+
+            addressResponsesList.add(accountAddress);
         }
 
         return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
