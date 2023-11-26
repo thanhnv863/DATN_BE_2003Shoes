@@ -52,6 +52,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -1082,15 +1083,19 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             } else {
                 row.createCell(6).setCellValue("");
             }
-            Cell startDateCell = row.createCell(7);
-            startDateCell.setCellValue(voucherOrderResponse.getStartDate());
-//            startDateCell.setCellStyle(dateCellStyle);
-            startDateCell.setCellValue(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(voucherOrderResponse.getStartDate()));
+            LocalDateTime localDateTime = voucherOrderResponse.getStartDate(); // Lấy giá trị từ cơ sở dữ liệu
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
+            //startDate
+            Cell startDateCell = row.createCell(7);
+            String startDate = localDateTime.format(formatter);
+            startDateCell.setCellValue(startDate);
+
+            //end Date
             Cell endDateCell = row.createCell(8);
-            endDateCell.setCellValue(voucherOrderResponse.getEndDate());
-//            endDateCell.setCellStyle(dateCellStyle);
-            endDateCell.setCellValue(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(voucherOrderResponse.getEndDate()));
+            String endDate = localDateTime.format(formatter);
+            endDateCell.setCellValue(endDate);
+
 
             if (voucherOrderResponse.getStatus() == 0) {
                 status = "Chờ kích hoạt";
