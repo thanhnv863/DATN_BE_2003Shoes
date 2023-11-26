@@ -51,6 +51,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -232,10 +233,10 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             VoucherOrder voucherHoaDon = optionalVoucherHoaDon.get();
             try {
                 if (voucherHoaDon.getStatus() == 3) {
-                        voucherHoaDon.setUpdateAt(currentDateTime);
-                        voucherHoaDon.setStatus(0);
-                        voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
-                        return new ServiceResult<>(AppConstant.SUCCESS, "Cập nhật trạng thái voucher thành công, vui lòng sửa lại các thông tin nếu cần!", voucherHoaDon);
+                    voucherHoaDon.setUpdateAt(currentDateTime);
+                    voucherHoaDon.setStatus(0);
+                    voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
+                    return new ServiceResult<>(AppConstant.SUCCESS, "Cập nhật trạng thái voucher thành công, vui lòng sửa lại các thông tin nếu cần!", voucherHoaDon);
                 } else {
                     throw new RuntimeException("Trạng thái không hợp lệ");
                 }
@@ -322,17 +323,17 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         if (optionalVoucherHoaDon.isPresent()) {
             VoucherOrder voucherHoaDon = optionalVoucherHoaDon.get();
             try {
-                    if (voucherHoaDon.getStatus() == 0) {
-                        voucherHoaDon.setUpdateAt(currentDateTime);
-                        voucherHoaDon.setStatus(3);
-                        voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
-                    } else if (voucherHoaDon.getStatus() == 1) {
-                        throw new RuntimeException("Voucher đang kích hoạt và không thể chuyển sang huỷ kích hoạt");
-                    } else if (voucherHoaDon.getStatus() == 2) {
-                        throw new RuntimeException("Voucher đã hết hạn và không thể chuyển sang huỷ kích hoạt");
-                    } else {
-                        throw new RuntimeException("Trạng thái không hợp lệ");
-                    }
+                if (voucherHoaDon.getStatus() == 0) {
+                    voucherHoaDon.setUpdateAt(currentDateTime);
+                    voucherHoaDon.setStatus(3);
+                    voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
+                } else if (voucherHoaDon.getStatus() == 1) {
+                    throw new RuntimeException("Voucher đang kích hoạt và không thể chuyển sang huỷ kích hoạt");
+                } else if (voucherHoaDon.getStatus() == 2) {
+                    throw new RuntimeException("Voucher đã hết hạn và không thể chuyển sang huỷ kích hoạt");
+                } else {
+                    throw new RuntimeException("Trạng thái không hợp lệ");
+                }
                 //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
                 return new ServiceResult<>(AppConstant.SUCCESS, "Huỷ kích hoạt voucher thành công", voucherHoaDon);
             } catch (Exception e) {
@@ -683,7 +684,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         if (startDateCell == null || startDateCell.getCellType() == CellType.BLANK) {
             errorMessage += "Ngày bắt đầu không được để trống. " + "\n";
         }
-        if(startDateCell != null){
+        if (startDateCell != null) {
             if (startDate.isBefore(currentDateTime)) {
                 errorMessage += "Ngày bắt đầu phải lớn hơn ngày hiện tại. " + "\n";
             }
@@ -691,7 +692,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         if (endDateCell == null || endDateCell.getCellType() == CellType.BLANK) {
             errorMessage += "Ngày kết thúc không được để trống. " + "\n";
         }
-        if(startDate != null && endDate !=null){
+        if (startDate != null && endDate != null) {
             if (endDate.isBefore(startDate)) {
                 errorMessage += "Ngày kết thúc phải lớn hơn ngày bắt đầu. " + "\n";
             }
@@ -912,10 +913,10 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     } else if (voucherListError.get(i).getReduceForm() == 1 && maximumReductionValue.compareTo(BigDecimal.ZERO) == 0) {
                         cellMaximumReductionValueCell.setCellValue(0);
                         cellMaximumReductionValueCell.setCellStyle(cellSymble);
-                    } else if(voucherListError.get(i).getReduceForm() == 1){
+                    } else if (voucherListError.get(i).getReduceForm() == 1) {
                         cellMaximumReductionValueCell.setCellValue(maximumReductionValue.toString());
                         cellMaximumReductionValueCell.setCellStyle(cellSymble);
-                    }else{
+                    } else {
                         cellMaximumReductionValueCell.setCellValue((Date) null);
                         cellMaximumReductionValueCell.setCellStyle(cellSymble);
                     }
@@ -929,7 +930,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                         cellStartDate.setCellStyle(cellStyleDate);
                     } else {
                         cellStartDate.setCellValue(voucherListError.get(i).getStartDate());
-                        cellStartDate.setCellStyle(cellSymble);
+                        cellStartDate.setCellStyle(cellSymbleDate);
                     }
                     // endDate
                     Cell cellEndDate = errorRow.createCell(9);
@@ -939,7 +940,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     } else if (voucherListError.get(i).getEndDate().isBefore(voucherListError.get(i).getStartDate())) {
                         cellEndDate.setCellValue(voucherListError.get(i).getEndDate());
                         cellEndDate.setCellStyle(cellStyleDate);
-                    }else {
+                    } else {
                         cellEndDate.setCellValue(voucherListError.get(i).getEndDate());
                         cellEndDate.setCellStyle(cellSymbleDate);
                     }
@@ -1007,6 +1008,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         }
         return list;
     }
+
     @Override
     public byte[] exportExcelListVoucher(VoucherOrderRequest voucherOrderRequest) throws IOException {
         String excelResourcePath = "static/xuatExcel/danhSachVoucher.xlsx";
@@ -1067,34 +1069,36 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             row.createCell(2).setCellValue(voucherOrderResponse.getName());
             row.createCell(3).setCellValue(voucherOrderResponse.getQuantity());
             BigDecimal giaTriGiam = voucherOrderResponse.getDiscountAmount();
-            if(voucherOrderResponse.getReduceForm() == 0){
-                row.createCell(4).setCellValue(giaTriGiam.toString() + "VND");
-            }
-            else{
-                row.createCell(4).setCellValue(giaTriGiam.toString() + "%");
+            if (voucherOrderResponse.getReduceForm() == 0) {
+                row.createCell(4).setCellValue(giaTriGiam.toString() + " VND");
+            } else {
+                row.createCell(4).setCellValue(giaTriGiam.toString() + " %");
             }
             BigDecimal giaTriDonHangToiThieu = voucherOrderResponse.getMinBillValue();
-            row.createCell(5).setCellValue(giaTriDonHangToiThieu.toString());
-            if(voucherOrderResponse.getMaximumReductionValue()!= null){
+            row.createCell(5).setCellValue(giaTriDonHangToiThieu.toString() + " VND");
+            if (voucherOrderResponse.getMaximumReductionValue() != null) {
                 BigDecimal giaTriGiamToiDa = voucherOrderResponse.getMaximumReductionValue();
-                row.createCell(6).setCellValue(giaTriGiamToiDa.toString());
-            }else{
+                row.createCell(6).setCellValue(giaTriGiamToiDa.toString() + " VND");
+            } else {
                 row.createCell(6).setCellValue("");
             }
             Cell startDateCell = row.createCell(7);
             startDateCell.setCellValue(voucherOrderResponse.getStartDate());
-            startDateCell.setCellStyle(dateCellStyle);
+//            startDateCell.setCellStyle(dateCellStyle);
+            startDateCell.setCellValue(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(voucherOrderResponse.getStartDate()));
 
             Cell endDateCell = row.createCell(8);
             endDateCell.setCellValue(voucherOrderResponse.getEndDate());
-            endDateCell.setCellStyle(dateCellStyle);
-            if (voucherOrderResponse.getStatus()== 0) {
+//            endDateCell.setCellStyle(dateCellStyle);
+            endDateCell.setCellValue(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(voucherOrderResponse.getEndDate()));
+
+            if (voucherOrderResponse.getStatus() == 0) {
                 status = "Chờ kích hoạt";
-            } else if(voucherOrderResponse.getStatus() == 1) {
+            } else if (voucherOrderResponse.getStatus() == 1) {
                 status = "Đã kích hoạt";
-            }else if(voucherOrderResponse.getStatus() == 2) {
+            } else if (voucherOrderResponse.getStatus() == 2) {
                 status = "Hết hạn";
-            }else{
+            } else {
                 status = "";
             }
             row.createCell(9).setCellValue(status);
@@ -1126,6 +1130,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         workbook.close();
         return outputStream.toByteArray();
     }
+
     @Override
     public CellStyle createHeaderCellStyle(Workbook workbook) {
         CellStyle headerCellStyle = workbook.createCellStyle();

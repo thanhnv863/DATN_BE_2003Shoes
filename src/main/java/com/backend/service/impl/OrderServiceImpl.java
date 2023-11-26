@@ -9,6 +9,7 @@ import com.backend.dto.request.orderCustomer.SearchOrderCutomerRequest;
 import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.response.OrderReponse;
 import com.backend.entity.Account;
+import com.backend.entity.Address;
 import com.backend.entity.Cart;
 import com.backend.entity.CartDetail;
 import com.backend.entity.EmailTemplate;
@@ -19,6 +20,7 @@ import com.backend.entity.Role;
 import com.backend.entity.ShoeDetail;
 import com.backend.entity.VoucherOrder;
 import com.backend.repository.AccountRepository;
+import com.backend.repository.AddressRepository;
 import com.backend.repository.CartDetailRepository;
 import com.backend.repository.CartRepository;
 import com.backend.repository.EmailRepository;
@@ -33,6 +35,8 @@ import com.backend.service.IOrderService;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -58,6 +62,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -101,6 +106,9 @@ public class OrderServiceImpl implements IOrderService {
 
     @Autowired
     private EmailRepository emailRepository;
+
+    @Autowired
+    private AddressRepository addressRepository;
 
     public OrderReponse convertPage(Object[] object) {
         OrderReponse orderReponse = new OrderReponse();
@@ -237,7 +245,7 @@ public class OrderServiceImpl implements IOrderService {
             orderGet.setId(orderGet.getId());
             orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
             orderGet.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
-            orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
+//            orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
             orderGet.setAddress(orderRequetUpdate.getAddress());
             orderGet.setShipFee(orderRequetUpdate.getShipFee());
             orderGet.setMoneyReduce(orderRequetUpdate.getMoneyReduce());
@@ -260,7 +268,22 @@ public class OrderServiceImpl implements IOrderService {
             orderHistory.setNote(orderRequetUpdate.getNote());
             orderHistory.setType("Updated");
             orderHistoryRepository.save(orderHistory);
-            //
+            // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
+            if (orderUpdate.getAccount() != null) {
+                List<Address> listCheckAddress = addressRepository.findAddressesByAccount_Id(orderUpdate.getAccount().getId());
+                if (listCheckAddress.isEmpty()) {
+                    Address address = new Address();
+                    address.setAccount(orderUpdate.getAccount());
+                    address.setName(orderRequetUpdate.getCustomerName());
+                    address.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
+                    address.setSpecificAddress(orderRequetUpdate.getSpecificAddress());
+                    address.setWard(orderRequetUpdate.getWard());
+                    address.setDistrict(orderRequetUpdate.getDistrict());
+                    address.setProvince(orderRequetUpdate.getProvince());
+                    address.setDefaultAddress("1");
+                    addressRepository.save(address);
+                }
+            }
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
         } else {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã hóa đơn không tồn tại!");
@@ -408,6 +431,22 @@ public class OrderServiceImpl implements IOrderService {
                     String mailContent = "Cảm ơn bạn đã mua hàng. Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu!!!!!!!! ";
                     iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
                 }
+                // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
+                if (orderCutomerRequest.getIdAccount() != null) {
+                    List<Address> list = addressRepository.findAddressesByAccount_Id(orderCutomerRequest.getIdAccount());
+                    if (list.isEmpty()) {
+                        Address address = new Address();
+                        address.setAccount(order.getAccount());
+                        address.setName(orderCutomerRequest.getCustomerName());
+                        address.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
+                        address.setSpecificAddress(orderCutomerRequest.getSpecificAddress());
+                        address.setWard(orderCutomerRequest.getWard());
+                        address.setDistrict(orderCutomerRequest.getDistrict());
+                        address.setProvince(orderCutomerRequest.getProvince());
+                        address.setDefaultAddress("1");
+                        addressRepository.save(address);
+                    }
+                }
                 return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
             }
         } catch (Exception e) {
@@ -509,6 +548,20 @@ public class OrderServiceImpl implements IOrderService {
                     Order orderAccount = orderRepository.findById(order.getId()).get();
                     orderAccount.setAccount(account);
                     orderRepository.save(orderAccount);
+                    // check địa chỉ
+                    List<Address> list = addressRepository.findAddressesByAccount_Id(account.getId());
+                    if (list.isEmpty()) {
+                        Address address = new Address();
+                        address.setAccount(order.getAccount());
+                        address.setName(orderCutomerRequest.getCustomerName());
+                        address.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
+                        address.setSpecificAddress(orderCutomerRequest.getSpecificAddress());
+                        address.setWard(orderCutomerRequest.getWard());
+                        address.setDistrict(orderCutomerRequest.getDistrict());
+                        address.setProvince(orderCutomerRequest.getProvince());
+                        address.setDefaultAddress("1");
+                        addressRepository.save(address);
+                    }
                 } else {
                     // tạo tài khoản
                     Account account = new Account();
@@ -550,6 +603,20 @@ public class OrderServiceImpl implements IOrderService {
                     Order orderAccount = orderRepository.findById(order.getId()).get();
                     orderAccount.setAccount(account);
                     orderRepository.save(orderAccount);
+                    // lưu địa chỉ vào tài khoản vừa tạo
+                    List<Address> list = addressRepository.findAddressesByAccount_Id(account.getId());
+                    if (list.isEmpty()) {
+                        Address address = new Address();
+                        address.setAccount(order.getAccount());
+                        address.setName(orderCutomerRequest.getCustomerName());
+                        address.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
+                        address.setSpecificAddress(orderCutomerRequest.getSpecificAddress());
+                        address.setWard(orderCutomerRequest.getWard());
+                        address.setDistrict(orderCutomerRequest.getDistrict());
+                        address.setProvince(orderCutomerRequest.getProvince());
+                        address.setDefaultAddress("1");
+                        addressRepository.save(address);
+                    }
                 }
                 return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
             }
@@ -558,8 +625,9 @@ public class OrderServiceImpl implements IOrderService {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
         }
     }
+
     @Override
-    public ServiceResultReponse<Order> customerByNow(OrderCutomerRequest orderCutomerRequest){
+    public ServiceResultReponse<Order> customerByNow(OrderCutomerRequest orderCutomerRequest) {
         try {
             Date date = new Date();
             Order order = new Order();
@@ -637,12 +705,29 @@ public class OrderServiceImpl implements IOrderService {
                 String mailContent = "Cảm ơn bạn đã mua hàng. Nhớ đánh giá 5 sao cho store với nha!. Mãi yêuu!!!!!!!! ";
                 iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
             }
+            // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
+            if (orderCutomerRequest.getIdAccount() != null) {
+                List<Address> list = addressRepository.findAddressesByAccount_Id(orderCutomerRequest.getIdAccount());
+                if (list.isEmpty()) {
+                    Address address = new Address();
+                    address.setAccount(order.getAccount());
+                    address.setName(orderCutomerRequest.getCustomerName());
+                    address.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
+                    address.setSpecificAddress(orderCutomerRequest.getSpecificAddress());
+                    address.setWard(orderCutomerRequest.getWard());
+                    address.setDistrict(orderCutomerRequest.getDistrict());
+                    address.setProvince(orderCutomerRequest.getProvince());
+                    address.setDefaultAddress("1");
+                    addressRepository.save(address);
+                }
+            }
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderAddCustomer, "Tạo đơn hàng thành công");
         } catch (Exception e) {
             e.printStackTrace();
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại");
         }
     }
+
     @Override
     public List<OrderReponse> searchOrderExport(SearchOrderRequest searchOrderRequest) {
         if (searchOrderRequest.getCustomer() != null) {
@@ -719,9 +804,9 @@ public class OrderServiceImpl implements IOrderService {
         centerAlignmentStyle.setBorderTop(BorderStyle.THIN);
         centerAlignmentStyle.setTopBorderColor(IndexedColors.BLACK.getIndex());
         //
-        CellStyle dateCellStyle = workbook.createCellStyle();
-        DataFormat dateFormat = workbook.createDataFormat();
-        dateCellStyle.setDataFormat(dateFormat.getFormat("dd/MM/yyyy"));
+        CellStyle cellSymbleDate = workbook.createCellStyle();
+        CreationHelper createHelper = workbook.getCreationHelper();
+        cellSymbleDate.setDataFormat(createHelper.createDataFormat().getFormat("MM/dd/yyyy"));
 
         List<OrderReponse> orderReponsesList = this.searchOrderExport(searchOrderRequest);
         int rowNum = 3;
@@ -733,7 +818,7 @@ public class OrderServiceImpl implements IOrderService {
             row.createCell(3).setCellValue(orderReponse.getPhoneNumber());
             if (orderReponse.getTotalMoney() != null) {
                 BigDecimal totalMoney = orderReponse.getTotalMoney();
-                row.createCell(4).setCellValue(totalMoney.toString());
+                row.createCell(4).setCellValue(totalMoney.toString() + " VND");
             }
             if (orderReponse.getType() != null) {
                 if (orderReponse.getType().equals("1")) {
@@ -747,7 +832,8 @@ public class OrderServiceImpl implements IOrderService {
 
             Cell createDate = row.createCell(6);
             createDate.setCellValue(orderReponse.getCreatedDate());
-            createDate.setCellStyle(dateCellStyle);
+//            createDate.setCellStyle(cellSymbleDate);
+            createDate.setCellValue(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(orderReponse.getCreatedDate()));
 
             if (orderReponse.getStatus() == 0) {
                 status = "Hóa đơn chờ";
@@ -795,4 +881,6 @@ public class OrderServiceImpl implements IOrderService {
         workbook.close();
         return outputStream.toByteArray();
     }
+
+
 }
