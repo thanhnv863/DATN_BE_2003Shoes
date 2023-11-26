@@ -157,7 +157,13 @@ public class AddressServiceImpl implements IAddressService {
             addressResponsesList.add(accountAddress);
         }
 
-        return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
+        if (addressResponsesList.size()<0){
+            return new ServiceResult<>(AppConstant.SUCCESS,"fail",null);
+        }else{
+            return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
+        }
+
+
     }
 
     @Override
