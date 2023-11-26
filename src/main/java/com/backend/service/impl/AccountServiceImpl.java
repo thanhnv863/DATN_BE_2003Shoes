@@ -293,7 +293,6 @@ public class AccountServiceImpl implements IAccountService {
             accountId.setId(accountId.getId());
             accountId.setName(accountRequest.getName());
             accountId.setEmail(accountRequest.getEmail());
-            accountId.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
             accountId.setAvatar(imageUploadService.uploadImageByName(accountRequest.getAvatar()));
 
             Account account = accountRepository.save(accountId);
@@ -489,6 +488,19 @@ public class AccountServiceImpl implements IAccountService {
             return new ServiceResult<>(AppConstant.SUCCESS,"Success",accountId);
         }else{
             return new ServiceResult<>(AppConstant.FAIL,"fail",null);
+        }
+    }
+
+    @Override
+    public ServiceResult<Account> kichHoatAccount(AccountRequest accountRequest) {
+        Optional<Account> accountId = accountRepository.findById(accountRequest.getId());
+        if (accountId.isPresent()) {
+            Account account = accountId.get();
+            account.setStatus(1);
+            accountRepository.save(account);
+            return new ServiceResult<>(AppConstant.SUCCESS, "kich hoat account Success", null);
+        } else {
+            return new ServiceResult<>(AppConstant.FAIL, "kich hoat account fail", null);
         }
     }
 }

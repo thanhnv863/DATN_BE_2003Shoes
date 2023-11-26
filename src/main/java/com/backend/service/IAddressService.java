@@ -3,6 +3,7 @@ package com.backend.service;
 import com.backend.ServiceResult;
 import com.backend.ServiceResultReponse;
 import com.backend.dto.request.AddressRequest;
+import com.backend.dto.request.account.AccountAddress;
 import com.backend.dto.response.AddressResponse;
 import com.backend.entity.Address;
 
@@ -23,7 +24,7 @@ public interface IAddressService {
 
     ServiceResult<Address> deleteAddress(AddressRequest addressRequest);
 
-    ServiceResult<List<AddressResponse>> getAllAddressAndAccount(Long id);
+    ServiceResult<List<AccountAddress>> getAllAddressAndAccount(Long id);
 
 
 }
