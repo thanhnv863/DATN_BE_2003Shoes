@@ -16,7 +16,7 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
             "\tacc.avatar,acc.created_time,acc.updated_time,acc.status,\n" +
             "    ad.name nameAddress,ad.phone_number,ad.specific_address,ad.ward,\n" +
             "    ad.district,ad.province,ad.note,ad.default_address\n" +
-            " FROM account acc join address ad \n" +
+            " FROM account acc left join address ad \n" +
             "\ton acc.id = ad.account_id\n" +
             "    where acc.id = :id",nativeQuery = true)
     List<Object[]> getAllAccountAndAddress(Long id);
