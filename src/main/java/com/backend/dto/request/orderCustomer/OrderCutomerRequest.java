@@ -44,6 +44,14 @@ public class OrderCutomerRequest {
 
     private List<ShoeDetail> shoeDetailListRequets;
 
+    private String specificAddress;
+
+    private String ward;
+
+    private Integer district;
+
+    private Integer province;
+
     private String email;
     @JsonSerialize(using = DateTimeSerializer.class)
     private Date payDate;

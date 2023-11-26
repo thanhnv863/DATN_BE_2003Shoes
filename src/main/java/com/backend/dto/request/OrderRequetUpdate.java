@@ -56,4 +56,12 @@ public class OrderRequetUpdate {
     private String note;
 
     private Integer status;
+
+    private String specificAddress;
+
+    private String ward;
+
+    private Integer district;
+
+    private Integer province;
 }
