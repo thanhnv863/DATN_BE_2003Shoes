@@ -110,18 +110,18 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     // Kiểm tra xem maximumReductionValue đã được nhập hay chưa
                     BigDecimal maximumReductionValue = voucherOrderRequest.getMaximumReductionValue();
                     if (maximumReductionValue == null) {
-                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Vui lòng nhập giá trị phần trăm giảm tối đa", null);
+                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Vui lòng nhập giá trị giảm tối đa", null);
                     }
 
                     // Kiểm tra xem maximumReductionValue có hợp lệ không
-                    if (maximumReductionValue.compareTo(BigDecimal.ZERO) < 0 || maximumReductionValue.compareTo(new BigDecimal(100)) > 0) {
-                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá tối đa phải nằm trong khoảng từ 0 đến 100", null);
-                    }
+//                    if (maximumReductionValue.compareTo(BigDecimal.ZERO) < 0 || maximumReductionValue.compareTo(new BigDecimal(100)) > 0) {
+//                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá tối đa phải nằm trong khoảng từ 0 đến 100", null);
+//                    }
 
                     // Kiểm tra xem phần trăm giảm giá có lớn hơn phần trăm giảm giá tối đa không
-                    if (discountPercentage.compareTo(maximumReductionValue) > 0) {
-                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá không được vượt quá phần trăm giảm giá tối đa", null);
-                    }
+//                    if (discountPercentage.compareTo(maximumReductionValue) > 0) {
+//                        return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá không được vượt quá phần trăm giảm giá tối đa", null);
+//                    }
 
                     voucherHoaDon.setDiscountAmount(discountPercentage);
                     voucherHoaDon.setMaximumReductionValue(maximumReductionValue);
@@ -180,18 +180,18 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                         // Kiểm tra xem maximumReductionValue đã được nhập hay chưa
                         BigDecimal maximumReductionValue = voucherOrderRequest.getMaximumReductionValue();
                         if (maximumReductionValue == null) {
-                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Vui lòng nhập giá trị phần trăm giảm tối đa", null);
+                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Vui lòng nhập giá trị giảm tối đa", null);
                         }
 
                         // Kiểm tra xem maximumReductionValue có hợp lệ không
-                        if (maximumReductionValue.compareTo(BigDecimal.ZERO) < 0 || maximumReductionValue.compareTo(new BigDecimal(100)) > 0) {
-                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá tối đa phải nằm trong khoảng từ 0 đến 100", null);
-                        }
+//                        if (maximumReductionValue.compareTo(BigDecimal.ZERO) < 0 || maximumReductionValue.compareTo(new BigDecimal(100)) > 0) {
+//                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá tối đa phải nằm trong khoảng từ 0 đến 100", null);
+//                        }
 
                         // Kiểm tra xem phần trăm giảm giá có lớn hơn phần trăm giảm giá tối đa không
-                        if (discountPercentage.compareTo(maximumReductionValue) > 0) {
-                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá không được vượt quá phần trăm giảm giá tối đa", null);
-                        }
+//                        if (discountPercentage.compareTo(maximumReductionValue) > 0) {
+//                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá không được vượt quá phần trăm giảm giá tối đa", null);
+//                        }
 
                         voucherHoaDon.setDiscountAmount(discountPercentage);
                         voucherHoaDon.setMaximumReductionValue(maximumReductionValue);
