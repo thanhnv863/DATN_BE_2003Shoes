@@ -40,7 +40,7 @@ public interface IAccountService {
 
     Page<AccountCustomResponse> searchAccount(SearchAccountRequest searchAccountRequest);
 
-    ServiceResult<AccountWithAddress> getOneAccount(Long id);
+    ServiceResult<Account> getOneAccount(Long id);
 
     ServiceResult<Account> kichHoatAccount(AccountRequest accountRequest);
 }
