@@ -1112,12 +1112,12 @@ public class VoucherServiceImpl implements IVoucherOrderService {
 //            cell7.setCellValue(subjectDTO.getDescription());
 //            cell7.setCellStyle(centerAlignmentStyle); // Áp dụng căn giữa cho cell7
 
-            for (int i = 0; i <= 3; i++) {
+            for (int i = 0; i <= 9; i++) {
                 Cell cell = row.getCell(i);
                 if (cell == null) {
                     cell = row.createCell(i);
                 }
-                cell.setCellStyle(cellStyle);
+                cell.setCellStyle(centerAlignmentStyle);
             }
         }
         sheet.autoSizeColumn(0);
