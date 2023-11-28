@@ -10,6 +10,7 @@ import com.backend.dto.response.AccountPageResponse;
 import com.backend.dto.response.AccountResponse;
 import com.backend.dto.response.RegisterResponse;
 import com.backend.dto.response.account.AccountCustomResponse;
+import com.backend.dto.response.account.AccountWithAddress;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
 import com.backend.entity.Cart;
@@ -24,6 +25,7 @@ import com.backend.repository.RoleRepository;
 import com.backend.service.IAccountService;
 import com.backend.service.IEmailTemplateService;
 import com.backend.service.ImageUploadService;
+import org.apache.commons.math3.analysis.function.Add;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -267,6 +269,20 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
+    public ServiceResult<AccountWithAddress> getOneAccount(Long id) {
+        Optional<Account> optionalAccount = accountRepository.findById(id);
+        List<Address> listAddress = addressRepository.findAddressesByAccount_Id(id);
+        Account account = optionalAccount.get();
+        AccountWithAddress convertResponse = convertToResponseAddress(account,listAddress);
+        System.out.println(convertResponse);
+        if (optionalAccount.isPresent()){
+            return new ServiceResult<>(AppConstant.SUCCESS,"Success",convertResponse);
+        }else{
+            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
+        }
+    }
+
+    @Override
     public ServiceResult<AccountPageResponse> findAllAccount(int pageNo, int pageSize) {
         Pageable pageable1 = PageRequest.of(pageNo, pageSize);
         Page<Account> pageAccount = accountRepository.getAllAccount(pageable1);
@@ -297,10 +313,10 @@ public class AccountServiceImpl implements IAccountService {
 
             Account account = accountRepository.save(accountId);
 
-            return new ServiceResult<>(AppConstant.SUCCESS, "update success", account);
+            return new ServiceResult<>(AppConstant.SUCCESS, "Cập nhật thành công!", account);
 
         } else {
-            return new ServiceResult<>(AppConstant.FAIL, "update fail", null);
+            return new ServiceResult<>(AppConstant.FAIL, "Cập nhật thất bại!", null);
         }
     }
 
@@ -311,9 +327,9 @@ public class AccountServiceImpl implements IAccountService {
             Account account = accountId.get();
             account.setStatus(0);
             accountRepository.save(account);
-            return new ServiceResult<>(AppConstant.SUCCESS, "huy account Success", null);
+            return new ServiceResult<>(AppConstant.SUCCESS, "Hủy tài khoản thành công", null);
         } else {
-            return new ServiceResult<>(AppConstant.FAIL, "huy account fail", null);
+            return new ServiceResult<>(AppConstant.FAIL, "Hủy tài khoản thất bại", null);
         }
     }
 
@@ -322,7 +338,7 @@ public class AccountServiceImpl implements IAccountService {
         List<Account> staffName = accountRepository.searchNameStaff(name);
 
         if (staffName.isEmpty()) {
-            return new ServiceResult<>(AppConstant.FAIL, "khong co nhan vien nay", null);
+            return new ServiceResult<>(AppConstant.FAIL, "Không có nhân viên này", null);
         } else {
             return new ServiceResult<>(AppConstant.SUCCESS, "success", staffName);
         }
@@ -340,9 +356,9 @@ public class AccountServiceImpl implements IAccountService {
 
         accountRepository.save(accountEmail);
         String to = accountEmail.getEmail();
-        String subject = "Welcome to store bee shoe of group SD-66";
-        String mailType = "chao mung nhan vien ";
-        String mailContent = "mat khau acccount cua ban la :" + passNew;
+        String subject = "Chúc mừng đã trở thành nhân viên của store 2003SHOES";
+        String mailType = "";
+        String mailContent = "Mật khẩu của bạn là: " + passNew;
 
         iEmailTemplateService.sendEmail(to, subject, mailType, mailContent);
 
@@ -377,6 +393,12 @@ public class AccountServiceImpl implements IAccountService {
         }
     }
 
+    public AccountWithAddress convertToResponseAddress(Account account,List<Address>  address){
+        return AccountWithAddress.builder()
+                .account(account)
+                .address(address)
+                .build();
+    }
 
 
     public AccountResponse convertToResponse(Account account) {
@@ -394,19 +416,19 @@ public class AccountServiceImpl implements IAccountService {
         List<String> errorMessages = new ArrayList<>();
 
         if (accountRequest.getRoleId() == null) {
-            errorMessages.add("không được để trông role");
+            errorMessages.add("không được để trông vai trò");
         }
         if (accountRequest.getName() == null) {
-            errorMessages.add("Name not null");
+            errorMessages.add("Tên không được để trống");
         }
         if (accountRequest.getEmail() == null) {
-            errorMessages.add("email not null");
+            errorMessages.add("Email không được để trống");
         }
         if (accountRequest.getPassword() == null) {
-            errorMessages.add("password not null");
+            errorMessages.add("Mật khẩu không được để trống");
         }
         if (accountRequest.getStatus() == null) {
-            errorMessages.add("status not null");
+            errorMessages.add("Trạng thái không được để trống");
         }
 
 
@@ -480,16 +502,7 @@ public class AccountServiceImpl implements IAccountService {
         return new PageImpl<>(list, pageable, objects.getTotalElements());
     }
 
-    @Override
-    public ServiceResult<Account> getOneAccount(Long id) {
-        Optional<Account> optionalAccount = accountRepository.findById(id);
-        Account accountId = optionalAccount.get();
-        if (optionalAccount.isPresent()){
-            return new ServiceResult<>(AppConstant.SUCCESS,"Success",accountId);
-        }else{
-            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
-        }
-    }
+
 
     @Override
     public ServiceResult<Account> kichHoatAccount(AccountRequest accountRequest) {
@@ -498,9 +511,9 @@ public class AccountServiceImpl implements IAccountService {
             Account account = accountId.get();
             account.setStatus(1);
             accountRepository.save(account);
-            return new ServiceResult<>(AppConstant.SUCCESS, "kich hoat account Success", null);
+            return new ServiceResult<>(AppConstant.SUCCESS, "Kích hoạt tài khoản thành công", null);
         } else {
-            return new ServiceResult<>(AppConstant.FAIL, "kich hoat account fail", null);
+            return new ServiceResult<>(AppConstant.FAIL, "Kích hoạt tài khoản thất bại", null);
         }
     }
 }
