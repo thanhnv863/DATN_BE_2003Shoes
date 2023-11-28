@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address,Long> {
@@ -20,5 +21,6 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
             "\ton acc.id = ad.account_id\n" +
             "    where acc.id = :id",nativeQuery = true)
     List<Object[]> getAllAccountAndAddress(Long id);
+
 }
 
