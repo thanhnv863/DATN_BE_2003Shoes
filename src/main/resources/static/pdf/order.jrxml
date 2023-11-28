@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="order" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4ccbb7ad-4f6f-4b35-8f77-938f3032bc77">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="order" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20"
+              topMargin="20" bottomMargin="20" uuid="4ccbb7ad-4f6f-4b35-8f77-938f3032bc77">
     <style name="Detail" mode="Transparent" fontName="DejaVu Sans"/>
     <parameter name="orderReportData" class="com.backend.model.OrderReportData"/>
 
@@ -165,28 +169,32 @@
                 <textElement verticalAlignment="Middle">
                     <font fontName="DejaVu Sans"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$P{orderReportData}.getOrder().getUpdatedBy() != null ? $P{orderReportData}.getOrder().getUpdatedBy() : ""]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[$P{orderReportData}.getOrder().getUpdatedBy() != null ? $P{orderReportData}.getOrder().getUpdatedBy() : ""]]></textFieldExpression>
             </textField>
             <textField>
                 <reportElement x="390" y="140" width="100" height="30" uuid="efd3a18b-8dc3-4f66-9b62-a4e0ff614a8d"/>
                 <textElement verticalAlignment="Middle">
                     <font fontName="DejaVu Sans"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$P{orderReportData}.getOrder().getCustomerName() != null ? $P{orderReportData}.getOrder().getCustomerName(): ""]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[$P{orderReportData}.getOrder().getCustomerName() != null ? $P{orderReportData}.getOrder().getCustomerName(): ""]]></textFieldExpression>
             </textField>
             <textField>
                 <reportElement x="390" y="190" width="100" height="30" uuid="0d753642-3dd5-4e7b-9b2a-f22cc412b49e"/>
                 <textElement verticalAlignment="Middle">
                     <font fontName="DejaVu Sans"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$P{orderReportData}.getOrder().getPhoneNumber() != null ? $P{orderReportData}.getOrder().getPhoneNumber() : ""]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[$P{orderReportData}.getOrder().getPhoneNumber() != null ? $P{orderReportData}.getOrder().getPhoneNumber() : ""]]></textFieldExpression>
             </textField>
             <textField>
                 <reportElement x="390" y="250" width="100" height="79" uuid="de563a30-0e68-4c6b-a5a9-6a3135d0de9f"/>
                 <textElement verticalAlignment="Top">
                     <font fontName="DejaVu Sans"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$P{orderReportData}.getOrder().getAddress() != null ? $P{orderReportData}.getOrder().getAddress() : ""]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[$P{orderReportData}.getOrder().getAddress() != null ? $P{orderReportData}.getOrder().getAddress() : ""]]></textFieldExpression>
             </textField>
             <staticText>
                 <reportElement x="20" y="290" width="82" height="30" uuid="0595b6f8-727f-4943-9cbe-7151e913775b"/>
@@ -200,7 +208,8 @@
                 <textElement verticalAlignment="Middle">
                     <font fontName="DejaVu Sans"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$P{orderReportData}.getOrder().getType().equals("1") ? "Tại quầy" : "Online"]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[$P{orderReportData}.getOrder().getType().equals("1") ? "Tại quầy" : "Online"]]></textFieldExpression>
             </textField>
         </band>
     </title>
@@ -229,7 +238,8 @@
             <textField>
                 <reportElement x="480" y="0" width="76" height="30" uuid="a6886112-80de-4b5b-8398-1cbb138dc99c"/>
                 <textElement textAlignment="Right" verticalAlignment="Middle"/>
-                <textFieldExpression><![CDATA[new BigDecimal($F{quantity}).multiply($F{price}) + " vnd"]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[new BigDecimal($F{quantity}).multiply($F{price}) + " vnd"]]></textFieldExpression>
             </textField>
         </band>
     </detail>
@@ -286,7 +296,8 @@
                 <textElement textAlignment="Right" verticalAlignment="Middle">
                     <font fontName="DejaVu Sans"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$P{orderReportData}.getOrder().getShipFee() != null ? " + " + $P{orderReportData}.getOrder().getShipFee() + " vnd" : "0 vnd"]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[$P{orderReportData}.getOrder().getShipFee() != null ? " + " + $P{orderReportData}.getOrder().getShipFee() + " vnd" : "0 vnd"]]></textFieldExpression>
             </textField>
             <textField>
                 <reportElement x="421" y="70" width="136" height="20" uuid="2603ea00-a82a-4d27-8f97-036690100763"/>
@@ -294,7 +305,21 @@
                 <textElement textAlignment="Right" verticalAlignment="Middle">
                     <font fontName="DejaVu Sans"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$P{orderReportData}.getOrder().getVoucherOrder() != null ? " - " + $P{orderReportData}.getOrder().getVoucherOrder().getDiscountAmount() + " vnd" : "- 0 vnd"]]></textFieldExpression>
+                <textFieldExpression><![CDATA[
+    $P{orderReportData}.getOrder().getVoucherOrder() != null ?
+        ($P{orderReportData}.getOrder().getVoucherOrder().getReduceForm() == 1 ?
+            " - " +
+            (($V{totalAmount}.multiply($P{orderReportData}.getOrder().getVoucherOrder().getDiscountAmount().divide(new BigDecimal(100))))
+             .compareTo($P{orderReportData}.getOrder().getVoucherOrder().getMaximumReductionValue()) == 1 ?
+                $P{orderReportData}.getOrder().getVoucherOrder().getMaximumReductionValue() :
+                $V{totalAmount}.multiply($P{orderReportData}.getOrder().getVoucherOrder().getDiscountAmount().divide(new BigDecimal(100)))) + " vnd" :
+            $P{orderReportData}.getOrder().getVoucherOrder().getReduceForm() == 0 ?
+                " - " +
+                ($P{orderReportData}.getOrder().getVoucherOrder().getDiscountAmount()) + " vnd" :
+                "- 0 vnd") :
+        "- 0 vnd"
+]]></textFieldExpression>
+
             </textField>
             <textField>
                 <reportElement x="420" y="100" width="136" height="20" uuid="76d4b5a2-3907-4fd1-89e4-48c130d56779"/>
@@ -302,7 +327,8 @@
                 <textElement textAlignment="Right" verticalAlignment="Middle">
                     <font fontName="DejaVu Sans"/>
                 </textElement>
-                <textFieldExpression><![CDATA[$P{orderReportData}.getOrder().getTotalMoney() + " vnd"]]></textFieldExpression>
+                <textFieldExpression>
+                    <![CDATA[$P{orderReportData}.getOrder().getTotalMoney() + " vnd"]]></textFieldExpression>
             </textField>
             <line>
                 <reportElement x="1" y="95" width="555" height="1" uuid="ddc1b298-2da1-41e4-9839-1771b4a730c7"/>
