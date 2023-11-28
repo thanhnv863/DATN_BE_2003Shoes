@@ -269,14 +269,14 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
-    public ServiceResult<AccountWithAddress> getOneAccount(Long id) {
+    public ServiceResult<Account> getOneAccount(Long id) {
         Optional<Account> optionalAccount = accountRepository.findById(id);
-        List<Address> listAddress = addressRepository.findAddressesByAccount_Id(id);
+//        List<Address> listAddress = addressRepository.findAddressesByAccount_Id(id);
         Account account = optionalAccount.get();
-        AccountWithAddress convertResponse = convertToResponseAddress(account,listAddress);
-        System.out.println(convertResponse);
+//        AccountWithAddress convertResponse = convertToResponseAddress(account,listAddress);
+//        System.out.println(convertResponse);
         if (optionalAccount.isPresent()){
-            return new ServiceResult<>(AppConstant.SUCCESS,"Success",convertResponse);
+            return new ServiceResult<>(AppConstant.SUCCESS,"Success",account);
         }else{
             return new ServiceResult<>(AppConstant.FAIL,"fail",null);
         }
