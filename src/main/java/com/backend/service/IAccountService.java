@@ -9,6 +9,7 @@ import com.backend.dto.response.AccountPageResponse;
 import com.backend.dto.response.AccountResponse;
 import com.backend.dto.response.RegisterResponse;
 import com.backend.dto.response.account.AccountCustomResponse;
+import com.backend.dto.response.account.AccountWithAddress;
 import com.backend.entity.Account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +40,7 @@ public interface IAccountService {
 
     Page<AccountCustomResponse> searchAccount(SearchAccountRequest searchAccountRequest);
 
-    ServiceResult<Account> getOneAccount(Long id);
+    ServiceResult<AccountWithAddress> getOneAccount(Long id);
 
     ServiceResult<Account> kichHoatAccount(AccountRequest accountRequest);
 }

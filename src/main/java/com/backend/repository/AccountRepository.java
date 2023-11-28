@@ -38,5 +38,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             "where account.role_id = ?1", nativeQuery = true)
     List<Account> getListByRole(Integer role);
 
-
+    @Query(value = "SELECT * FROM account acc left join address ad \n" +
+            "\ton acc.id = ad.account_id\n" +
+            "    where acc.id = :id",nativeQuery = true)
+    Optional<Account> getAccountWithAddress(Long id);
 }

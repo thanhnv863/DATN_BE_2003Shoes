@@ -10,6 +10,7 @@ import com.backend.dto.response.AccountPageResponse;
 import com.backend.dto.response.AccountResponse;
 import com.backend.dto.response.RegisterResponse;
 import com.backend.dto.response.account.AccountCustomResponse;
+import com.backend.dto.response.account.AccountWithAddress;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
 import com.backend.entity.Cart;
@@ -24,6 +25,7 @@ import com.backend.repository.RoleRepository;
 import com.backend.service.IAccountService;
 import com.backend.service.IEmailTemplateService;
 import com.backend.service.ImageUploadService;
+import org.apache.commons.math3.analysis.function.Add;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -267,6 +269,20 @@ public class AccountServiceImpl implements IAccountService {
     }
 
     @Override
+    public ServiceResult<AccountWithAddress> getOneAccount(Long id) {
+        Optional<Account> optionalAccount = accountRepository.findById(id);
+        List<Address> listAddress = addressRepository.findAddressesByAccount_Id(id);
+        Account account = optionalAccount.get();
+        AccountWithAddress convertResponse = convertToResponseAddress(account,listAddress);
+        System.out.println(convertResponse);
+        if (optionalAccount.isPresent()){
+            return new ServiceResult<>(AppConstant.SUCCESS,"Success",convertResponse);
+        }else{
+            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
+        }
+    }
+
+    @Override
     public ServiceResult<AccountPageResponse> findAllAccount(int pageNo, int pageSize) {
         Pageable pageable1 = PageRequest.of(pageNo, pageSize);
         Page<Account> pageAccount = accountRepository.getAllAccount(pageable1);
@@ -377,6 +393,12 @@ public class AccountServiceImpl implements IAccountService {
         }
     }
 
+    public AccountWithAddress convertToResponseAddress(Account account,List<Address>  address){
+        return AccountWithAddress.builder()
+                .account(account)
+                .address(address)
+                .build();
+    }
 
 
     public AccountResponse convertToResponse(Account account) {
@@ -480,16 +502,7 @@ public class AccountServiceImpl implements IAccountService {
         return new PageImpl<>(list, pageable, objects.getTotalElements());
     }
 
-    @Override
-    public ServiceResult<Account> getOneAccount(Long id) {
-        Optional<Account> optionalAccount = accountRepository.findById(id);
-        Account accountId = optionalAccount.get();
-        if (optionalAccount.isPresent()){
-            return new ServiceResult<>(AppConstant.SUCCESS,"Success",accountId);
-        }else{
-            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
-        }
-    }
+
 
     @Override
     public ServiceResult<Account> kichHoatAccount(AccountRequest accountRequest) {
