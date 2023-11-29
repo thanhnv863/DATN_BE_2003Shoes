@@ -26,7 +26,7 @@
         <band height="360" splitType="Stretch">
             <image>
                 <reportElement x="-10" y="-10" width="100" height="79" uuid="fb302674-9995-44bd-ae5d-bbc9d75ee4e0"/>
-                <imageExpression><![CDATA["classpath:static/images/avatar/logo.jpg"]]></imageExpression>
+                <imageExpression><![CDATA["classpath:static/images/avatar/logo.png"]]></imageExpression>
             </image>
             <textField pattern="MMMMM dd, yyyy">
                 <reportElement x="460" y="14" width="100" height="30" uuid="18a20121-ca25-4dac-ad9a-7c55061d4a53"/>
