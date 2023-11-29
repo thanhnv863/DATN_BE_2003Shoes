@@ -26,5 +26,5 @@ public interface ShoeDetailCustomRepository {
                                  String sole, String color, BigDecimal minPrice,
                                  BigDecimal maxPrice, Integer status);
 
-    List<Object> getListSizeByShoeNameId(Integer id);
+    List<Object[]> getListSizeByShoeNameId(Long id);
 }

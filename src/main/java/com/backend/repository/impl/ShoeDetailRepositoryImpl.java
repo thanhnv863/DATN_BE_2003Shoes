@@ -286,7 +286,7 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
     }
 
     @Override
-    public List<Object> getListSizeByShoeNameId(Integer id) {
+    public List<Object[]> getListSizeByShoeNameId(Long id) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT MIN(size.name) AS size_name, MIN(sd.shoe_id) AS shoe_id, MIN(sd.code) AS code, MIN(sd.id) AS idSD");
         sql.append("  FROM shoe_detail sd");
@@ -299,7 +299,7 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
 
         Query query = entityManager.createNativeQuery(sql.toString());
         query.setParameter("idShoe", id);
-        List<Object> results = query.getResultList();
+        List<Object[]> results = query.getResultList();
         return results;
     }
 }

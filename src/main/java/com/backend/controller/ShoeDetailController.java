@@ -81,6 +81,11 @@ public class ShoeDetailController {
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",response));
     }
 
+    @GetMapping("/getListSizeOfShoeById/{id}")
+    public ResponseEntity<?> getListSizeOfShoeById(@PathVariable(name = "id")Long id){
+        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",iShoeDetailService.getListSizeOfShoe(id)));
+    }
+
     @PostMapping("/getAllCustom")
     public ResponseEntity<?> getAllCustom(@RequestBody SearchShoeDetailRequest searchShoeDetailRequest) {
         List<ResultItem> list = iShoeDetailService.getShoeDetailsCustom(searchShoeDetailRequest);

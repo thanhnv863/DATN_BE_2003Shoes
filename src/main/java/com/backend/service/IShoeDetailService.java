@@ -6,6 +6,7 @@ import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.ResponseImport;
 import com.backend.dto.response.ShoeAndShoeDetailResponse;
+import com.backend.dto.response.shoedetail.ListSizeOfShoe;
 import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.entity.Shoe;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -26,6 +27,8 @@ public interface IShoeDetailService {
     ServiceResult<Shoe> resultValidate(String mess);
 
     Object searchById(BigInteger id);
+
+    List<ListSizeOfShoe> getListSizeOfShoe(Long id);
 
     List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest);
 

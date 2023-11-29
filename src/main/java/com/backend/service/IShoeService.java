@@ -9,6 +9,7 @@ import com.backend.dto.response.shoedetail.DataPaginate;
 import com.backend.entity.Color;
 import com.backend.entity.Shoe;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public interface IShoeService {
@@ -22,4 +23,6 @@ public interface IShoeService {
     ServiceResult<List<ShoeResponse>> getAllShoeName();
 
     ServiceResult<ShoeResponse> addNewShoeName(ShoeRequest shoeRequest);
+
+    ServiceResult<Shoe> getShoeByName(String name);
 }
