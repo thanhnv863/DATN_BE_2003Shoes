@@ -10,6 +10,7 @@ import com.backend.dto.statistical.DoanhThuTheoThang;
 import com.backend.dto.statistical.HoaDonHuy;
 import com.backend.dto.statistical.SoHangHoaBanDuocTrongNam;
 import com.backend.dto.statistical.SoHangHoaTrongThang;
+import com.backend.dto.statistical.SoHoaDon;
 import com.backend.dto.statistical.ThongKeDoanhThu;
 import com.backend.dto.statistical.Top5SanPhamBanChayTrongThangVaNam;
 import com.backend.repository.StatisticalRepository;
@@ -453,6 +454,50 @@ public class StatisticalServiceImpl implements IStatistical {
         }
     }
 
+    @Override
+    public ServiceResult<List<SoHoaDon>> soHoaDonBanTrongNgay(Integer typeBanHang) {
+        List<Object[]> listHoaDon = statisticalRepository.soHoaDonTrongNgay(typeBanHang);
+        List<SoHoaDon> result = new ArrayList<>();
+
+        for (Object[] record: listHoaDon){
+            SoHoaDon soHoaDon = new SoHoaDon();
+            soHoaDon.setTongTien((BigDecimal) record[0]);
+            soHoaDon.setSoHoaDon((BigInteger) record[1]);
+
+            result.add(soHoaDon);
+        }
+        return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
+    }
+
+    @Override
+    public ServiceResult<List<SoHoaDon>> soHoaDonBanTrongThang(Integer typeBanHang) {
+        List<Object[]> listHoaDon = statisticalRepository.soHoaDonTheoThang(typeBanHang);
+        List<SoHoaDon> result = new ArrayList<>();
+        for (Object[] record: listHoaDon){
+            SoHoaDon soHoaDon = new SoHoaDon();
+            soHoaDon.setTongTien((BigDecimal) record[0]);
+            soHoaDon.setSoHoaDon((BigInteger) record[1]);
+
+            result.add(soHoaDon);
+        }
+
+        return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
+    }
+
+    @Override
+    public ServiceResult<List<SoHoaDon>> soHoaDonBanTrongNam(Integer typeBanHang) {
+        List<Object[]> listHoaDon = statisticalRepository.soHoaDonTheoNam(typeBanHang);
+        List<SoHoaDon> result = new ArrayList<>();
+        for (Object[] record: listHoaDon){
+            SoHoaDon soHoaDon = new SoHoaDon();
+            soHoaDon.setTongTien((BigDecimal) record[0]);
+            soHoaDon.setSoHoaDon((BigInteger) record[1]);
+
+            result.add(soHoaDon);
+        }
+
+        return new ServiceResult<>(AppConstant.SUCCESS,"get success",result);
+    }
 
 
     @Override
@@ -572,6 +617,8 @@ public class StatisticalServiceImpl implements IStatistical {
         }
         return new ServiceResult<>(AppConstant.SUCCESS,"success",dataItems);
     }
+
+
 
 
 }

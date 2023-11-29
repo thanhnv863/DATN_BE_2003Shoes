@@ -19,7 +19,7 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
             "    ad.district,ad.province,ad.note,ad.default_address\n" +
             " FROM account acc left join address ad \n" +
             "\ton acc.id = ad.account_id\n" +
-            "    where acc.id = :id",nativeQuery = true)
+            "    where acc.id = :id and ad.default_address = 0",nativeQuery = true)
     List<Object[]> getAllAccountAndAddress(Long id);
 
 }
