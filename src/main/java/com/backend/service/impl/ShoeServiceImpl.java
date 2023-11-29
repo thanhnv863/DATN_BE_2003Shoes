@@ -29,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -238,6 +239,17 @@ public class ShoeServiceImpl implements IShoeService {
             shoe.setCreatedAt(date);
             shoe.setUpdatedAt(date);
             return new ServiceResult(AppConstant.SUCCESS, "Success", shoeRepository.save(shoe));
+        }
+
+    }
+
+    @Override
+    public ServiceResult<Shoe> getShoeByName(String name) {
+        Optional shoe = shoeRepository.findByNameShoe(name);
+        if (shoe.isPresent()) {
+            return new ServiceResult(AppConstant.SUCCESS, "get data successfully!", shoe);
+        }else {
+            return new ServiceResult(AppConstant.NOT_FOUND, "Name of shoe not found", null);
         }
 
     }

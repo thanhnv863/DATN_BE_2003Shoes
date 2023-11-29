@@ -3,10 +3,12 @@ package com.backend.service.impl;
 import com.backend.ServiceResult;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.ShoeDetailRequestUpdate;
+import com.backend.dto.request.shoedetail.ListSizeOfShoeReq;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.ResponseImport;
 import com.backend.dto.response.ShoeAndShoeDetailResponse;
+import com.backend.dto.response.shoedetail.ListSizeOfShoe;
 import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.entity.Brand;
 import com.backend.entity.Category;
@@ -129,6 +131,20 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         Object[] resultArray = (Object[]) result;
         ResultItem resultItem = convertToPage(resultArray);
         return resultItem;
+    }
+
+    @Override
+    public List<ListSizeOfShoe> getListSizeOfShoe(ListSizeOfShoeReq listSizeOfShoeReq) {
+        List<Object[]> list =
+                shoeDetailCustomRepository.getListSizeByShoeNameId(listSizeOfShoeReq.getIdShoe(), listSizeOfShoeReq.getIdColor());
+        List<ListSizeOfShoe> listSizeOfShoe = list.stream().map(row -> {
+            Float nameOfSize = (Float) row[0];
+            BigInteger shoeId = (BigInteger) row[1];
+            String code = (String) row[2];
+            BigInteger shoeDetailId = (BigInteger) row[3];
+            return new ListSizeOfShoe(nameOfSize, shoeId, code, shoeDetailId);
+        }).collect(Collectors.toList());
+        return listSizeOfShoe;
     }
 
     @Override
