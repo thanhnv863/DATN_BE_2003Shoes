@@ -89,6 +89,16 @@ public class ColorServiceImpl implements IColorService {
         }
     }
 
+    @Override
+    public ServiceResult<Color> getColorByName(String name) {
+        Optional color = colorRepository.findByNameColor(name);
+        if (color.isPresent()) {
+            return new ServiceResult(AppConstant.SUCCESS, "get data successfully!", color);
+        }else {
+            return new ServiceResult(AppConstant.NOT_FOUND, "Name of color not found", color);
+        }
+    }
+
 
     private List<ColorResponse> convertToRes(List<Color> colorList) {
         return colorList.stream().map(color ->

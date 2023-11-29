@@ -5,6 +5,7 @@ import com.backend.ServiceResultReponse;
 import com.backend.config.AppConstant;
 import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.request.ShoeDetailRequestUpdate;
+import com.backend.dto.request.shoedetail.ListSizeOfShoeReq;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.OrderReponse;
@@ -81,9 +82,9 @@ public class ShoeDetailController {
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",response));
     }
 
-    @GetMapping("/getListSizeOfShoeById/{id}")
-    public ResponseEntity<?> getListSizeOfShoeById(@PathVariable(name = "id")Long id){
-        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",iShoeDetailService.getListSizeOfShoe(id)));
+    @PostMapping("/getListSizeOfShoeById")
+    public ResponseEntity<?> getListSizeOfShoeById(@RequestBody ListSizeOfShoeReq listSizeOfShoeReq){
+        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",iShoeDetailService.getListSizeOfShoe(listSizeOfShoeReq)));
     }
 
     @PostMapping("/getAllCustom")

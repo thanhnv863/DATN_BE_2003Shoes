@@ -2,6 +2,7 @@ package com.backend.service;
 
 import com.backend.ServiceResult;
 import com.backend.dto.request.ShoeDetailRequestUpdate;
+import com.backend.dto.request.shoedetail.ListSizeOfShoeReq;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.ResponseImport;
@@ -28,7 +29,7 @@ public interface IShoeDetailService {
 
     Object searchById(BigInteger id);
 
-    List<ListSizeOfShoe> getListSizeOfShoe(Long id);
+    List<ListSizeOfShoe> getListSizeOfShoe(ListSizeOfShoeReq listSizeOfShoeReq);
 
     List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest);
 

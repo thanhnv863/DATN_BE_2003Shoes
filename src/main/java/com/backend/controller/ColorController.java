@@ -8,6 +8,7 @@ import com.backend.service.IColorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,5 +39,10 @@ public class ColorController {
     @PostMapping("/deleteColor")
     public ResponseEntity<?> deleteColor(@RequestBody ColorRequestUpdate colorRequestUpdate){
         return ResponseEntity.ok(iColorService.deleteColor(colorRequestUpdate));
+    }
+
+    @GetMapping("/getColorByName/{name}")
+    public ResponseEntity<?> getColorByName(@PathVariable String name){
+        return ResponseEntity.ok(iColorService.getColorByName(name));
     }
 }
