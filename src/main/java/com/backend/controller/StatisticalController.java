@@ -58,4 +58,18 @@ public class StatisticalController {
         return ResponseEntity.ok(iStatistical.soHangHoaBanDuocTrongNam(nam));
     }
 
+    @GetMapping("/so-luong-hoa-don-theo-ngay")
+    public ResponseEntity<?> soLuongHangHoaTrongNgay(@RequestParam(value = "typeBanHang",defaultValue = "") Integer typeBanHang){
+        return ResponseEntity.ok(iStatistical.soHoaDonBanTrongNgay(typeBanHang));
+    }
+
+    @GetMapping("/so-luong-hoa-don-theo-thang")
+    public ResponseEntity<?> soLuongHangHoaTrongThang(@RequestParam(value = "typeBanHang",defaultValue = "") Integer typeBanHang){
+        return ResponseEntity.ok(iStatistical.soHoaDonBanTrongThang(typeBanHang));
+    }
+
+    @GetMapping("/so-luong-hoa-don-theo-nam")
+    public ResponseEntity<?> soLuongHangHoaTrongNam(@RequestParam(value = "typeBanHang",defaultValue = "") Integer typeBanHang){
+        return ResponseEntity.ok(iStatistical.soHoaDonBanTrongNam(typeBanHang));
+    }
 }
