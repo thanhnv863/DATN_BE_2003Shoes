@@ -6,6 +6,7 @@ import com.backend.dto.statistical.DataItemDoanhThu;
 import com.backend.dto.statistical.DataItemDoanhThuThang;
 import com.backend.dto.statistical.DoanhThuTheoNgay;
 import com.backend.dto.statistical.DoanhThuTheoThang;
+import com.backend.dto.statistical.SoHoaDon;
 import com.backend.dto.statistical.Top5SanPhamBanChayTrongThangVaNam;
 
 import java.util.Date;
@@ -19,4 +20,7 @@ public interface IStatistical {
     ServiceResult<List<DoanhThuTheoNgay>> doanhThuTheoNgay( Integer typeBanHang);
     ServiceResult<List<DataItemDoanhThuThang>> doanhThuTheoThang(Integer nam, Integer typeBanHang);
     ServiceResult<List<DataItem>> soHangHoaBanDuocTrongNam(Integer nam);
+    ServiceResult<List<SoHoaDon>> soHoaDonBanTrongNgay(Integer typeBanHang);
+    ServiceResult<List<SoHoaDon>> soHoaDonBanTrongThang(Integer typeBanHang);
+    ServiceResult<List<SoHoaDon>> soHoaDonBanTrongNam(Integer typeBanHang);
 }

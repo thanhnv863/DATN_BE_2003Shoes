@@ -88,6 +88,28 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "        where date(mo.pay_date) = CURDATE() and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
     List<Object[]> doanhThuTheoNgay(Integer typeBanHang);
 
+    // doanh thu và số lượng Hóa đơn theo ngày
+    @Query(value = "select  CASE WHEN date(mo.pay_date) = CURDATE() THEN sum(mo.total_money) ELSE 0 END AS 'tongTien' ,\n" +
+            "            CASE WHEN date(mo.pay_date) = CURDATE() THEN count(mo.status) ELSE 0 END AS 'SoLuongHoaDon'\n" +
+            "            from db_datn.my_order mo\n" +
+            "            where date(mo.pay_date) = CURDATE() and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
+    List<Object[]> soHoaDonTrongNgay(Integer typeBanHang);
+
+    // doanh thu và số lượng Hóa đơn theo tháng
+    @Query(value = "select  CASE WHEN month(mo.pay_date) = MONTH(CURDATE()) THEN sum(mo.total_money) ELSE 0 END AS 'tongTien' ,\n" +
+            "            CASE WHEN month(mo.pay_date) = MONTH(CURDATE()) THEN count(mo.status) ELSE 0 END AS 'SoLuongHoaDon'\n" +
+            "            from db_datn.my_order mo\n" +
+            "            where month(mo.pay_date) = MONTH(CURDATE()) and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
+    List<Object[]> soHoaDonTheoThang(Integer typeBanHang);
+
+    @Query(value = "select  CASE WHEN year(mo.pay_date) = year(CURDATE()) THEN sum(mo.total_money) ELSE 0 END AS 'tongTien' ,\n" +
+            "                        CASE WHEN year(mo.pay_date) = year(CURDATE()) THEN count(mo.status) ELSE 0 END AS 'SoLuongHoaDon'\n" +
+            "                        from db_datn.my_order mo\n" +
+            "                        where year(mo.pay_date) = year(CURDATE()) and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
+    List<Object[]> soHoaDonTheoNam(Integer typeBanHang);
+
+    // doanh thu và số lượng Hóa đơn theo năm
+
     // doanh thu theo tháng, chọn năm hiện ra 12 tháng
     @Query(value = "select \n" +
             "                CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang1',\n" +
