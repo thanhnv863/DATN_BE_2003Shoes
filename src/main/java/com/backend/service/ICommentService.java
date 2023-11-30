@@ -8,10 +8,14 @@ import com.backend.dto.response.CommentResponse;
 import com.backend.entity.Comment;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface ICommentService {
     Page<CommentResponse> searchComment(SearchCommentRequest commentRequest);
 
     ServiceResultReponse<?> add(CommentRequest commentRequest);
 
     ServiceResultReponse<?> checkCommentIsPresent(CommentRequest commentRequest);
+
+    List<CommentResponse> top3();
 }

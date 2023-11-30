@@ -10,6 +10,7 @@ import com.backend.service.ICommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +37,10 @@ public class CommentController {
     @PostMapping("/get-one")
     public ResponseEntity<?> getOneComment(@RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok().body(iCommentService.checkCommentIsPresent(commentRequest));
+    }
+
+    @GetMapping("/top-3")
+    public ResponseEntity<?> top3(){
+        return ResponseEntity.ok().body(iCommentService.top3());
     }
 }
