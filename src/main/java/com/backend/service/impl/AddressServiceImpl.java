@@ -10,6 +10,8 @@ import com.backend.entity.Address;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.AddressRepository;
 import com.backend.service.IAddressService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -127,44 +129,7 @@ public class AddressServiceImpl implements IAddressService {
                     addressResponses);
     }
 
-    @Override
-    public ServiceResult<List<AccountAddress>> getAllAddressAndAccount(Long id) {
-        List<Object[]> addressList = addressRepository.getAllAccountAndAddress(id);
-        List<AccountAddress> addressResponsesList = new ArrayList<>();
 
-
-        for (Object[] record: addressList){
-            AccountAddress accountAddress = new AccountAddress();
-
-            accountAddress.setIdAccount( (BigInteger) record[0]);
-            accountAddress.setIdRole((BigInteger) record[1]);
-            accountAddress.setNameAccount((String) record[2]);
-            accountAddress.setCode((String) record[3]);
-            accountAddress.setPassword((String) record[4]);
-            accountAddress.setAvatar((String) record[5]);
-            accountAddress.setFormattedDatesCreateTime((Timestamp) record[6]);
-            accountAddress.setFormattedDatesUpdateTime((Timestamp) record[7]);
-            accountAddress.setStatus((Integer) record[8]);
-            accountAddress.setNameAddress((String) record[9]);
-            accountAddress.setPhoneNumber((String) record[10]);
-            accountAddress.setSpecificAddress((String) record[11]);
-            accountAddress.setWard((String) record[12]);
-            accountAddress.setDistrict((Integer) record[13]);
-            accountAddress.setProvince((Integer) record[14]);
-            accountAddress.setNote((String) record[15]);
-            accountAddress.setDefaultAddress((String) record[16]);
-
-            addressResponsesList.add(accountAddress);
-        }
-
-        if (addressResponsesList.size()<0){
-            return new ServiceResult<>(AppConstant.SUCCESS,"fail",null);
-        }else{
-            return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
-        }
-
-
-    }
 
     @Override
     public ServiceResult<Address> deleteAddress(AddressRequest addressRequest) {
@@ -177,8 +142,6 @@ public class AddressServiceImpl implements IAddressService {
             return new ServiceResult<>(AppConstant.FAIL,"Id not exist",null);
         }
     }
-
-
 
     @Override
     public String validateAddress(AddressRequest addressRequest) {
@@ -225,6 +188,7 @@ public class AddressServiceImpl implements IAddressService {
             return null;
         }
     }
+
 
     @Override
     public AddressResponse convertToResponse(Address address) {

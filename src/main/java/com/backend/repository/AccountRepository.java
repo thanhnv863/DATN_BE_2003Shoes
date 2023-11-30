@@ -38,5 +38,12 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
             "where account.role_id = ?1", nativeQuery = true)
     List<Account> getListByRole(Integer role);
 
-
+    @Query(value = "SELECT acc.id,acc.role_id,acc.name as nameAccount,acc.code,acc.password,\n" +
+            "\tacc.avatar,acc.created_time,acc.updated_time,acc.status,\n" +
+            "    ad.name nameAddress,ad.phone_number,ad.specific_address,ad.ward,\n" +
+            "    ad.district,ad.province,ad.note,ad.default_address\n" +
+            " FROM account acc left join address ad \n" +
+            "\ton acc.id = ad.account_id\n" +
+            "    where acc.id = :id and ad.default_address = 0",nativeQuery = true)
+    List<Object[]> getAllAccountAndAddress(Long id);
 }

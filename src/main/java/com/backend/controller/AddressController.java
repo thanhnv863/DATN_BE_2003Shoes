@@ -43,9 +43,4 @@ public class AddressController {
         return ResponseEntity.ok(iAddressService.deleteAddress(addressRequest));
     }
 
-    @GetMapping("/addressbyaccountid/{id}")
-    public ResponseEntity<?> addressByAccountId(@PathVariable("id") Long id){
-        return ResponseEntity.ok(iAddressService.getAllAddressAndAccount(id));
-    }
-
 }

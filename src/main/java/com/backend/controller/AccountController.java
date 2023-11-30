@@ -80,4 +80,9 @@ public class AccountController {
     public ResponseEntity<?> kichHoatAccount(@RequestBody AccountRequest accountRequest){
         return ResponseEntity.ok(iAccountService.kichHoatAccount(accountRequest));
     }
+
+    @GetMapping("/addressbyaccountid/{id}")
+    public ResponseEntity<?> addressByAccountId(@PathVariable("id") Long id){
+        return ResponseEntity.ok(iAccountService.getAllAddressAndAccount(id));
+    }
 }
