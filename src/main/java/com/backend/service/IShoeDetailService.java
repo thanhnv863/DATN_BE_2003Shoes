@@ -33,6 +33,10 @@ public interface IShoeDetailService {
 
     List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest);
 
+    List<ResultItem> getTop4BestSale();
+
+    List<ResultItem> getTop4News();
+
     ServiceResult<Shoe> updateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequestUpdate);
 
     ServiceResult<String> updateQtyShoeDetail(List<ShoeDetailRequestUpdate> shoeDetailRequestUpdateList);

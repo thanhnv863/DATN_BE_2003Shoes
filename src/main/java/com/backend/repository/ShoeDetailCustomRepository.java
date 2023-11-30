@@ -27,4 +27,8 @@ public interface ShoeDetailCustomRepository {
                                  BigDecimal maxPrice, Integer status);
 
     List<Object[]> getListSizeByShoeNameId(Long idShoe, Long idColor);
+
+    List<Object[]> getListTop4BestSale();
+
+    List<Object[]> getListTop4Newest();
 }
