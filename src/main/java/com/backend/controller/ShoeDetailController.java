@@ -82,6 +82,18 @@ public class ShoeDetailController {
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",response));
     }
 
+    @GetMapping("/getListTop4BestSales")
+    public ResponseEntity<?> getListTop4BestSales(){
+        List<ResultItem> list = iShoeDetailService.getTop4BestSale();
+        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",list));
+    }
+
+    @GetMapping("/getListTop4News")
+    public ResponseEntity<?> getListTop4News(){
+        List<ResultItem> list = iShoeDetailService.getTop4News();
+        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",list));
+    }
+
     @PostMapping("/getListSizeOfShoeById")
     public ResponseEntity<?> getListSizeOfShoeById(@RequestBody ListSizeOfShoeReq listSizeOfShoeReq){
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",iShoeDetailService.getListSizeOfShoe(listSizeOfShoeReq)));

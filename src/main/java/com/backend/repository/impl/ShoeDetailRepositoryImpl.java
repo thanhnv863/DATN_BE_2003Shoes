@@ -297,10 +297,59 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
         sql.append(" AND (:idShoe IS NULL OR shoe.id = :idShoe)");
         sql.append(" AND (:idColor IS NULL OR color_id = :idColor)");
         sql.append(" GROUP BY size.name");
-        sql.append(" ORDER BY size_name ASC;");
+        sql.append(" ORDER BY size_name ASC");
         Query query = entityManager.createNativeQuery(sql.toString());
         query.setParameter("idShoe", idShoe);
         query.setParameter("idColor", idColor);
+        List<Object[]> results = query.getResultList();
+        return results;
+    }
+
+    @Override
+    public List<Object[]> getListTop4BestSale() {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT a.id, d.name as nameShoe, e.name as sizeName, f.name as categoryName, g.name as brandName,");
+        sql.append(" h.name as soleName, i.name as colorName, a.code,");
+        sql.append("  a.qrcode, a.price, a.quantity, a.created_time, a.updated_time, a.status,");
+        sql.append(" c.img_url as thumbnail,GROUP_CONCAT(b.img_url) as images");
+        sql.append(" FROM shoe_detail a");
+        sql.append(" JOIN image b ON a.id = b.shoe_detail_id");
+        sql.append(" JOIN thumbnail c ON a.id = c.shoe_detail_id");
+        sql.append(" JOIN shoe d ON a.shoe_id = d.id");
+        sql.append(" JOIN size e ON a.size_id = e.id");
+        sql.append(" JOIN category f ON a.category_id = f.id");
+        sql.append(" JOIN brand g ON a.brand_id = g.id");
+        sql.append(" JOIN sole h ON a.sole_id = h.id");
+        sql.append(" JOIN color i ON a.color_id = i.id");
+        sql.append(" JOIN (");
+        sql.append(" SELECT shoe_detail_id");
+        sql.append(" FROM order_detail");
+        sql.append(" WHERE status = 1");
+        sql.append(" GROUP BY shoe_detail_id");
+        sql.append(" ORDER BY COUNT(*) DESC");
+        sql.append(" LIMIT 4");
+        sql.append(" ) AS top_shoes ON a.id = top_shoes.shoe_detail_id");
+        sql.append(" GROUP BY a.id, d.name");
+        sql.append(" ORDER BY a.updated_time DESC");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        List<Object[]> results = query.getResultList();
+        return results;
+    }
+
+    @Override
+    public List<Object[]> getListTop4Newest() {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT a.id, d.name as nameShoe, e.name as sizeName, f.name as categoryName, g.name as brandName,");
+        sql.append("  h.name as soleName, i.name as colorName, a.code,");
+        sql.append(" a.qrcode, a.price, a.quantity, a.created_time, a.updated_time, a.status,");
+        sql.append(" c.img_url as thumbnail,GROUP_CONCAT(b.img_url) as images");
+        sql.append(" FROM shoe_detail a JOIN image b ON a.id = b.shoe_detail_id");
+        sql.append(" JOIN thumbnail c ON a.id = c.shoe_detail_id JOIN shoe d ON a.shoe_id = d.id");
+        sql.append(" JOIN size e ON a.size_id = e.id JOIN category f ON a.category_id = f.id");
+        sql.append(" JOIN brand g ON a.brand_id = g.id JOIN sole h ON a.sole_id = h.id");
+        sql.append(" JOIN color i ON a.color_id = i.id JOIN order_detail k ON k.shoe_detail_id = a.id");
+        sql.append(" GROUP BY d.name ORDER BY MAX(a.created_time) DESC LIMIT 4");
+        Query query = entityManager.createNativeQuery(sql.toString());
         List<Object[]> results = query.getResultList();
         return results;
     }
