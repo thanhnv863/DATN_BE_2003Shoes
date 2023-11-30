@@ -52,4 +52,18 @@ public class CommentRepositoryImpl implements CommentCustomRepository {
         countQuery.setParameter("idShoeDetail", idShoeDetail);
         return ((Number) countQuery.getSingleResult()).longValue();
     }
+
+    @Override
+    public List<Object> top3() {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT a.id,b.name, a.stars, a.content, a.date");
+        sql.append("  FROM comment as a");
+        sql.append(" join account as b on a.account_id = b.id");
+        sql.append(" join shoe_detail as c on c.id = a.shoe_detail_id");
+        sql.append(" WHERE 1 = 1 and a.stars = 5");
+        sql.append(" ORDER BY a.date desc limit 3");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        List<Object> results = query.getResultList();
+        return results;
+    }
 }

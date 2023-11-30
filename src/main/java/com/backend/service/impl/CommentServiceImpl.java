@@ -121,6 +121,18 @@ public class CommentServiceImpl implements ICommentService {
         }
     }
 
+    @Override
+    public List<CommentResponse> top3() {
+        List<Object> objectList = commentCustomRepository.top3();
+        List<CommentResponse> list = new ArrayList<>();
+        for (Object object : objectList) {
+            Object[] result = (Object[]) object;
+            CommentResponse commentResponse = convertPage(result);
+            list.add(commentResponse);
+        }
+        return list;
+    }
+
     public CommentResponse convertComment(Comment comment) {
         return CommentResponse.builder()
                 .id(comment.getId())
