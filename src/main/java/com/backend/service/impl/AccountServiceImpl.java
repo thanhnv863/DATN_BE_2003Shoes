@@ -5,6 +5,7 @@ import com.backend.config.AppConstant;
 import com.backend.dto.request.AccountRequest;
 import com.backend.dto.request.PasswordRequest;
 import com.backend.dto.request.RegisterRequest;
+import com.backend.dto.request.account.AccountAddress;
 import com.backend.dto.request.account.SearchAccountRequest;
 import com.backend.dto.response.AccountPageResponse;
 import com.backend.dto.response.AccountResponse;
@@ -41,6 +42,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -514,6 +516,43 @@ public class AccountServiceImpl implements IAccountService {
             return new ServiceResult<>(AppConstant.SUCCESS, "Kích hoạt tài khoản thành công", null);
         } else {
             return new ServiceResult<>(AppConstant.FAIL, "Kích hoạt tài khoản thất bại", null);
+        }
+    }
+
+    @Override
+    public ServiceResult<List<AccountAddress>> getAllAddressAndAccount(Long id) {
+        List<Object[]> addressList = accountRepository.getAllAccountAndAddress(id);
+        List<AccountAddress> addressResponsesList = new ArrayList<>();
+
+
+        for (Object[] record: addressList){
+            AccountAddress accountAddress = new AccountAddress();
+
+            accountAddress.setIdAccount( (BigInteger) record[0]);
+            accountAddress.setIdRole((BigInteger) record[1]);
+            accountAddress.setNameAccount((String) record[2]);
+            accountAddress.setCode((String) record[3]);
+            accountAddress.setPassword((String) record[4]);
+            accountAddress.setAvatar((String) record[5]);
+            accountAddress.setFormattedDatesCreateTime((Timestamp) record[6]);
+            accountAddress.setFormattedDatesUpdateTime((Timestamp) record[7]);
+            accountAddress.setStatus((Integer) record[8]);
+            accountAddress.setNameAddress((String) record[9]);
+            accountAddress.setPhoneNumber((String) record[10]);
+            accountAddress.setSpecificAddress((String) record[11]);
+            accountAddress.setWard((String) record[12]);
+            accountAddress.setDistrict((Integer) record[13]);
+            accountAddress.setProvince((Integer) record[14]);
+            accountAddress.setNote((String) record[15]);
+            accountAddress.setDefaultAddress((String) record[16]);
+
+            addressResponsesList.add(accountAddress);
+        }
+
+        if (addressResponsesList.size()<0){
+            return new ServiceResult<>(AppConstant.SUCCESS,"fail",null);
+        }else{
+            return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
         }
     }
 }

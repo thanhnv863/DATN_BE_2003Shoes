@@ -4,6 +4,7 @@ import com.backend.ServiceResult;
 import com.backend.dto.request.AccountRequest;
 import com.backend.dto.request.PasswordRequest;
 import com.backend.dto.request.RegisterRequest;
+import com.backend.dto.request.account.AccountAddress;
 import com.backend.dto.request.account.SearchAccountRequest;
 import com.backend.dto.response.AccountPageResponse;
 import com.backend.dto.response.AccountResponse;
@@ -43,4 +44,6 @@ public interface IAccountService {
     ServiceResult<Account> getOneAccount(Long id);
 
     ServiceResult<Account> kichHoatAccount(AccountRequest accountRequest);
+
+    ServiceResult<List<AccountAddress>> getAllAddressAndAccount(Long id);
 }

@@ -24,7 +24,4 @@ public interface IAddressService {
 
     ServiceResult<Address> deleteAddress(AddressRequest addressRequest);
 
-    ServiceResult<List<AccountAddress>> getAllAddressAndAccount(Long id);
-
-
 }
