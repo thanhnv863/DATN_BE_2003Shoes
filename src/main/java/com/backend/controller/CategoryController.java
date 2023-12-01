@@ -37,4 +37,9 @@ public class CategoryController {
     public ResponseEntity<?> deleteCategory(@RequestBody CategoryRequestUpdate categoryRequestUpdate){
         return ResponseEntity.ok(iCategoryService.deleteCategory(categoryRequestUpdate));
     }
+
+    @PostMapping("/activeCategory")
+    public ResponseEntity<?> activeCategory(@RequestBody CategoryRequestUpdate categoryRequestUpdate){
+        return ResponseEntity.ok(iCategoryService.activeCategory(categoryRequestUpdate));
+    }
 }

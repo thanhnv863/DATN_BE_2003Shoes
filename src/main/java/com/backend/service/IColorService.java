@@ -20,6 +20,8 @@ public interface IColorService {
 
     ServiceResult<Color> deleteColor(ColorRequestUpdate colorRequestUpdate);
 
+    ServiceResult<Color> activeColor(ColorRequestUpdate colorRequestUpdate);
+
     ServiceResult<Color> getColorByName(String name);
 
 }

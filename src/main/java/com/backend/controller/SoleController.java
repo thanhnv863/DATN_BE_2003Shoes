@@ -37,4 +37,9 @@ public class SoleController {
     public ResponseEntity<?> deleteSole(@RequestBody SoleRequestUpdate soleRequestUpdate){
         return ResponseEntity.ok(iSoleService.deleteSole(soleRequestUpdate));
     }
+
+    @PostMapping("/activeSole")
+    public ResponseEntity<?> activeSole(@RequestBody SoleRequestUpdate soleRequestUpdate){
+        return ResponseEntity.ok(iSoleService.activeSole(soleRequestUpdate));
+    }
 }

@@ -7,7 +7,9 @@ import com.backend.dto.request.SearchOrderRequest;
 import com.backend.dto.request.ShoeDetailRequestUpdate;
 import com.backend.dto.request.shoedetail.ListSizeOfShoeReq;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
+import com.backend.dto.request.shoedetail.ShoeDetailId;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
+import com.backend.dto.request.size.SizeRequestUpdate;
 import com.backend.dto.response.OrderReponse;
 import com.backend.dto.response.ResponseImport;
 import com.backend.dto.response.shoedetail.ResultItem;
@@ -62,6 +64,16 @@ public class ShoeDetailController {
 //    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> updateShoeDetail(@RequestBody ShoeDetailRequestUpdate shoeDetailRequestUpdate){
         return ResponseEntity.ok(iShoeDetailService.updateShoeDetail(shoeDetailRequestUpdate));
+    }
+
+    @PostMapping("/inActiveShoeDetail")
+    public ResponseEntity<?> inActiveShoeDetail(@RequestBody ShoeDetailId shoeDetailId){
+        return ResponseEntity.ok(iShoeDetailService.inActiveShoeDetail(shoeDetailId));
+    }
+
+    @PostMapping("/activeShoeDetail")
+    public ResponseEntity<?> activeShoeDetail(@RequestBody ShoeDetailId shoeDetailId){
+        return ResponseEntity.ok(iShoeDetailService.activeShoeDetail(shoeDetailId));
     }
 
     @PostMapping("/getAllHomePage")

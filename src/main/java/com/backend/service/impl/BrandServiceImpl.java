@@ -88,6 +88,19 @@ public class BrandServiceImpl implements IBrandService {
         }
     }
 
+    @Override
+    public ServiceResult<Brand> activeBrand(BrandRequestUpdate brandRequestUpdate) {
+        Optional<Brand> brandOptional = brandRepository.findById(brandRequestUpdate.getId());
+        if (brandOptional.isPresent()) {
+            Brand brandExits = brandOptional.get();
+            brandExits.setStatus(1);
+            brandRepository.save(brandExits);
+            return new ServiceResult<>(AppConstant.SUCCESS, "The brand active succesfully!", null);
+        }else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The brand not found!", null);
+        }
+    }
+
     private List<BrandResponse> convertToRes(List<Brand> brandList) {
         return brandList.stream().map(brand ->
                 BrandResponse.builder()

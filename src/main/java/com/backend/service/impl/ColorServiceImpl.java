@@ -90,6 +90,19 @@ public class ColorServiceImpl implements IColorService {
     }
 
     @Override
+    public ServiceResult<Color> activeColor(ColorRequestUpdate colorRequestUpdate) {
+        Optional<Color> colorOptional = colorRepository.findById(colorRequestUpdate.getId());
+        if (colorOptional.isPresent()){
+            Color colorExits = colorOptional.get();
+            colorExits.setStatus(1);
+            colorRepository.save(colorExits);
+            return new ServiceResult<>(AppConstant.SUCCESS,"The color active succesfully!", null);
+        }else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The color not found!", null);
+        }
+    }
+
+    @Override
     public ServiceResult<Color> getColorByName(String name) {
         Optional color = colorRepository.findByNameColor(name);
         if (color.isPresent()) {

@@ -41,6 +41,11 @@ public class ColorController {
         return ResponseEntity.ok(iColorService.deleteColor(colorRequestUpdate));
     }
 
+    @PostMapping("/activeColor")
+    public ResponseEntity<?> activeColor(@RequestBody ColorRequestUpdate colorRequestUpdate){
+        return ResponseEntity.ok(iColorService.activeColor(colorRequestUpdate));
+    }
+
     @GetMapping("/getColorByName/{name}")
     public ResponseEntity<?> getColorByName(@PathVariable String name){
         return ResponseEntity.ok(iColorService.getColorByName(name));

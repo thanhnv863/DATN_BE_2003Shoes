@@ -20,4 +20,5 @@ public class CategoryResponse {
     private String name;
 
     private Integer status;
+
 }
