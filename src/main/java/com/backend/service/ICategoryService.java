@@ -18,4 +18,6 @@ public interface ICategoryService {
     ServiceResult<Category> updateCategory(CategoryRequestUpdate categoryRequestUpdate);
 
     ServiceResult<Category> deleteCategory(CategoryRequestUpdate categoryRequestUpdate);
+
+    ServiceResult<Category> activeCategory(CategoryRequestUpdate categoryRequestUpdate);
 }

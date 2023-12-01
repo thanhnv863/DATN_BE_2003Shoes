@@ -190,6 +190,7 @@ public class ShoeServiceImpl implements IShoeService {
             resultItem.setQty(shoeDetail.getQuantity());
             resultItem.setCreatedAt(shoeDetail.getCreatedAt());
             resultItem.setUpdatedAt(shoeDetail.getUpdatedAt());
+            resultItem.setStatus(shoeDetail.getStatus());
 //            resultItem.setThumbnail(shoeDetail.getThumbnails().get(0).getImgUrl());
             if (!shoeDetail.getThumbnails().isEmpty()) {
                 resultItem.setThumbnail(shoeDetail.getThumbnails().get(0).getImgUrl());

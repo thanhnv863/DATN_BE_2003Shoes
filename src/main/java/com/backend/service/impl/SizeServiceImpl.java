@@ -89,6 +89,19 @@ public class SizeServiceImpl implements ISizeService {
         }
     }
 
+    @Override
+    public ServiceResult<Size> activeSize(SizeRequestUpdate sizeRequestUpdate) {
+        Optional<Size> sizeOptional = sizeRepository.findById(sizeRequestUpdate.getId());
+        if (sizeOptional.isPresent()) {
+            Size sizeExits = sizeOptional.get();
+            sizeExits.setStatus(1);
+            sizeRepository.save(sizeExits);
+            return new ServiceResult<>(AppConstant.SUCCESS, "The size active succesfully!", null);
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The size not found!", null);
+        }
+    }
+
 
     private List<SizeResponse> convertToRes(List<Size> sizeList) {
         return sizeList.stream().map(size ->

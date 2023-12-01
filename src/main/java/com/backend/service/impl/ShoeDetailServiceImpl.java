@@ -5,6 +5,7 @@ import com.backend.config.AppConstant;
 import com.backend.dto.request.ShoeDetailRequestUpdate;
 import com.backend.dto.request.shoedetail.ListSizeOfShoeReq;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
+import com.backend.dto.request.shoedetail.ShoeDetailId;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.ResponseImport;
 import com.backend.dto.response.ShoeAndShoeDetailResponse;
@@ -131,6 +132,32 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         Object[] resultArray = (Object[]) result;
         ResultItem resultItem = convertToPage(resultArray);
         return resultItem;
+    }
+
+    @Override
+    public ServiceResult<ShoeDetail> activeShoeDetail(ShoeDetailId shoeDetailId) {
+        Optional<ShoeDetail> shoeDetailOptional = shoeDetailRepository.findById(shoeDetailId.getIdSD());
+        if (shoeDetailOptional.isPresent()) {
+            ShoeDetail shoeDetail = shoeDetailOptional.get();
+            shoeDetail.setStatus(1);
+            shoeDetailRepository.save(shoeDetail);
+            return new ServiceResult<>(AppConstant.SUCCESS, "The Shoe active succesfully!", null);
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The Shoe not found!", null);
+        }
+    }
+
+    @Override
+    public ServiceResult<ShoeDetail> inActiveShoeDetail(ShoeDetailId shoeDetailId) {
+        Optional<ShoeDetail> shoeDetailOptional = shoeDetailRepository.findById(shoeDetailId.getIdSD());
+        if (shoeDetailOptional.isPresent()) {
+            ShoeDetail shoeDetail = shoeDetailOptional.get();
+            shoeDetail.setStatus(0);
+            shoeDetailRepository.save(shoeDetail);
+            return new ServiceResult<>(AppConstant.SUCCESS, "The Shoe inactive succesfully!", null);
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The Shoe not found!", null);
+        }
     }
 
     @Override

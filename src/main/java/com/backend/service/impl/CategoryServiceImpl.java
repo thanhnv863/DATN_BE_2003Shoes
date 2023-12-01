@@ -91,6 +91,19 @@ public class CategoryServiceImpl implements ICategoryService {
 
     }
 
+    @Override
+    public ServiceResult<Category> activeCategory(CategoryRequestUpdate categoryRequestUpdate) {
+        Optional<Category> categoryOptional = categoryRepository.findById(categoryRequestUpdate.getId());
+        if (categoryOptional.isPresent()) {
+            Category categoryExits = categoryOptional.get();
+            categoryExits.setStatus(1);
+            categoryRepository.save(categoryExits);
+            return new ServiceResult<>(AppConstant.SUCCESS, "The category active succesfully!", null);
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The category not found!", null);
+        }
+    }
+
     private List<CategoryResponse> convertToRes(List<Category> categoryList) {
         return categoryList.stream().map(category ->
                 CategoryResponse.builder()
