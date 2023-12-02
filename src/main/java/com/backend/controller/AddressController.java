@@ -43,4 +43,13 @@ public class AddressController {
         return ResponseEntity.ok(iAddressService.deleteAddress(addressRequest));
     }
 
+    @GetMapping("/address-by-account-id/{id}")
+    public ResponseEntity<?> addressByAccount(@PathVariable("id")Long id){
+        return ResponseEntity.ok(iAddressService.getOneAddressByAccountId(id));
+    }
+
+    @PostMapping("/update-address-default")
+    public ResponseEntity<?> updateAddressDefault(@RequestBody AddressRequest addressRequest){
+        return ResponseEntity.ok(iAddressService.updateDefaultAddress(addressRequest));
+    }
 }

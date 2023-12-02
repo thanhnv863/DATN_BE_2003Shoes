@@ -1,7 +1,6 @@
 package com.backend.service;
 
 import com.backend.ServiceResult;
-import com.backend.ServiceResultReponse;
 import com.backend.dto.request.AddressRequest;
 import com.backend.dto.request.account.AccountAddress;
 import com.backend.dto.response.AddressResponse;
@@ -14,6 +13,8 @@ public interface IAddressService {
 
     ServiceResult<Address> updateAddress(AddressRequest addressRequest);
 
+    ServiceResult<Address> updateDefaultAddress(AddressRequest addressRequest);
+
     String validateAddress(AddressRequest addressRequest);
 
     AddressResponse convertToResponse(Address address);
@@ -23,5 +24,7 @@ public interface IAddressService {
     ServiceResult<List<AddressResponse>> getAllAddress();
 
     ServiceResult<Address> deleteAddress(AddressRequest addressRequest);
+
+    ServiceResult<List<AccountAddress>> getOneAddressByAccountId(Long id);
 
 }
