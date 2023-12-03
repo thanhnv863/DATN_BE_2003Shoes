@@ -54,7 +54,12 @@ public class AddressServiceImpl implements IAddressService {
                    address.setDistrict(addressRequest.getDistrict());
                    address.setProvince(addressRequest.getProvince());
                    address.setNote(addressRequest.getNote());
-                   address.setDefaultAddress("0");
+
+                   if(addressList.size()<1){
+                       address.setDefaultAddress("1");
+                   }else{
+                       address.setDefaultAddress("0");
+                   }
 
                     if(addressList.size() < 5){
                         address = addressRepository.save(address);
@@ -128,12 +133,6 @@ public class AddressServiceImpl implements IAddressService {
 
             return new ServiceResult<>(AppConstant.SUCCESS, "Update success", address);
 
-//            if (hasAddressWithOneDefault) {
-//                return new ServiceResult<>(AppConstant.BAD_REQUEST, "chi duoc 1 dia chi mac dinh", null);
-//            } else {
-//
-//            }
-
         }else{
             return new ServiceResult<>(AppConstant.BAD_REQUEST,"Update fail",null);
         }
@@ -176,7 +175,10 @@ public class AddressServiceImpl implements IAddressService {
         Optional<Address> optionalAddress = addressRepository.findById(addressRequest.getId());
         if (optionalAddress.isPresent()){
             Address address = optionalAddress.get();
-            addressRepository.save(address);
+            if(address.getDefaultAddress().equals("1")){
+                return new ServiceResult<>(AppConstant.FAIL,"Không được xóa địa chỉ mặc định",null);
+            }
+            addressRepository.delete(address);
             return new ServiceResult<>(AppConstant.SUCCESS,"delete Success",null);
         }else{
             return new ServiceResult<>(AppConstant.FAIL,"Id not exist",null);
