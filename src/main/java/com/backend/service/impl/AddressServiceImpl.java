@@ -38,7 +38,7 @@ public class AddressServiceImpl implements IAddressService {
     public ServiceResult<AddressResponse> addAddress(AddressRequest addressRequest) {
         Address address = new Address();
         String result = validateAddress(addressRequest);
-
+        List<Address> addressList = addressRepository.findAddressesByAccount_Id(addressRequest.getAccountId());
         if (result != null){
             return result(result);
         }else {
@@ -55,14 +55,16 @@ public class AddressServiceImpl implements IAddressService {
                    address.setProvince(addressRequest.getProvince());
                    address.setNote(addressRequest.getNote());
                    address.setDefaultAddress("0");
-//                   if(address.getDefaultAddress().equals("0")){
-//                       return new ServiceResult<>(AppConstant.SUCCESS, "Add that bai chi duoc 1 dia chi mac dinh", null);
-//                   }
 
-                       address = addressRepository.save(address);
-                       AddressResponse convertAddressResponse = convertToResponse(address);
+                    if(addressList.size() < 5){
+                        address = addressRepository.save(address);
+                        AddressResponse convertAddressResponse = convertToResponse(address);
 
-                       return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertAddressResponse);
+                        return new ServiceResult<>(AppConstant.SUCCESS, "Add thanh cong", convertAddressResponse);
+                    }else{
+                        return new ServiceResult<>(AppConstant.FAIL,"Bạn chỉ được thêm tối 5 địa chỉ",null);
+                    }
+
 
                }else{
                   return new ServiceResult<>(AppConstant.FAIL,"Add fail",null);
