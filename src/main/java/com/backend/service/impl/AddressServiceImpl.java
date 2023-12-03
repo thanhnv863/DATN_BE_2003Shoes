@@ -117,15 +117,22 @@ public class AddressServiceImpl implements IAddressService {
 
             System.out.println(hasAddressWithOneDefault);
 
-            if (hasAddressWithOneDefault) {
-                return new ServiceResult<>(AppConstant.BAD_REQUEST, "chi duoc 1 dia chi mac dinh", null);
-            } else {
-                addressExist.setAccount(account);
-                addressExist.setDefaultAddress("1");
-                Address address = addressRepository.save(addressExist);
+            addressList.forEach(addr -> addr.setDefaultAddress("0"));
 
-                return new ServiceResult<>(AppConstant.SUCCESS, "Update success", address);
-            }
+            addressExist.setAccount(account);
+            addressExist.setDefaultAddress("1");
+
+            addressRepository.saveAll(addressList);
+
+            Address address = addressRepository.save(addressExist);
+
+            return new ServiceResult<>(AppConstant.SUCCESS, "Update success", address);
+
+//            if (hasAddressWithOneDefault) {
+//                return new ServiceResult<>(AppConstant.BAD_REQUEST, "chi duoc 1 dia chi mac dinh", null);
+//            } else {
+//
+//            }
 
         }else{
             return new ServiceResult<>(AppConstant.BAD_REQUEST,"Update fail",null);
