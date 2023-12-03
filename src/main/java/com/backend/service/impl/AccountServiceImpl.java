@@ -311,8 +311,9 @@ public class AccountServiceImpl implements IAccountService {
             accountId.setId(accountId.getId());
             accountId.setName(accountRequest.getName());
             accountId.setEmail(accountRequest.getEmail());
-            accountId.setAvatar(imageUploadService.uploadImageByName(accountRequest.getAvatar()));
-
+            if (accountRequest.getAvatar() != null){
+                accountId.setAvatar(imageUploadService.uploadImageByName(accountRequest.getAvatar()));
+            }
             Account account = accountRepository.save(accountId);
 
             return new ServiceResult<>(AppConstant.SUCCESS, "Cập nhật thành công!", account);

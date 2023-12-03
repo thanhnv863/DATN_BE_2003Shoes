@@ -69,12 +69,13 @@ public class Account {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public Account(Long id, String name ,String code , String email, String password, Role role, Collection<? extends GrantedAuthority> authorities) {
+    public Account(Long id, String name ,String code , String email, String password,String avatar, Role role, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
         this.code = code;
         this.email = email;
         this.password = password;
+        this.avatar = avatar;
         this.role = role;
 
         List<String> roleNames = new ArrayList<>();

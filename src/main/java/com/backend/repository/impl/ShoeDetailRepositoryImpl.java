@@ -353,4 +353,22 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
         List<Object[]> results = query.getResultList();
         return results;
     }
+
+    @Override
+    public List<Object[]> getListVersionOfShoe(Long idShoe) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT a.id, d.name as nameShoe, e.name as sizeName, f.name as categoryName, g.name as brandName,");
+        sql.append("  h.name as soleName, i.name as colorName, a.code,");
+        sql.append(" a.qrcode, a.price, a.quantity, a.created_time, a.updated_time, a.status,");
+        sql.append(" c.img_url as thumbnail,GROUP_CONCAT(b.img_url) as images");
+        sql.append(" FROM shoe_detail a JOIN image b ON a.id = b.shoe_detail_id");
+        sql.append(" JOIN thumbnail c ON a.id = c.shoe_detail_id JOIN shoe d ON a.shoe_id = d.id");
+        sql.append(" JOIN size e ON a.size_id = e.id JOIN category f ON a.category_id = f.id");
+        sql.append(" JOIN brand g ON a.brand_id = g.id JOIN sole h ON a.sole_id = h.id");
+        sql.append(" JOIN color i ON a.color_id = i.id where 1 = 1 and d.id = :idShoe GROUP BY a.id, d.name");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("idShoe", idShoe);
+        List<Object[]> results = query.getResultList();
+        return results;
+    }
 }

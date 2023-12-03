@@ -45,6 +45,8 @@ public interface IShoeDetailService {
 
     List<ResultItem> getTop4News();
 
+    List<ResultItem> getVersionOfShoe(Long idShoe);
+
     ServiceResult<Shoe> updateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequestUpdate);
 
     ServiceResult<String> updateQtyShoeDetail(List<ShoeDetailRequestUpdate> shoeDetailRequestUpdateList);
