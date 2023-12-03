@@ -54,7 +54,12 @@ public class AddressServiceImpl implements IAddressService {
                    address.setDistrict(addressRequest.getDistrict());
                    address.setProvince(addressRequest.getProvince());
                    address.setNote(addressRequest.getNote());
-                   address.setDefaultAddress("0");
+
+                   if(addressList.size()<1){
+                       address.setDefaultAddress("1");
+                   }else{
+                       address.setDefaultAddress("0");
+                   }
 
                     if(addressList.size() < 5){
                         address = addressRepository.save(address);
@@ -117,15 +122,16 @@ public class AddressServiceImpl implements IAddressService {
 
             System.out.println(hasAddressWithOneDefault);
 
-            if (hasAddressWithOneDefault) {
-                return new ServiceResult<>(AppConstant.BAD_REQUEST, "chi duoc 1 dia chi mac dinh", null);
-            } else {
-                addressExist.setAccount(account);
-                addressExist.setDefaultAddress("1");
-                Address address = addressRepository.save(addressExist);
+            addressList.forEach(addr -> addr.setDefaultAddress("0"));
 
-                return new ServiceResult<>(AppConstant.SUCCESS, "Update success", address);
-            }
+            addressExist.setAccount(account);
+            addressExist.setDefaultAddress("1");
+
+            addressRepository.saveAll(addressList);
+
+            Address address = addressRepository.save(addressExist);
+
+            return new ServiceResult<>(AppConstant.SUCCESS, "Update success", address);
 
         }else{
             return new ServiceResult<>(AppConstant.BAD_REQUEST,"Update fail",null);
@@ -169,7 +175,10 @@ public class AddressServiceImpl implements IAddressService {
         Optional<Address> optionalAddress = addressRepository.findById(addressRequest.getId());
         if (optionalAddress.isPresent()){
             Address address = optionalAddress.get();
-            addressRepository.save(address);
+            if(address.getDefaultAddress().equals("1")){
+                return new ServiceResult<>(AppConstant.FAIL,"Không được xóa địa chỉ mặc định",null);
+            }
+            addressRepository.delete(address);
             return new ServiceResult<>(AppConstant.SUCCESS,"delete Success",null);
         }else{
             return new ServiceResult<>(AppConstant.FAIL,"Id not exist",null);
@@ -179,6 +188,7 @@ public class AddressServiceImpl implements IAddressService {
     @Override
     public ServiceResult<List<AccountAddress>> getOneAddressByAccountId(Long id) {
         List<Object[]> addressList = addressRepository.getOneAddressByAccountId(id);
+        Optional<Account> optionalAccount = accountRepository.findById(id);
         List<AccountAddress> addressResponsesList = new ArrayList<>();
 
         for (Object[] record: addressList){
@@ -205,11 +215,17 @@ public class AddressServiceImpl implements IAddressService {
             addressResponsesList.add(accountAddress);
         }
 
-        if (addressResponsesList.size()<0){
-            return new ServiceResult<>(AppConstant.SUCCESS,"fail",null);
-        }else{
+        if(optionalAccount.isPresent()){
             return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
+        }else{
+            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
         }
+
+//        if (addressResponsesList.size()<0){
+//            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
+//        }else{
+//            return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
+//        }
     }
 
     @Override
