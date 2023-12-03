@@ -188,6 +188,7 @@ public class AddressServiceImpl implements IAddressService {
     @Override
     public ServiceResult<List<AccountAddress>> getOneAddressByAccountId(Long id) {
         List<Object[]> addressList = addressRepository.getOneAddressByAccountId(id);
+        Optional<Account> optionalAccount = accountRepository.findById(id);
         List<AccountAddress> addressResponsesList = new ArrayList<>();
 
         for (Object[] record: addressList){
@@ -214,11 +215,17 @@ public class AddressServiceImpl implements IAddressService {
             addressResponsesList.add(accountAddress);
         }
 
-        if (addressResponsesList.size()<0){
-            return new ServiceResult<>(AppConstant.SUCCESS,"fail",null);
-        }else{
+        if(optionalAccount.isPresent()){
             return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
+        }else{
+            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
         }
+
+//        if (addressResponsesList.size()<0){
+//            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
+//        }else{
+//            return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
+//        }
     }
 
     @Override
