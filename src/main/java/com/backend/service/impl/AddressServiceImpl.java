@@ -221,12 +221,8 @@ public class AddressServiceImpl implements IAddressService {
             return new ServiceResult<>(AppConstant.FAIL,"fail",null);
         }
 
-//        if (addressResponsesList.size()<0){
-//            return new ServiceResult<>(AppConstant.FAIL,"fail",null);
-//        }else{
-//            return new ServiceResult<>(AppConstant.SUCCESS,"success",addressResponsesList);
-//        }
     }
+
 
     @Override
     public String validateAddress(AddressRequest addressRequest) {
