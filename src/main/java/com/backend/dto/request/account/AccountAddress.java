@@ -20,6 +20,7 @@ import java.util.Date;
 @Builder
 public class AccountAddress {
 
+    private  BigInteger idAddress;
     private BigInteger idAccount;
     private BigInteger idRole;
     private String nameAccount;
