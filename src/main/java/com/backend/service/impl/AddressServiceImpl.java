@@ -223,7 +223,6 @@ public class AddressServiceImpl implements IAddressService {
 
     }
 
-
     @Override
     public String validateAddress(AddressRequest addressRequest) {
         List<String> errorMessages = new ArrayList<>();
