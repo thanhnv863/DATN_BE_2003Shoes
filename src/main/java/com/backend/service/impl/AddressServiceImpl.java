@@ -194,23 +194,24 @@ public class AddressServiceImpl implements IAddressService {
         for (Object[] record: addressList){
             AccountAddress accountAddress = new AccountAddress();
 
-            accountAddress.setIdAccount( (BigInteger) record[0]);
-            accountAddress.setIdRole((BigInteger) record[1]);
-            accountAddress.setNameAccount((String) record[2]);
-            accountAddress.setCode((String) record[3]);
-            accountAddress.setPassword((String) record[4]);
-            accountAddress.setAvatar((String) record[5]);
-            accountAddress.setFormattedDatesCreateTime((Timestamp) record[6]);
-            accountAddress.setFormattedDatesUpdateTime((Timestamp) record[7]);
-            accountAddress.setStatus((Integer) record[8]);
-            accountAddress.setNameAddress((String) record[9]);
-            accountAddress.setPhoneNumber((String) record[10]);
-            accountAddress.setSpecificAddress((String) record[11]);
-            accountAddress.setWard((String) record[12]);
-            accountAddress.setDistrict((Integer) record[13]);
-            accountAddress.setProvince((Integer) record[14]);
-            accountAddress.setNote((String) record[15]);
-            accountAddress.setDefaultAddress((String) record[16]);
+            accountAddress.setIdAddress((BigInteger) record[0]);
+            accountAddress.setIdAccount( (BigInteger) record[1]);
+            accountAddress.setIdRole((BigInteger) record[2]);
+            accountAddress.setNameAccount((String) record[3]);
+            accountAddress.setCode((String) record[4]);
+            accountAddress.setPassword((String) record[5]);
+            accountAddress.setAvatar((String) record[6]);
+            accountAddress.setFormattedDatesCreateTime((Timestamp) record[7]);
+            accountAddress.setFormattedDatesUpdateTime((Timestamp) record[8]);
+            accountAddress.setStatus((Integer) record[9]);
+            accountAddress.setNameAddress((String) record[10]);
+            accountAddress.setPhoneNumber((String) record[11]);
+            accountAddress.setSpecificAddress((String) record[12]);
+            accountAddress.setWard((String) record[13]);
+            accountAddress.setDistrict((Integer) record[14]);
+            accountAddress.setProvince((Integer) record[15]);
+            accountAddress.setNote((String) record[16]);
+            accountAddress.setDefaultAddress((String) record[17]);
 
             addressResponsesList.add(accountAddress);
         }
