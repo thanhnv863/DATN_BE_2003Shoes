@@ -102,63 +102,63 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "            where month(mo.pay_date) = MONTH(CURDATE()) and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
     List<Object[]> soHoaDonTheoThang(Integer typeBanHang);
 
+    // doanh thu và số lượng Hóa đơn theo năm
     @Query(value = "select  CASE WHEN year(mo.pay_date) = year(CURDATE()) THEN sum(mo.total_money) ELSE 0 END AS 'tongTien' ,\n" +
             "                        CASE WHEN year(mo.pay_date) = year(CURDATE()) THEN count(mo.status) ELSE 0 END AS 'SoLuongHoaDon'\n" +
             "                        from db_datn.my_order mo\n" +
             "                        where year(mo.pay_date) = year(CURDATE()) and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
     List<Object[]> soHoaDonTheoNam(Integer typeBanHang);
 
-    // doanh thu và số lượng Hóa đơn theo năm
-
     // doanh thu theo tháng, chọn năm hiện ra 12 tháng
-    @Query(value = "select \n" +
-            "                CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang1',\n" +
-            "                CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang1',\n" +
-            "                CASE WHEN month(mo.pay_date) = 2 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang2',\n" +
-            "                CASE WHEN month(mo.pay_date) = 2 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang2',\n" +
-            "                CASE WHEN month(mo.pay_date) = 3 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang3',\n" +
-            "                CASE WHEN month(mo.pay_date) = 3 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang3',\n" +
-            "                CASE WHEN month(mo.pay_date) = 4 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang4',\n" +
-            "                CASE WHEN month(mo.pay_date) = 4 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang4',\n" +
-            "                CASE WHEN month(mo.pay_date) = 5 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang5',\n" +
-            "                CASE WHEN month(mo.pay_date) = 5 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang5',\n" +
-            "                CASE WHEN month(mo.pay_date) = 6 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang6',\n" +
-            "                CASE WHEN month(mo.pay_date) = 6 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang6',\n" +
-            "                CASE WHEN month(mo.pay_date) = 7 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang7',\n" +
-            "                CASE WHEN month(mo.pay_date) = 7 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang7',\n" +
-            "                CASE WHEN month(mo.pay_date) = 8 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang8',\n" +
-            "                CASE WHEN month(mo.pay_date) = 8 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang8',\n" +
-            "                CASE WHEN month(mo.pay_date) = 9 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang9',\n" +
-            "                CASE WHEN month(mo.pay_date) = 9 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang9',\n" +
-            "                CASE WHEN month(mo.pay_date) = 10 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang10',\n" +
-            "                CASE WHEN month(mo.pay_date) = 10 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang10',\n" +
-            "                CASE WHEN month(mo.pay_date) = 11 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang11',\n" +
-            "                CASE WHEN month(mo.pay_date) = 11 THEN sum(od.quantity) ELSE 0 END AS 'soLuong11',\n" +
-            "                CASE WHEN month(mo.pay_date) = 12 THEN sum(od.quantity * od.price) ELSE 0 END AS 'totalThang12',\n" +
-            "                CASE WHEN month(mo.pay_date) = 12 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang12'\n" +
-            "             from my_order mo \n" +
-            "             left join payment_method pm on mo.id = pm.order_id\n" +
-            "             left join order_detail od on mo.id = od.order_id\n" +
-            "                       where YEAR(mo.pay_date) = :nam and mo.status = 8 and (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
+    @Query(value = "SELECT \n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang1',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity ELSE 0 END) AS 'soLuongThang1',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang2',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity ELSE 0 END) AS 'soLuongThang2',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang3',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity ELSE 0 END) AS 'soLuongThang3',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang4',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity ELSE 0 END) AS 'soLuongThang4',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang5',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity ELSE 0 END) AS 'soLuongThang5',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang6',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity ELSE 0 END) AS 'soLuongThang6',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang7',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity ELSE 0 END) AS 'soLuongThang7',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang8',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity ELSE 0 END) AS 'soLuongThang8',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang9',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity ELSE 0 END) AS 'soLuongThang9',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang10',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity ELSE 0 END) AS 'soLuongThang10',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang11',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity ELSE 0 END) AS 'soLuongThang11',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang12',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity ELSE 0 END) AS 'soLuongThang12'\n" +
+            "\t\tFROM my_order mo \n" +
+            "\t\tLEFT JOIN payment_method pm ON mo.id = pm.order_id\n" +
+            "\t\tLEFT JOIN order_detail od ON mo.id = od.order_id\n" +
+            "\t\tWHERE YEAR(mo.pay_date) = :nam AND mo.status = 8 AND (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
     List<Object[]> doanhThuTheoThang(Integer nam, Integer typeBanHang);
 
     // số lượng sản phẩm bán được trong năm
-    @Query(value = "select \n" +
-            "                            CASE WHEN month(mo.pay_date) = 1 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang1',\n" +
-            "                           CASE WHEN month(mo.pay_date) = 2 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang2',          \n" +
-            "                           CASE WHEN month(mo.pay_date) = 3 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang3',\n" +
-            "                           CASE WHEN month(mo.pay_date) = 4 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang4',\n" +
-            "                            CASE WHEN month(mo.pay_date) = 5 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang5',\n" +
-            "                            CASE WHEN month(mo.pay_date) = 6 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang6',\n" +
-            "                            CASE WHEN month(mo.pay_date) = 7 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang7',\n" +
-            "                            CASE WHEN month(mo.pay_date) = 8 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang8',\n" +
-            "                            CASE WHEN month(mo.pay_date) = 9 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang9',\n" +
-            "                           CASE WHEN month(mo.pay_date) = 10 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang10',\n" +
-            "                            CASE WHEN month(mo.pay_date) = 11 THEN sum(od.quantity) ELSE 0 END AS 'soLuong11',\n" +
-            "                            CASE WHEN month(mo.pay_date) = 12 THEN sum(od.quantity) ELSE 0 END AS 'soLuongThang12'\n" +
-            "                         from my_order mo \n" +
-            "                         left join payment_method pm on mo.id = pm.order_id\n" +
-            "                        left join order_detail od on mo.id = od.order_id\n" +
-            "                                  where YEAR(mo.pay_date) = :nam and mo.status = 8 ",nativeQuery = true)
+    @Query(value = "SELECT \n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity ELSE 0 END) AS 'soLuongThang1',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity ELSE 0 END) AS 'soLuongThang2',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity ELSE 0 END) AS 'soLuongThang3',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity ELSE 0 END) AS 'soLuongThang4',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity ELSE 0 END) AS 'soLuongThang5',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity ELSE 0 END) AS 'soLuongThang6',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity ELSE 0 END) AS 'soLuongThang7',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity ELSE 0 END) AS 'soLuongThang8',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity ELSE 0 END) AS 'soLuongThang9',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity ELSE 0 END) AS 'soLuongThang10',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity ELSE 0 END) AS 'soLuongThang11',\n" +
+            "    SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity ELSE 0 END) AS 'soLuongThang12'\n" +
+            "\t\tFROM my_order mo \n" +
+            "\t\t\tLEFT JOIN payment_method pm ON mo.id = pm.order_id\n" +
+            "\t\t\tLEFT JOIN order_detail od ON mo.id = od.order_id\n" +
+            "\t\t\tWHERE \n" +
+            "\t\t\tYEAR(mo.pay_date) = 2023 AND mo.status = 8",nativeQuery = true)
     List<Object[]> soLuongSanPhamBanTheoNam(Integer nam);
 }
