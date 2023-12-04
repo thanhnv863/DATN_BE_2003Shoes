@@ -27,4 +27,6 @@ public interface IAddressService {
 
     ServiceResult<List<AccountAddress>> getOneAddressByAccountId(Long id);
 
+    ServiceResult<Address> getDefaultAddressByAccountId(AddressRequest addressRequest);
+
 }

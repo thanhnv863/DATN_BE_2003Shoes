@@ -31,4 +31,6 @@ public interface ShoeDetailCustomRepository {
     List<Object[]> getListTop4BestSale();
 
     List<Object[]> getListTop4Newest();
+
+    List<Object[]> getListVersionOfShoe(Long idShoe);
 }

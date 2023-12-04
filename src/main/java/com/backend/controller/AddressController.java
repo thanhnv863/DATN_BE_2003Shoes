@@ -53,4 +53,9 @@ public class AddressController {
         return ResponseEntity.ok(iAddressService.updateDefaultAddress(addressRequest));
     }
 
+    @PostMapping("/getDefautAddressByAccountId")
+    public ResponseEntity<?> getDefautAddressByAccountId(@RequestBody AddressRequest addressRequest){
+        return ResponseEntity.ok(iAddressService.getDefaultAddressByAccountId(addressRequest));
+    }
+
 }

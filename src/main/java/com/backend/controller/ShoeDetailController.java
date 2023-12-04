@@ -106,6 +106,12 @@ public class ShoeDetailController {
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",list));
     }
 
+    @GetMapping("/getListVersionOfShoe/{id}")
+    public ResponseEntity<?> getListVersionOfShoe(@PathVariable(name = "id") Long id){
+        List<ResultItem> list = iShoeDetailService.getVersionOfShoe(id);
+        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",list));
+    }
+
     @PostMapping("/getListSizeOfShoeById")
     public ResponseEntity<?> getListSizeOfShoeById(@RequestBody ListSizeOfShoeReq listSizeOfShoeReq){
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",iShoeDetailService.getListSizeOfShoe(listSizeOfShoeReq)));

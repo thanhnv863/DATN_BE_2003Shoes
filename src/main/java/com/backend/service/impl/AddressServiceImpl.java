@@ -8,6 +8,7 @@ import com.backend.dto.response.AddressResponse;
 import com.backend.dto.response.shoedetail.ListSizeOfShoe;
 import com.backend.entity.Account;
 import com.backend.entity.Address;
+import com.backend.entity.Size;
 import com.backend.repository.AccountRepository;
 import com.backend.repository.AddressRepository;
 import com.backend.service.IAddressService;
@@ -222,6 +223,21 @@ public class AddressServiceImpl implements IAddressService {
             return new ServiceResult<>(AppConstant.FAIL,"fail",null);
         }
 
+    }
+
+    @Override
+    public ServiceResult<Address> getDefaultAddressByAccountId(AddressRequest addressRequest) {
+        Optional<Address> addressOptional = addressRepository.findByAccountIdAndDefaultAddress(addressRequest.getAccountId());
+        if (addressOptional.isPresent()) {
+            Address address = addressOptional.get();
+            if (address.getDefaultAddress().equals("1")) {
+                return new ServiceResult<>(AppConstant.SUCCESS, "Get data success!", address);
+            } else {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The address is not the default one!", null);
+            }
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The id not found!", null);
+        }
     }
 
     @Override

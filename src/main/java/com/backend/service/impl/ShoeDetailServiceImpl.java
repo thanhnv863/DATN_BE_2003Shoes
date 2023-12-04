@@ -230,6 +230,18 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
     }
 
     @Override
+    public List<ResultItem> getVersionOfShoe(Long idShoe) {
+        List<Object[]> list =
+                shoeDetailCustomRepository.getListVersionOfShoe(idShoe);
+        List<ResultItem> listResult = new ArrayList<>();
+        for (Object[] object : list) {
+            ResultItem resultItem = convertToPage(object);
+            listResult.add(resultItem);
+        }
+        return listResult;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public ServiceResult<Shoe> updateShoeDetail(ShoeDetailRequestUpdate shoeDetailRequestUpdate) {
         String result = validateUpdateShoeDetail(shoeDetailRequestUpdate);

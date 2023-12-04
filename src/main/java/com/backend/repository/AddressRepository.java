@@ -22,6 +22,7 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
             "    where acc.id = :id",nativeQuery = true)
     List<Object[]> getOneAddressByAccountId(Long id);
 
-
+    @Query(value = "SELECT * FROM address WHERE account_id = ?1 AND default_address = '1'", nativeQuery = true)
+    Optional<Address> findByAccountIdAndDefaultAddress(Long accountId);
 }
 

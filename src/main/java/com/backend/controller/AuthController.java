@@ -102,7 +102,7 @@ public class AuthController {
                 Optional<Account> userInfoOptional = accountRepository.findByEmail(authRequest.getEmail());
 
                 if (userInfoOptional.isPresent()) {
-                    Account userInfo = new Account(userInfoOptional.get().getId(), userInfoOptional.get().getName(),userInfoOptional.get().getCode(), userDetails.getUsername(), userDetails.getPassword(), userInfoOptional.get().getRole(), userDetails.getAuthorities());
+                    Account userInfo = new Account(userInfoOptional.get().getId(), userInfoOptional.get().getName(),userInfoOptional.get().getCode(), userDetails.getUsername(), userDetails.getPassword(),userInfoOptional.get().getAvatar(), userInfoOptional.get().getRole(), userDetails.getAuthorities());
                     return ResponseEntity.status(HttpStatus.OK).body(JwtResponse.builder()
                             .statusCode(AppConstant.SUCCESS)
                             .accessToken(accessToken)
