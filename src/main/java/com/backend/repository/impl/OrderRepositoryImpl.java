@@ -51,7 +51,7 @@ public class OrderRepositoryImpl implements OrderCustomRepository {
             sql.append(" AND (a.total_money >= :priceMin AND a.total_money <= :priceMax) ");
         }
 
-//        sql.append(" GROUP BY a.name, a.code, a.grade_level, a.type, a.sup_type, a.description, c.ord, c.name");
+        sql.append(" GROUP BY a.id");
         sql.append(" ORDER BY a.create_date desc, a.pay_date desc, a.ship_date desc, a.desired_date desc, a.receive_date desc");
 
         Query query = entityManager.createNativeQuery(sql.toString());
