@@ -6,14 +6,12 @@ import com.backend.dto.request.shoedetail.ListSizeOfShoeReq;
 import com.backend.dto.request.shoedetail.SearchShoeDetailRequest;
 import com.backend.dto.request.shoedetail.ShoeDetailId;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
-import com.backend.dto.request.size.SizeRequestUpdate;
 import com.backend.dto.response.ResponseImport;
 import com.backend.dto.response.ShoeAndShoeDetailResponse;
 import com.backend.dto.response.shoedetail.ListSizeOfShoe;
 import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.entity.Shoe;
 import com.backend.entity.ShoeDetail;
-import com.backend.entity.Size;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -38,6 +36,8 @@ public interface IShoeDetailService {
     ServiceResult<ShoeDetail> inActiveShoeDetail(ShoeDetailId shoeDetailId);
 
     List<ListSizeOfShoe> getListSizeOfShoe(ListSizeOfShoeReq listSizeOfShoeReq);
+
+    List<?> getListSizeExits(ListSizeOfShoeReq listSizeOfShoeReq);
 
     List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest);
 
