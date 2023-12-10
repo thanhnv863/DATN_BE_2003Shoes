@@ -77,7 +77,7 @@ public class JwtService {
 
     private String createAccessToken(Map<String, Object> claims, String userName) {
         long currentTimeMillis = System.currentTimeMillis();
-        long expirationMillis = currentTimeMillis + (1800 * 1000);
+        long expirationMillis = currentTimeMillis + (18000 * 1000);
 //        long expirationMillis = currentTimeMillis + (10 * 1000);
         return Jwts.builder()
                 .setClaims(claims)
