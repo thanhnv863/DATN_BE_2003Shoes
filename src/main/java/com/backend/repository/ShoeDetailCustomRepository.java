@@ -33,4 +33,6 @@ public interface ShoeDetailCustomRepository {
     List<Object[]> getListTop4Newest();
 
     List<Object[]> getListVersionOfShoe(Long idShoe);
+
+    List<Object[]> getListSizeExits(Long idShoe, Long idColor);
 }

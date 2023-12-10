@@ -15,6 +15,7 @@ import com.backend.dto.response.ResponseImport;
 import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.service.IShoeDetailService;
 import com.backend.service.IShoeService;
+import com.backend.service.impl.ShoeDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,9 @@ public class ShoeDetailController {
 
     @Autowired
     private IShoeDetailService iShoeDetailService;
+
+    @Autowired
+    private ShoeDetailServiceImpl shoeDetailServiceimpl;
 
     @GetMapping("/getAllShoeDetailWithPaginate")
     public ResponseEntity<?> getAllShoeDetailWithPaginate(@RequestParam(defaultValue = "0") Integer page,
@@ -115,6 +119,11 @@ public class ShoeDetailController {
     @PostMapping("/getListSizeOfShoeById")
     public ResponseEntity<?> getListSizeOfShoeById(@RequestBody ListSizeOfShoeReq listSizeOfShoeReq){
         return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",iShoeDetailService.getListSizeOfShoe(listSizeOfShoeReq)));
+    }
+
+    @PostMapping("/getListSizeExist")
+    public ResponseEntity<?> getListSizeExist(@RequestBody ListSizeOfShoeReq listSizeOfShoeReq){
+        return ResponseEntity.ok().body(new ServiceResult<>(AppConstant.SUCCESS, "Succesfully",iShoeDetailService.getListSizeExits(listSizeOfShoeReq)));
     }
 
     @PostMapping("/getAllCustom")

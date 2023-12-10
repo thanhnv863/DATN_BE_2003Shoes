@@ -9,6 +9,7 @@ import com.backend.dto.request.shoedetail.ShoeDetailId;
 import com.backend.dto.request.shoedetail.ShoeDetailRequest;
 import com.backend.dto.response.ResponseImport;
 import com.backend.dto.response.ShoeAndShoeDetailResponse;
+import com.backend.dto.response.shoedetail.ListSizeExits;
 import com.backend.dto.response.shoedetail.ListSizeOfShoe;
 import com.backend.dto.response.shoedetail.ResultItem;
 import com.backend.entity.Brand;
@@ -174,6 +175,28 @@ public class ShoeDetailServiceImpl implements IShoeDetailService {
         return listSizeOfShoe;
     }
 
+    @Override
+    public List<?> getListSizeExits(ListSizeOfShoeReq listSizeOfShoeReq) {
+        List<Object[]> list =
+                shoeDetailCustomRepository.getListSizeExits(listSizeOfShoeReq.getIdShoe(), listSizeOfShoeReq.getIdColor());
+//        List<ListSizeExits> listSizeExits = list.stream().map(row -> {
+//            Long sizeId = (Long) row[0];
+//            return new ListSizeExits(sizeId);
+//        }).collect(Collectors.toList());
+
+        return list;
+    }
+
+    public ServiceResult<?> getListSizeExitss(ListSizeOfShoeReq listSizeOfShoeReq) {
+        List<Object[]> list =
+                shoeDetailCustomRepository.getListSizeExits(listSizeOfShoeReq.getIdShoe(), listSizeOfShoeReq.getIdColor());
+//        List<ListSizeExits> listSizeExits = list.stream().map(row -> {
+//            Long sizeId = (Long) row[0];
+//            return new ListSizeExits(sizeId);
+//        }).collect(Collectors.toList());
+
+        return new ServiceResult<>(AppConstant.SUCCESS,"hi",list);
+    }
     @Override
     public List<ResultItem> getShoeDetailsCustom(SearchShoeDetailRequest searchShoeDetailRequest) {
         if (searchShoeDetailRequest.getShoe() != null) {

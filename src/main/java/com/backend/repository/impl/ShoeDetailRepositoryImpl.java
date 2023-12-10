@@ -371,4 +371,19 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
         List<Object[]> results = query.getResultList();
         return results;
     }
+
+    @Override
+    public List<Object[]> getListSizeExits(Long idShoe, Long idColor) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT shoe_detail.size_id FROM shoe_detail");
+        sql.append("  JOIN shoe ON shoe_detail.shoe_id = shoe.id");
+        sql.append(" JOIN color ON shoe_detail.color_id = color.id");
+        sql.append(" JOIN size ON shoe_detail.size_id = size.id");
+        sql.append(" WHERE 1 = 1 and shoe_detail.shoe_id = :idShoe and shoe_detail.color_id = :idColor");
+        Query query = entityManager.createNativeQuery(sql.toString());
+        query.setParameter("idShoe", idShoe);
+        query.setParameter("idColor", idColor);
+        List<Object[]> results = query.getResultList();
+        return results;
+    }
 }
