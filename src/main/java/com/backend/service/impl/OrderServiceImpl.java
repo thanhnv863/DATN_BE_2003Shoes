@@ -415,8 +415,10 @@ public class OrderServiceImpl implements IOrderService {
                     shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
                     cartDetailRepository.deleteCartDetailByStatus(cartDetail.getStatus());
                     if(quantityNew == 0){
-                        shoeDetail.setStatus(0);
-                        shoeDetailRepository.save(shoeDetail);
+                        ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+                        shoeDetail2.setStatus(0);
+                        shoeDetail2.setQuantity(0);
+                        shoeDetailRepository.save(shoeDetail2);
                     }
                 }
                 // gửi mail
@@ -529,8 +531,10 @@ public class OrderServiceImpl implements IOrderService {
                     orderDetailRepository.save(orderDetail);
                     shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
                     if(quantityNew == 0){
-                        shoeDetail.setStatus(0);
-                        shoeDetailRepository.save(shoeDetail);
+                        ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+                        shoeDetail2.setStatus(0);
+                        shoeDetail2.setQuantity(0);
+                        shoeDetailRepository.save(shoeDetail2);
                     }
                 }
                 //check xem email đã có tài khoản hay chưa
@@ -698,8 +702,10 @@ public class OrderServiceImpl implements IOrderService {
                 orderDetailRepository.save(orderDetail);
                 shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
                 if(quantityNew == 0){
-                    shoeDetail.setStatus(0);
-                    shoeDetailRepository.save(shoeDetail);
+                    ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+                    shoeDetail2.setStatus(0);
+                    shoeDetail2.setQuantity(0);
+                    shoeDetailRepository.save(shoeDetail2);
                 }
             }
             Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
