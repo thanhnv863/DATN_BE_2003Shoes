@@ -414,6 +414,10 @@ public class OrderServiceImpl implements IOrderService {
                     orderDetailRepository.save(orderDetail);
                     shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
                     cartDetailRepository.deleteCartDetailByStatus(cartDetail.getStatus());
+                    if(quantityNew == 0){
+                        shoeDetail.setStatus(0);
+                        shoeDetailRepository.save(shoeDetail);
+                    }
                 }
                 // gửi mail
                 Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
@@ -524,6 +528,10 @@ public class OrderServiceImpl implements IOrderService {
                     Integer quantityNew = shoeDetail1.getQuantity() - orderDetail.getQuantity();
                     orderDetailRepository.save(orderDetail);
                     shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+                    if(quantityNew == 0){
+                        shoeDetail.setStatus(0);
+                        shoeDetailRepository.save(shoeDetail);
+                    }
                 }
                 //check xem email đã có tài khoản hay chưa
                 Optional<Account> accountCheck = accountRepository.getOneByEmail(orderCutomerRequest.getEmail());
@@ -689,6 +697,10 @@ public class OrderServiceImpl implements IOrderService {
                 Integer quantityNew = shoeDetail1.getQuantity() - orderDetail.getQuantity();
                 orderDetailRepository.save(orderDetail);
                 shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+                if(quantityNew == 0){
+                    shoeDetail.setStatus(0);
+                    shoeDetailRepository.save(shoeDetail);
+                }
             }
             Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
             if (emailTemplateCheckCustomer.isPresent()) {
