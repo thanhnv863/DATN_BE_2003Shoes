@@ -186,8 +186,8 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public ServiceResultReponse<Order> add(OrderRequest orderRequest) {
         List<Object> objectList = orderRepository.listOrderByStatus(0);
-        if (!objectList.isEmpty() && objectList.size() >= 10) {
-            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Chỉ được tạo tối đa 10 hóa đơn chờ! ");
+        if (!objectList.isEmpty() && objectList.size() >= 20) {
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Chỉ được tạo tối đa 20 hóa đơn chờ! ");
         } else {
             try {
                 Date date = new Date();
