@@ -12,7 +12,7 @@ public interface ShoeDetailCustomRepository {
     Page<Object> doSearch(Pageable pageable, String shoe,
                           List<Float> size, List<String> category, List<String> brand,
                           List<String> sole, List<String> color, BigDecimal minPrice,
-                          BigDecimal maxPrice);
+                          BigDecimal maxPrice, String sort);
 
     long getTotalCount(String shoe, List<Float> size, List<String> category, List<String> brand,
                        List<String> sole, List<String> color, BigDecimal minPrice,

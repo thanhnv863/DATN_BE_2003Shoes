@@ -30,6 +30,8 @@ public class SearchShoeDetailRequest {
     private List<String> colorList;
     private String color;
 
+    private String sort;
+
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private int page;
