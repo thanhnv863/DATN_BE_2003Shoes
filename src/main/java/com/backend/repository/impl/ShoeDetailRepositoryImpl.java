@@ -22,7 +22,7 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
     @Override
     public Page<Object> doSearch(Pageable pageable,String shoe, List<Float> size, List<String> category,
                                  List<String> brand, List<String> sole, List<String> color,
-                                 BigDecimal minPrice, BigDecimal maxPrice) {
+                                 BigDecimal minPrice, BigDecimal maxPrice, String sort) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT a.id, d.name as nameShoe, e.name as size, f.name as category,");
         sql.append(" g.name as brand, h.name as sole, i.name as color, a.code, a.qrcode,");
@@ -32,7 +32,7 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
         sql.append(" JOIN thumbnail c ON a.id = c.shoe_detail_id JOIN shoe d ON a.shoe_id = d.id");
         sql.append(" JOIN size e ON a.size_id = e.id JOIN category f ON a.category_id = f.id");
         sql.append(" JOIN brand g ON a.brand_id = g.id JOIN sole h ON a.sole_id = h.id");
-        sql.append(" JOIN color i ON a.color_id = i.id WHERE 1 = 1");
+        sql.append(" JOIN color i ON a.color_id = i.id WHERE 1 = 1 AND a.status = 1");
 //        sql.append("SELECT d.name, MAX(a.updated_time) as updated_time FROM shoe_detail a");
 //        sql.append(" JOIN shoe d ON a.shoe_id = d.id GROUP BY d.name)");
 
@@ -64,7 +64,17 @@ public class ShoeDetailRepositoryImpl implements ShoeDetailCustomRepository {
             sql.append(" AND (a.price >= :minPrice AND a.price <= :maxPrice)");
         }
 
-        sql.append(" GROUP BY a.id ORDER BY a.updated_time DESC");
+        if (sort.equalsIgnoreCase("-updatedAt")){
+            sql.append(" GROUP BY a.id ORDER BY a.updated_time DESC");
+        }
+
+        if (sort.equalsIgnoreCase("-price")){
+            sql.append(" GROUP BY a.id ORDER BY a.price DESC");
+        }
+
+        if (sort.equalsIgnoreCase("price")){
+            sql.append(" GROUP BY a.id ORDER BY a.price ASC");
+        }
 
         Query query = entityManager.createNativeQuery(sql.toString());
 
