@@ -111,54 +111,55 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
 
     // doanh thu theo tháng, chọn năm hiện ra 12 tháng
     @Query(value = "SELECT \n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang1',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity ELSE 0 END) AS 'soLuongThang1',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang2',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity ELSE 0 END) AS 'soLuongThang2',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang3',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity ELSE 0 END) AS 'soLuongThang3',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang4',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity ELSE 0 END) AS 'soLuongThang4',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang5',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity ELSE 0 END) AS 'soLuongThang5',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang6',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity ELSE 0 END) AS 'soLuongThang6',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang7',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity ELSE 0 END) AS 'soLuongThang7',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang8',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity ELSE 0 END) AS 'soLuongThang8',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang9',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity ELSE 0 END) AS 'soLuongThang9',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang10',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity ELSE 0 END) AS 'soLuongThang10',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang11',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity ELSE 0 END) AS 'soLuongThang11',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity * od.price ELSE 0 END) AS 'totalThang12',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity ELSE 0 END) AS 'soLuongThang12'\n" +
-            "\t\tFROM my_order mo \n" +
-            "\t\tLEFT JOIN payment_method pm ON mo.id = pm.order_id\n" +
-            "\t\tLEFT JOIN order_detail od ON mo.id = od.order_id\n" +
-            "\t\tWHERE YEAR(mo.pay_date) = :nam AND mo.status = 8 AND (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang1',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang1',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang2',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang2',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang3',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang3',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang4',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang4',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang5',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang5',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang6',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang6',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang7',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang7',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang8',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang8',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang9',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang9',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang10',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang10',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang11',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang11',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity * od.price ELSE 0 END), 0) AS 'totalThang12',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang12'\n" +
+            "FROM my_order mo \n" +
+            "JOIN payment_method pm ON mo.id = pm.order_id\n" +
+            "JOIN order_detail od ON mo.id = od.order_id\n" +
+            "WHERE\n" +
+            "    YEAR(mo.pay_date) = :nam AND mo.status = 8 AND (:typeBanHang is null or mo.type = :typeBanHang)",nativeQuery = true)
     List<Object[]> doanhThuTheoThang(Integer nam, Integer typeBanHang);
 
     // số lượng sản phẩm bán được trong năm
     @Query(value = "SELECT \n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity ELSE 0 END) AS 'soLuongThang1',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity ELSE 0 END) AS 'soLuongThang2',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity ELSE 0 END) AS 'soLuongThang3',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity ELSE 0 END) AS 'soLuongThang4',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity ELSE 0 END) AS 'soLuongThang5',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity ELSE 0 END) AS 'soLuongThang6',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity ELSE 0 END) AS 'soLuongThang7',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity ELSE 0 END) AS 'soLuongThang8',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity ELSE 0 END) AS 'soLuongThang9',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity ELSE 0 END) AS 'soLuongThang10',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity ELSE 0 END) AS 'soLuongThang11',\n" +
-            "    SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity ELSE 0 END) AS 'soLuongThang12'\n" +
-            "\t\tFROM my_order mo \n" +
-            "\t\t\tLEFT JOIN payment_method pm ON mo.id = pm.order_id\n" +
-            "\t\t\tLEFT JOIN order_detail od ON mo.id = od.order_id\n" +
-            "\t\t\tWHERE \n" +
-            "\t\t\tYEAR(mo.pay_date) = 2023 AND mo.status = 8",nativeQuery = true)
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 1 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang1',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 2 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang2',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 3 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang3',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 4 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang4',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 5 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang5',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 6 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang6',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 7 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang7',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 8 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang8',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 9 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang9',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 10 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang10',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 11 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang11',\n" +
+            "    COALESCE(SUM(CASE WHEN MONTH(mo.pay_date) = 12 THEN od.quantity ELSE 0 END), 0) AS 'soLuongThang12'\n" +
+            "FROM my_order mo \n" +
+            "JOIN payment_method pm ON mo.id = pm.order_id\n" +
+            "JOIN order_detail od ON mo.id = od.order_id\n" +
+            "WHERE\n" +
+            "    YEAR(mo.pay_date) = :nam AND mo.status = 8;",nativeQuery = true)
     List<Object[]> soLuongSanPhamBanTheoNam(Integer nam);
 }
