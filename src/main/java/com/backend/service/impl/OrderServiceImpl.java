@@ -377,16 +377,17 @@ public class OrderServiceImpl implements IOrderService {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(date);
 
-                // Thêm 2 ngày vào ngày giao hàng
-                calendar.add(Calendar.DAY_OF_MONTH, 2);
-                Date shipDate = calendar.getTime();
-                order.setShipDate(shipDate);
-
-                // Thêm 2 ngày nữa vào ngày mong muốn
-                calendar.add(Calendar.DAY_OF_MONTH, 2);
-                Date desiredDate = calendar.getTime();
-                order.setDesiredDate(desiredDate);
-
+//                // Thêm 2 ngày vào ngày giao hàng
+//                calendar.add(Calendar.DAY_OF_MONTH, 2);
+//                Date shipDate = calendar.getTime();
+//                order.setShipDate(shipDate);
+//
+//                // Thêm 2 ngày nữa vào ngày mong muốn
+//                calendar.add(Calendar.DAY_OF_MONTH, 2);
+//                Date desiredDate = calendar.getTime();
+//                order.setDesiredDate(desiredDate);
+                order.setShipDate(null);
+                order.setDesiredDate(null);
                 order.setReceiveDate(null);
                 order.setCreatedBy(order.getAccount().getName());
                 order.setNote(orderCutomerRequest.getNote());
