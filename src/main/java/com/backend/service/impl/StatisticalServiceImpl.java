@@ -526,6 +526,7 @@ public class StatisticalServiceImpl implements IStatistical {
         List<SoHangHoaBanDuocTrongNam> result = new ArrayList<>();
         List<DataItem> dataItems = new ArrayList<>();
 
+
         for (Object[] record: soHangHoa) {
             SoHangHoaBanDuocTrongNam soHangHoaBanDuocTrongNam = new SoHangHoaBanDuocTrongNam();
 
@@ -615,10 +616,7 @@ public class StatisticalServiceImpl implements IStatistical {
             dataItems.add(dataItem11);
             dataItems.add(dataItem12);
         }
+
         return new ServiceResult<>(AppConstant.SUCCESS,"success",dataItems);
     }
-
-
-
-
 }
