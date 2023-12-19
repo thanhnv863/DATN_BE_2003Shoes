@@ -44,14 +44,19 @@ public class CategoryServiceImpl implements ICategoryService {
                 return new ServiceResult(AppConstant.FAIL, "Category already exits!", null);
             }
         } else {
-            Category category = new Category();
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            category.setName(categoryRequest.getName());
-            category.setStatus(1);
-            category.setCreatedAt(date);
-            category.setUpdatedAt(date);
-            return new ServiceResult(AppConstant.SUCCESS, "Category", categoryRepository.save(category));
+            if (categoryRequest.getName() == null || (categoryRequest.getName() != null && categoryRequest.getName().trim().isEmpty())) {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The name of category not valid!", null);
+            } else {
+                Category category = new Category();
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                category.setName(categoryRequest.getName());
+                category.setStatus(1);
+                category.setCreatedAt(date);
+                category.setUpdatedAt(date);
+                return new ServiceResult(AppConstant.SUCCESS, "Category", categoryRepository.save(category));
+            }
+
         }
 
     }
@@ -60,17 +65,22 @@ public class CategoryServiceImpl implements ICategoryService {
     public ServiceResult<Category> updateCategory(CategoryRequestUpdate categoryRequestUpdate) {
         Optional<Category> categoryOptional = categoryRepository.findById(categoryRequestUpdate.getId());
         if (categoryOptional.isPresent()) {
-            Category categoryExits = categoryOptional.get();
-            categoryExits.setId(categoryExits.getId());
-            categoryExits.setName(categoryRequestUpdate.getName());
-            categoryExits.setCreatedAt(categoryExits.getCreatedAt());
+            if (categoryRequestUpdate.getName() == null || (categoryRequestUpdate.getName() != null && categoryRequestUpdate.getName().trim().isEmpty())) {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The name of category not valid!", null);
+            } else {
+                Category categoryExits = categoryOptional.get();
+                categoryExits.setId(categoryExits.getId());
+                categoryExits.setName(categoryRequestUpdate.getName());
+                categoryExits.setCreatedAt(categoryExits.getCreatedAt());
 
-            Calendar calendar = Calendar.getInstance();
-            categoryExits.setUpdatedAt(calendar.getTime());
+                Calendar calendar = Calendar.getInstance();
+                categoryExits.setUpdatedAt(calendar.getTime());
 
-            categoryExits.setStatus(categoryRequestUpdate.getStatus());
-            Category categoryUpdate = categoryRepository.save(categoryExits);
-            return new ServiceResult<>(AppConstant.SUCCESS, "The category update succesfully!", categoryUpdate);
+                categoryExits.setStatus(categoryRequestUpdate.getStatus());
+                Category categoryUpdate = categoryRepository.save(categoryExits);
+                return new ServiceResult<>(AppConstant.SUCCESS, "The category update succesfully!", categoryUpdate);
+            }
+
         } else {
             return new ServiceResult<>(AppConstant.BAD_REQUEST, "The category not found!", null);
         }

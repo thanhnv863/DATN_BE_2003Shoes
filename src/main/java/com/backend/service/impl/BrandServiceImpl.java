@@ -43,14 +43,19 @@ public class BrandServiceImpl implements IBrandService {
                 return new ServiceResult(AppConstant.FAIL, "Category already exits!", null);
             }
         } else {
-            Brand brand = new Brand();
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            brand.setName(brandRequest.getName());
-            brand.setStatus(0);
-            brand.setCreatedAt(date);
-            brand.setUpdatedAt(date);
-            return new ServiceResult(AppConstant.SUCCESS, "Brand created succesfully!", brandRepository.save(brand));
+            if (brandRequest.getName() == null || (brandRequest.getName() != null && brandRequest.getName().trim().isEmpty())) {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The name of brand not valid!", null);
+            } else {
+                Brand brand = new Brand();
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                brand.setName(brandRequest.getName());
+                brand.setStatus(0);
+                brand.setCreatedAt(date);
+                brand.setUpdatedAt(date);
+                return new ServiceResult(AppConstant.SUCCESS, "Brand created succesfully!", brandRepository.save(brand));
+            }
+
         }
     }
 
@@ -58,17 +63,22 @@ public class BrandServiceImpl implements IBrandService {
     public ServiceResult<Brand> updateBrand(BrandRequestUpdate brandRequestUpdate) {
         Optional<Brand> brandOptional = brandRepository.findById(brandRequestUpdate.getId());
         if (brandOptional.isPresent()) {
-            Brand brandExits = brandOptional.get();
-            brandExits.setId(brandExits.getId());
-            brandExits.setName(brandRequestUpdate.getName());
-            brandExits.setCreatedAt(brandExits.getCreatedAt());
+            if (brandRequestUpdate.getName() == null || (brandRequestUpdate.getName() != null && brandRequestUpdate.getName().trim().isEmpty())) {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The name of brand not valid!", null);
+            } else {
+                Brand brandExits = brandOptional.get();
+                brandExits.setId(brandExits.getId());
+                brandExits.setName(brandRequestUpdate.getName());
+                brandExits.setCreatedAt(brandExits.getCreatedAt());
 
-            Calendar calendar = Calendar.getInstance();
-            brandExits.setUpdatedAt(calendar.getTime());
+                Calendar calendar = Calendar.getInstance();
+                brandExits.setUpdatedAt(calendar.getTime());
 
-            brandExits.setStatus(brandRequestUpdate.getStatus());
-            Brand brandUpdate = brandRepository.save(brandExits);
-            return new ServiceResult<>(AppConstant.SUCCESS, "The brand update succesfully!", brandUpdate);
+                brandExits.setStatus(brandRequestUpdate.getStatus());
+                Brand brandUpdate = brandRepository.save(brandExits);
+                return new ServiceResult<>(AppConstant.SUCCESS, "The brand update succesfully!", brandUpdate);
+            }
+
         } else {
             return new ServiceResult<>(AppConstant.BAD_REQUEST, "The brand not found!", null);
         }

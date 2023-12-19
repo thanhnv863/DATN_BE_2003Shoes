@@ -45,14 +45,18 @@ public class SizeServiceImpl implements ISizeService {
                 return new ServiceResult(AppConstant.FAIL, "Size already exits!", null);
             }
         } else {
-            Size size = new Size();
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            size.setName(sizeRequest.getName());
-            size.setStatus(1);
-            size.setCreatedAt(date);
-            size.setUpdatedAt(date);
-            return new ServiceResult(AppConstant.SUCCESS, "Category", sizeRepository.save(size));
+            if (sizeRequest.getName() == null) {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The name of size not valid!", null);
+            } else {
+                Size size = new Size();
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                size.setName(sizeRequest.getName());
+                size.setStatus(1);
+                size.setCreatedAt(date);
+                size.setUpdatedAt(date);
+                return new ServiceResult(AppConstant.SUCCESS, "Category", sizeRepository.save(size));
+            }
         }
     }
 
@@ -60,17 +64,21 @@ public class SizeServiceImpl implements ISizeService {
     public ServiceResult<Size> updateSize(SizeRequestUpdate sizeRequestUpdate) {
         Optional<Size> sizeOptional = sizeRepository.findById(sizeRequestUpdate.getId());
         if (sizeOptional.isPresent()) {
-            Size sizeExits = sizeOptional.get();
-            sizeExits.setId(sizeExits.getId());
-            sizeExits.setName(sizeRequestUpdate.getName());
-            sizeExits.setCreatedAt(sizeExits.getCreatedAt());
+            if (sizeRequestUpdate.getName() == null) {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The name of size not valid!", null);
+            } else {
+                Size sizeExits = sizeOptional.get();
+                sizeExits.setId(sizeExits.getId());
+                sizeExits.setName(sizeRequestUpdate.getName());
+                sizeExits.setCreatedAt(sizeExits.getCreatedAt());
 
-            Calendar calendar = Calendar.getInstance();
-            sizeExits.setUpdatedAt(calendar.getTime());
+                Calendar calendar = Calendar.getInstance();
+                sizeExits.setUpdatedAt(calendar.getTime());
 
-            sizeExits.setStatus(sizeRequestUpdate.getStatus());
-            Size sizeUpdate = sizeRepository.save(sizeExits);
-            return new ServiceResult<>(AppConstant.SUCCESS, "The size update succesfully!", sizeUpdate);
+                sizeExits.setStatus(sizeRequestUpdate.getStatus());
+                Size sizeUpdate = sizeRepository.save(sizeExits);
+                return new ServiceResult<>(AppConstant.SUCCESS, "The size update succesfully!", sizeUpdate);
+            }
         } else {
             return new ServiceResult<>(AppConstant.BAD_REQUEST, "The size not found!", null);
         }

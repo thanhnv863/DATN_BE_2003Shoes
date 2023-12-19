@@ -93,18 +93,23 @@ public class OrderDetailServiceImpl implements IOrderDetailSerivice {
         Optional<ShoeDetail> shoeDetail = shoeDetailRepository.findById(orderDetailRequest.getIdShoeDetail());
         Optional<Order> order = orderRepository.findById(orderDetailRequest.getIdOrder());
         if (orderDetail.isPresent() && shoeDetail.isPresent() && order.isPresent()) {
-            OrderDetail orderDetailUpdate = orderDetail.get();
-            ShoeDetail shoeDetailUpdateOrderDetail = shoeDetail.get();
-            Order orderUpdateOrderDetail = order.get();
-            orderDetailUpdate.setShoeDetail(shoeDetailUpdateOrderDetail);
-            orderDetailUpdate.setOrder(orderUpdateOrderDetail);
-            orderDetailUpdate.setQuantity(orderDetailRequest.getQuantity());
-            orderDetailUpdate.setPrice(orderDetailRequest.getPrice());
-            orderDetailUpdate.setDiscount(orderDetailRequest.getDiscount());
-            orderDetailUpdate.setStatus(orderDetailRequest.getStatus());
-            OrderDetail orderDetail1 = orderDetailRepository.save(orderDetailUpdate);
-            OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
-            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetailRequest1, "Cập nhật orderDetail thành công");
+            if (orderDetailRequest.getQuantity() > shoeDetail.get().getQuantity()) {
+                return new ServiceResultReponse<>(AppConstant.BAD_REQUEST, 0L, null, "Số lượng tồn không đủ!");
+            }else {
+                OrderDetail orderDetailUpdate = orderDetail.get();
+                ShoeDetail shoeDetailUpdateOrderDetail = shoeDetail.get();
+                Order orderUpdateOrderDetail = order.get();
+                orderDetailUpdate.setShoeDetail(shoeDetailUpdateOrderDetail);
+                orderDetailUpdate.setOrder(orderUpdateOrderDetail);
+                orderDetailUpdate.setQuantity(orderDetailRequest.getQuantity());
+                orderDetailUpdate.setPrice(orderDetailRequest.getPrice());
+                orderDetailUpdate.setDiscount(orderDetailRequest.getDiscount());
+                orderDetailUpdate.setStatus(orderDetailRequest.getStatus());
+                OrderDetail orderDetail1 = orderDetailRepository.save(orderDetailUpdate);
+                OrderDetailReponse orderDetailRequest1 = this.convertToOrderDetail(orderDetail1);
+                return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderDetailRequest1, "Cập nhật orderDetail thành công");
+            }
+
         } else {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Không tồn tại chi tiết hóa đơn hoặc hóa đơn hoặc sản phẩm");
         }
