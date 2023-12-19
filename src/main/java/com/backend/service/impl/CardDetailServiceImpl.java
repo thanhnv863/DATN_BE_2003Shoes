@@ -174,7 +174,17 @@ public class CardDetailServiceImpl implements ICartDetailService {
         Optional<Cart> optionalCart = cartRepository.findById(cartId);
         if (optionalCart.isPresent()) {
             Cart cart = optionalCart.get();
+            List<ShoeDetail> shoeDetailList = shoeDetailRepository.findAll();
             List<CartDetail> cartDetailList = cartDetailRepository.findByCart(cart);
+            System.out.println(cartDetailList);
+            System.out.println(shoeDetailList);
+            for (CartDetail cartDetail: cartDetailList) {
+                for (ShoeDetail shoeDetail: shoeDetailList) {
+                    if (cartDetail.getId() == shoeDetail.getId() && cartDetail.getQuantity() > shoeDetail.getQuantity()) {
+                        cartDetail.setStatus(3);
+                    }
+                }
+            }
             List<CartDetailResponse> cartDetailResponses = convertToCartDetailResponse(cartDetailList);
             return new ServiceResult<>(AppConstant.SUCCESS, "get list successfully!", cartDetailResponses);
         } else {
