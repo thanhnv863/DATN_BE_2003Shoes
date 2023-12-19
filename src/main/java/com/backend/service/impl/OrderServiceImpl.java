@@ -220,18 +220,25 @@ public class OrderServiceImpl implements IOrderService {
     public ServiceResultReponse<Order> update(OrderRequetUpdate orderRequetUpdate) {
         Optional<Order> order = orderRepository.findOrderByCode(orderRequetUpdate.getCode());
         Date date = new Date();
+        int checkStatus5 = 0;
+        List<String> tenGiayListStatus5 = new ArrayList<>();
         if (order.isPresent()) {
             Order orderGet = order.get();
-            boolean check = false;
+            int check = 0;
+            List<String> tenGiayList = new ArrayList<>();
             List<OrderDetail> orderDetailList = orderDetailRepository.getAllOrderDetail(orderGet.getId());
             for (OrderDetail orderDetail : orderDetailList) {
                 ShoeDetail shoeDetail = shoeDetailRepository.findById(orderDetail.getShoeDetail().getId()).get();
                 if (orderGet.getStatus() == 0 && orderDetail.getQuantity() > shoeDetail.getQuantity()) {
-                    check = true;
+                    check++;
+                    tenGiayList.add(shoeDetail.getCode());
                 }
             }
-            if (check == true) {
-                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Số lượng sản phẩm tồn không đủ vui lòng chọn lại số lượng !");
+            if (check > 0) {
+                String errorMessage = "Số lượng sản phẩm tồn của giày ";
+                errorMessage += String.join(", ", tenGiayList);
+                errorMessage += " không đủ vui lòng chọn lại số lượng !";
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, errorMessage);
             } else {
                 orderGet.setId(orderGet.getId());
                 orderGet.setCode(orderGet.getCode());
@@ -283,35 +290,62 @@ public class OrderServiceImpl implements IOrderService {
                         }
                     }
                 }
-
                 orderGet.setStatus(orderRequetUpdate.getStatus());
-                Order orderUpdate = orderRepository.save(orderGet);
-                //
-                OrderHistory orderHistory = new OrderHistory();
-                orderHistory.setOrder(orderUpdate);
-                orderHistory.setCreatedTime(date);
-                orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
-                orderHistory.setNote(orderRequetUpdate.getNote());
-                orderHistory.setType("Updated");
-                orderHistoryRepository.save(orderHistory);
-
-                // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
-                if (orderUpdate.getAccount() != null) {
-                    List<Address> listCheckAddress = addressRepository.findAddressesByAccount_Id(orderUpdate.getAccount().getId());
-                    if (listCheckAddress.isEmpty()) {
-                        Address address = new Address();
-                        address.setAccount(orderUpdate.getAccount());
-                        address.setName(orderRequetUpdate.getCustomerName());
-                        address.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
-                        address.setSpecificAddress(orderRequetUpdate.getSpecificAddress());
-                        address.setWard(orderRequetUpdate.getWard());
-                        address.setDistrict(orderRequetUpdate.getDistrict());
-                        address.setProvince(orderRequetUpdate.getProvince());
-                        address.setDefaultAddress("1");
-                        addressRepository.save(address);
+//                Order orderUpdate = orderRepository.save(orderGet);
+                if (orderGet.getStatus() == 5) {
+                    for (OrderDetail orderDetail : orderDetailList) {
+                        ShoeDetail shoeDetail = shoeDetailRepository.findById(orderDetail.getShoeDetail().getId()).get();
+                        if (orderDetail.getQuantity() > shoeDetail.getQuantity()) {
+                            checkStatus5++;
+                            tenGiayListStatus5.add(shoeDetail.getCode());
+                        } else {
+                            Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
+                            shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+                            if (quantityNew == 0) {
+                                ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+                                shoeDetail2.setStatus(0);
+                                shoeDetail2.setQuantity(0);
+                                shoeDetailRepository.save(shoeDetail2);
+                            }
+                        }
                     }
                 }
-                return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
+                if (checkStatus5 > 0) {
+                    orderGet.setStatus(4);
+                    orderRepository.save(orderGet);
+                    String errorMessage = "Số lượng sản phẩm tồn của giày ";
+                    errorMessage += String.join(", ", tenGiayList);
+                    errorMessage += " không đủ vui lòng chọn lại số lượng !";
+                    return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, errorMessage);
+                } else {
+                    Order orderUpdate = orderRepository.save(orderGet);
+                    //
+                    OrderHistory orderHistory = new OrderHistory();
+                    orderHistory.setOrder(orderUpdate);
+                    orderHistory.setCreatedTime(date);
+                    orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
+                    orderHistory.setNote(orderRequetUpdate.getNote());
+                    orderHistory.setType("Updated");
+                    orderHistoryRepository.save(orderHistory);
+
+                    // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
+                    if (orderUpdate.getAccount() != null) {
+                        List<Address> listCheckAddress = addressRepository.findAddressesByAccount_Id(orderUpdate.getAccount().getId());
+                        if (listCheckAddress.isEmpty()) {
+                            Address address = new Address();
+                            address.setAccount(orderUpdate.getAccount());
+                            address.setName(orderRequetUpdate.getCustomerName());
+                            address.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
+                            address.setSpecificAddress(orderRequetUpdate.getSpecificAddress());
+                            address.setWard(orderRequetUpdate.getWard());
+                            address.setDistrict(orderRequetUpdate.getDistrict());
+                            address.setProvince(orderRequetUpdate.getProvince());
+                            address.setDefaultAddress("1");
+                            addressRepository.save(address);
+                        }
+                    }
+                    return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
+                }
             }
 
         } else {
@@ -392,15 +426,20 @@ public class OrderServiceImpl implements IOrderService {
             if (cartDetailList.isEmpty()) {
                 return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại, vui lòng chọn sản phẩm mua!");
             } else {
-                boolean check = false;
+                int check = 0;
+                List<String> tenGiayList = new ArrayList<>();
                 for (CartDetail cartDetail : cartDetailList) {
                     ShoeDetail shoeDetail = shoeDetailRepository.findById(cartDetail.getShoeDetail().getId()).get();
                     if (cartDetail.getQuantity() > shoeDetail.getQuantity()) {
-                        check = true;
+                        check++;
+                        tenGiayList.add(shoeDetail.getCode());
                     }
                 }
-                if (check == true) {
-                    return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Số lượng sản phẩm tồn không đủ vui lòng chọn lại số lượng");
+                if (check > 0) {
+                    String errorMessage = "Số lượng sản phẩm tồn của giày ";
+                    errorMessage += String.join(", ", tenGiayList);
+                    errorMessage += " không đủ vui lòng chọn lại số lượng !";
+                    return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, errorMessage);
                 } else {
                     order.setType("2");
                     order.setPhoneNumber(orderCutomerRequest.getPhoneNumber());
@@ -438,16 +477,16 @@ public class OrderServiceImpl implements IOrderService {
                         orderDetail.setPrice(shoeDetail.getPriceInput());
                         orderDetail.setDiscount(BigDecimal.valueOf(0));
                         orderDetail.setStatus(1);
-                        Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
+//                        Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
                         orderDetailRepository.save(orderDetail);
-                        shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+//                        shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
                         cartDetailRepository.deleteCartDetailByStatus(cartDetail.getStatus());
-                        if (quantityNew == 0) {
-                            ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
-                            shoeDetail2.setStatus(0);
-                            shoeDetail2.setQuantity(0);
-                            shoeDetailRepository.save(shoeDetail2);
-                        }
+//                        if (quantityNew == 0) {
+//                            ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+//                            shoeDetail2.setStatus(0);
+//                            shoeDetail2.setQuantity(0);
+//                            shoeDetailRepository.save(shoeDetail2);
+//                        }
                     }
                     // gửi mail
                     Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
@@ -498,15 +537,20 @@ public class OrderServiceImpl implements IOrderService {
             } else {
                 List<ShoeDetail> shoeDetailList = new ArrayList<>();
                 shoeDetailList = orderCutomerRequest.getShoeDetailListRequets();
-                boolean check = false;
+                int check = 0;
+                List<String> tenGiayList = new ArrayList<>();
                 for (ShoeDetail shoeDetailCheck : shoeDetailList) {
                     ShoeDetail shoeDetailCheck1 = shoeDetailRepository.findById(shoeDetailCheck.getId()).get();
                     if (shoeDetailCheck.getQuantity() > shoeDetailCheck1.getQuantity()) {
-                        check = true;
+                        check++;
+                        tenGiayList.add(shoeDetailCheck1.getCode());
                     }
                 }
-                if (check == true) {
-                    return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Số lượng sản phẩm tồn không đủ vui lòng chọn lại số lượng");
+                if (check > 0) {
+                    String errorMessage = "Số lượng sản phẩm tồn của giày ";
+                    errorMessage += String.join(", ", tenGiayList);
+                    errorMessage += " không đủ vui lòng chọn lại số lượng !";
+                    return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, errorMessage);
                 } else {
                     Date date = new Date();
                     Order order = new Order();
@@ -557,15 +601,15 @@ public class OrderServiceImpl implements IOrderService {
                         orderDetail.setPrice(shoeDetail.getPriceInput());
                         orderDetail.setDiscount(BigDecimal.valueOf(0));
                         orderDetail.setStatus(1);
-                        Integer quantityNew = shoeDetail1.getQuantity() - orderDetail.getQuantity();
+//                        Integer quantityNew = shoeDetail1.getQuantity() - orderDetail.getQuantity();
                         orderDetailRepository.save(orderDetail);
-                        shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
-                        if (quantityNew == 0) {
-                            ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
-                            shoeDetail2.setStatus(0);
-                            shoeDetail2.setQuantity(0);
-                            shoeDetailRepository.save(shoeDetail2);
-                        }
+//                        shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+//                        if (quantityNew == 0) {
+//                            ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+//                            shoeDetail2.setStatus(0);
+//                            shoeDetail2.setQuantity(0);
+//                            shoeDetailRepository.save(shoeDetail2);
+//                        }
                     }
                     //check xem email đã có tài khoản hay chưa
                     Optional<Account> accountCheck = accountRepository.getOneByEmail(orderCutomerRequest.getEmail());
@@ -675,14 +719,16 @@ public class OrderServiceImpl implements IOrderService {
             List<ShoeDetail> shoeDetailList = new ArrayList<>();
             shoeDetailList = orderCutomerRequest.getShoeDetailListRequets();
             boolean check = false;
+            String tenGiay = "";
             for (ShoeDetail shoeDetailCheck : shoeDetailList) {
                 ShoeDetail shoeDetailCheck1 = shoeDetailRepository.findById(shoeDetailCheck.getId()).get();
                 if (shoeDetailCheck.getQuantity() > shoeDetailCheck1.getQuantity()) {
                     check = true;
+                    tenGiay = shoeDetailCheck1.getCode();
                 }
             }
             if (check == true) {
-                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Số lượng sản phẩm tồn không đủ vui lòng chọn lại số lượng");
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Số lượng sản phẩm tồn của giày " + tenGiay + " không đủ vui lòng chọn lại số lượng");
             } else {
                 Date date = new Date();
                 Order order = new Order();
@@ -739,15 +785,15 @@ public class OrderServiceImpl implements IOrderService {
                     orderDetail.setPrice(shoeDetail.getPriceInput());
                     orderDetail.setDiscount(BigDecimal.valueOf(0));
                     orderDetail.setStatus(1);
-                    Integer quantityNew = shoeDetail1.getQuantity() - orderDetail.getQuantity();
+//                    Integer quantityNew = shoeDetail1.getQuantity() - orderDetail.getQuantity();
                     orderDetailRepository.save(orderDetail);
-                    shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
-                    if (quantityNew == 0) {
-                        ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
-                        shoeDetail2.setStatus(0);
-                        shoeDetail2.setQuantity(0);
-                        shoeDetailRepository.save(shoeDetail2);
-                    }
+//                    shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+//                    if (quantityNew == 0) {
+//                        ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+//                        shoeDetail2.setStatus(0);
+//                        shoeDetail2.setQuantity(0);
+//                        shoeDetailRepository.save(shoeDetail2);
+//                    }
                 }
                 Optional<EmailTemplate> emailTemplateCheckCustomer = emailRepository.checkSendMail(5);
                 if (emailTemplateCheckCustomer.isPresent()) {
