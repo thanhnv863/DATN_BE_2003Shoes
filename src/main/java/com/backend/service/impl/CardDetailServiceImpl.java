@@ -178,13 +178,29 @@ public class CardDetailServiceImpl implements ICartDetailService {
             List<CartDetail> cartDetailList = cartDetailRepository.findByCart(cart);
             System.out.println(cartDetailList);
             System.out.println(shoeDetailList);
-            for (CartDetail cartDetail: cartDetailList) {
-                for (ShoeDetail shoeDetail: shoeDetailList) {
-                    if (cartDetail.getId() == shoeDetail.getId() && cartDetail.getQuantity() > shoeDetail.getQuantity()) {
+//            for (ShoeDetail shoeDetail: shoeDetailList) {
+                for (CartDetail cartDetail: cartDetailList) {
+                    System.out.println(cartDetail.getShoeDetail().getId());
+                    System.out.println(cartDetail.getId());
+                    System.out.println(cartDetail.getQuantity());
+                    System.out.println(cartDetail.getShoeDetail().getQuantity());
+                    if ( cartDetail.getQuantity() > cartDetail.getShoeDetail().getQuantity()) {
+                        System.out.println(cartDetail.getId());
                         cartDetail.setStatus(3);
+                        cartDetailRepository.save(cartDetail);
+                    }
+                    if (cartDetail.getStatus() == 3 && cartDetail.getQuantity() <= cartDetail.getShoeDetail().getQuantity()) {
+                        System.out.println(cartDetail.getId());
+                        cartDetail.setStatus(0);
+                        cartDetailRepository.save(cartDetail);
+                    }
+                    if ( cartDetail.getShoeDetail().getStatus() == 0) {
+                        System.out.println(cartDetail.getId());
+                        cartDetail.setStatus(3);
+                        cartDetailRepository.save(cartDetail);
                     }
                 }
-            }
+
             List<CartDetailResponse> cartDetailResponses = convertToCartDetailResponse(cartDetailList);
             return new ServiceResult<>(AppConstant.SUCCESS, "get list successfully!", cartDetailResponses);
         } else {
