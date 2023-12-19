@@ -108,17 +108,21 @@ public class ShoeServiceImpl implements IShoeService {
     public ServiceResult<Shoe> updateShoe(ShoeRequestUpdate shoeRequestUpdate) {
         Optional<Shoe> shoeOptional = shoeRepository.findById(shoeRequestUpdate.getId());
         if (shoeOptional.isPresent()){
-            Shoe shoeExits = shoeOptional.get();
-            shoeExits.setId(shoeExits.getId());
-            shoeExits.setName(shoeRequestUpdate.getName());
-            shoeExits.setCreatedAt(shoeExits.getCreatedAt());
+            if(shoeRequestUpdate.getName() == null || (shoeRequestUpdate.getName() != null && shoeRequestUpdate.getName().trim().isEmpty())){
+                return new ServiceResult<>(AppConstant.BAD_REQUEST,"The name of shoe not valid!", null);
+            }else {
+                Shoe shoeExits = shoeOptional.get();
+                shoeExits.setId(shoeExits.getId());
+                shoeExits.setName(shoeRequestUpdate.getName().trim());
+                shoeExits.setCreatedAt(shoeExits.getCreatedAt());
 
-            Calendar calendar = Calendar.getInstance();
-            shoeExits.setUpdatedAt(calendar.getTime());
+                Calendar calendar = Calendar.getInstance();
+                shoeExits.setUpdatedAt(calendar.getTime());
 
-            shoeExits.setStatus(shoeRequestUpdate.getStatus());
-            Shoe shoeUpdate = shoeRepository.save(shoeExits);
-            return new ServiceResult<>(AppConstant.SUCCESS,"The shoe update succesfully!", shoeUpdate);
+                shoeExits.setStatus(shoeRequestUpdate.getStatus());
+                Shoe shoeUpdate = shoeRepository.save(shoeExits);
+                return new ServiceResult<>(AppConstant.SUCCESS,"The shoe update succesfully!", shoeUpdate);
+            }
         }else {
             return new ServiceResult<>(AppConstant.BAD_REQUEST,"The shoe not found!", null);
         }
@@ -221,7 +225,7 @@ public class ShoeServiceImpl implements IShoeService {
 
     @Override
     public ServiceResult<ShoeResponse> addNewShoeName(ShoeRequest shoeRequest) {
-        Optional<Shoe> optionalShoe = shoeRepository.findByNameShoe(shoeRequest.getName());
+        Optional<Shoe> optionalShoe = shoeRepository.findByNameShoe(shoeRequest.getName().trim());
         if (optionalShoe.isPresent()) {
             if (optionalShoe.get().getStatus() == 0) {
                 Shoe shoe = optionalShoe.get();
@@ -232,14 +236,18 @@ public class ShoeServiceImpl implements IShoeService {
                 return new ServiceResult(AppConstant.FAIL, "Shoe already exits!", null);
             }
         } else {
-            Shoe shoe = new Shoe();
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            shoe.setName(shoeRequest.getName());
-            shoe.setStatus(1);
-            shoe.setCreatedAt(date);
-            shoe.setUpdatedAt(date);
-            return new ServiceResult(AppConstant.SUCCESS, "Success", shoeRepository.save(shoe));
+            if(shoeRequest.getName() == null || (shoeRequest.getName() != null && shoeRequest.getName().trim().isEmpty())){
+                return new ServiceResult<>(AppConstant.BAD_REQUEST,"The name of shoe not valid!", null);
+            }else {
+                Shoe shoe = new Shoe();
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                shoe.setName(shoeRequest.getName().trim());
+                shoe.setStatus(1);
+                shoe.setCreatedAt(date);
+                shoe.setUpdatedAt(date);
+                return new ServiceResult(AppConstant.SUCCESS, "Success", shoeRepository.save(shoe));
+            }
         }
 
     }
