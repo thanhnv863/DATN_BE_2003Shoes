@@ -89,19 +89,26 @@ public class CardDetailServiceImpl implements ICartDetailService {
 
             CartDetail existingCartDetail = cartDetailRepository.findByCartAndShoeDetail(cart, shoeDetail);
 
-            if (existingCartDetail != null) {
-                existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantity);
-                cartDetailRepository.save(existingCartDetail);
-                return new ServiceResult<>(AppConstant.SUCCESS, "Update cartdetail successfully!", null);
-            } else {
-                CartDetail newCartDetail = new CartDetail();
-                newCartDetail.setCart(cart);
-                newCartDetail.setShoeDetail(shoeDetail);
-                newCartDetail.setQuantity(quantity);
-                newCartDetail.setStatus(0);
-                cartDetailRepository.save(newCartDetail);
-                return new ServiceResult<>(AppConstant.SUCCESS, "Add new succesfully!", null);
-            }
+                if (existingCartDetail != null) {
+                    if (existingCartDetail.getQuantity() + quantity > shoeDetail.getQuantity()){
+                        return new ServiceResult<>(AppConstant.FAIL, "Invalid quantity", null);
+                    }else {
+                        existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantity);
+                        cartDetailRepository.save(existingCartDetail);
+                        return new ServiceResult<>(AppConstant.SUCCESS, "Update cartdetail successfully!", null);
+                    }
+
+                } else {
+                    CartDetail newCartDetail = new CartDetail();
+                    newCartDetail.setCart(cart);
+                    newCartDetail.setShoeDetail(shoeDetail);
+                    newCartDetail.setQuantity(quantity);
+                    newCartDetail.setStatus(0);
+                    cartDetailRepository.save(newCartDetail);
+                    return new ServiceResult<>(AppConstant.SUCCESS, "Add new succesfully!", null);
+                }
+
+
         } else {
             return new ServiceResult<>(AppConstant.NOT_FOUND, "Ko tim thay idcart, shoedetailis", null);
         }

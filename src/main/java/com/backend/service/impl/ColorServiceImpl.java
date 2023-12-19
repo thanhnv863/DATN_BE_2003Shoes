@@ -45,60 +45,70 @@ public class ColorServiceImpl implements IColorService {
                 return new ServiceResult(AppConstant.FAIL, "Color already exits!", null);
             }
         } else {
-            Color color = new Color();
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            color.setName(colorRequest.getName());
-            color.setStatus(1);
-            color.setCreatedAt(date);
-            color.setUpdatedAt(date);
-            return new ServiceResult(AppConstant.SUCCESS, "Category", colorRepository.save(color));
+            if (colorRequest.getName() == null || (colorRequest.getName() != null && colorRequest.getName().trim().isEmpty())) {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The name of color not valid!", null);
+            } else {
+                Color color = new Color();
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                color.setName(colorRequest.getName());
+                color.setStatus(1);
+                color.setCreatedAt(date);
+                color.setUpdatedAt(date);
+                return new ServiceResult(AppConstant.SUCCESS, "Category", colorRepository.save(color));
+            }
+
         }
     }
 
     @Override
     public ServiceResult<Color> updateColor(ColorRequestUpdate colorRequestUpdate) {
         Optional<Color> colorOptional = colorRepository.findById(colorRequestUpdate.getId());
-        if (colorOptional.isPresent()){
-            Color colorExits = colorOptional.get();
-            colorExits.setId(colorExits.getId());
-            colorExits.setName(colorRequestUpdate.getName());
-            colorExits.setCreatedAt(colorExits.getCreatedAt());
+        if (colorOptional.isPresent()) {
+            if (colorRequestUpdate.getName() == null || (colorRequestUpdate.getName() != null && colorRequestUpdate.getName().trim().isEmpty())) {
+                return new ServiceResult<>(AppConstant.BAD_REQUEST, "The name of color not valid!", null);
+            } else {
+                Color colorExits = colorOptional.get();
+                colorExits.setId(colorExits.getId());
+                colorExits.setName(colorRequestUpdate.getName());
+                colorExits.setCreatedAt(colorExits.getCreatedAt());
 
-            Calendar calendar = Calendar.getInstance();
-            colorExits.setUpdatedAt(calendar.getTime());
+                Calendar calendar = Calendar.getInstance();
+                colorExits.setUpdatedAt(calendar.getTime());
 
-            colorExits.setStatus(colorRequestUpdate.getStatus());
-            Color colorUpdate = colorRepository.save(colorExits);
-            return new ServiceResult<>(AppConstant.SUCCESS,"The color update succesfully!", colorUpdate);
-        }else {
-            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The color not found!", null);
+                colorExits.setStatus(colorRequestUpdate.getStatus());
+                Color colorUpdate = colorRepository.save(colorExits);
+                return new ServiceResult<>(AppConstant.SUCCESS, "The color update succesfully!", colorUpdate);
+            }
+
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The color not found!", null);
         }
     }
 
     @Override
     public ServiceResult<Color> deleteColor(ColorRequestUpdate colorRequestUpdate) {
         Optional<Color> colorOptional = colorRepository.findById(colorRequestUpdate.getId());
-        if (colorOptional.isPresent()){
+        if (colorOptional.isPresent()) {
             Color colorExits = colorOptional.get();
             colorExits.setStatus(0);
             colorRepository.save(colorExits);
-            return new ServiceResult<>(AppConstant.SUCCESS,"The color delete succesfully!", null);
-        }else {
-            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The color not found!", null);
+            return new ServiceResult<>(AppConstant.SUCCESS, "The color delete succesfully!", null);
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The color not found!", null);
         }
     }
 
     @Override
     public ServiceResult<Color> activeColor(ColorRequestUpdate colorRequestUpdate) {
         Optional<Color> colorOptional = colorRepository.findById(colorRequestUpdate.getId());
-        if (colorOptional.isPresent()){
+        if (colorOptional.isPresent()) {
             Color colorExits = colorOptional.get();
             colorExits.setStatus(1);
             colorRepository.save(colorExits);
-            return new ServiceResult<>(AppConstant.SUCCESS,"The color active succesfully!", null);
-        }else {
-            return new ServiceResult<>(AppConstant.BAD_REQUEST,"The color not found!", null);
+            return new ServiceResult<>(AppConstant.SUCCESS, "The color active succesfully!", null);
+        } else {
+            return new ServiceResult<>(AppConstant.BAD_REQUEST, "The color not found!", null);
         }
     }
 
@@ -107,7 +117,7 @@ public class ColorServiceImpl implements IColorService {
         Optional color = colorRepository.findByNameColor(name);
         if (color.isPresent()) {
             return new ServiceResult(AppConstant.SUCCESS, "get data successfully!", color);
-        }else {
+        } else {
             return new ServiceResult(AppConstant.NOT_FOUND, "Name of color not found", color);
         }
     }

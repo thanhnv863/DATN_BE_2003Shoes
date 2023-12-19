@@ -26,7 +26,6 @@ import com.backend.repository.RoleRepository;
 import com.backend.service.IAccountService;
 import com.backend.service.IEmailTemplateService;
 import com.backend.service.ImageUploadService;
-import org.apache.commons.math3.analysis.function.Add;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,7 +34,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -197,9 +195,9 @@ public class AccountServiceImpl implements IAccountService {
                     Role roleId = optionalRole.get();
                     account.setRole(roleId);
                     account.setCreatedAt(now);
-                    account.setName(accountRequest.getName());
-                    account.setEmail(accountRequest.getEmail());
-                    account.setPassword(passwordEncoder.encode(accountRequest.getPassword()));
+                    account.setName(accountRequest.getName().trim());
+                    account.setEmail(accountRequest.getEmail().trim());
+                    account.setPassword(passwordEncoder.encode(accountRequest.getPassword()).trim());
                     account.setAvatar(imageUploadService.uploadImageByName(accountRequest.getAvatar()));
                     account.setStatus(accountRequest.getStatus());
                     accountRepository.save(account);
@@ -421,19 +419,27 @@ public class AccountServiceImpl implements IAccountService {
         if (accountRequest.getRoleId() == null) {
             errorMessages.add("không được để trông vai trò");
         }
-        if (accountRequest.getName() == null) {
+        if (accountRequest.getName() != null && accountRequest.getName().trim().isEmpty()) {
             errorMessages.add("Tên không được để trống");
         }
-        if (accountRequest.getEmail() == null) {
+        if (accountRequest.getEmail() != null && accountRequest.getEmail().trim().isEmpty()) {
             errorMessages.add("Email không được để trống");
         }
-        if (accountRequest.getPassword() == null) {
+        if (accountRequest.getPassword() != null && accountRequest.getPassword().trim().isEmpty()) {
             errorMessages.add("Mật khẩu không được để trống");
         }
         if (accountRequest.getStatus() == null) {
             errorMessages.add("Trạng thái không được để trống");
         }
 
+        // kiểm tra định dạng email
+        String reg = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
+        boolean kt = accountRequest.getEmail().matches(reg);
+
+        if (accountRequest.getEmail() != null && kt == false){
+            errorMessages.add("email không đúng định dạng");
+        }
 
         if (errorMessages.size() > 0) {
             return String.join(", ", errorMessages);

@@ -44,14 +44,18 @@ public class SoleServiceImpl implements ISoleService {
                 return new ServiceResult(AppConstant.FAIL,"Sole already exits!",null);
             }
         }else {
-            Sole sole = new Sole();
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            sole.setName(soleRequest.getName());
-            sole.setStatus(0);
-            sole.setCreatedAt(date);
-            sole.setUpdatedAt(date);
-            return new ServiceResult(AppConstant.SUCCESS,"Category",soleRepository.save(sole));
+            if(soleRequest.getName() == null || (soleRequest.getName() != null && soleRequest.getName().trim().isEmpty())){
+                return new ServiceResult<>(AppConstant.BAD_REQUEST,"The name of sole not valid!", null);
+            }else {
+                Sole sole = new Sole();
+                Calendar calendar = Calendar.getInstance();
+                Date date = calendar.getTime();
+                sole.setName(soleRequest.getName());
+                sole.setStatus(0);
+                sole.setCreatedAt(date);
+                sole.setUpdatedAt(date);
+                return new ServiceResult(AppConstant.SUCCESS,"Category",soleRepository.save(sole));
+            }
         }
     }
 
@@ -59,17 +63,21 @@ public class SoleServiceImpl implements ISoleService {
     public ServiceResult<Sole> updateSole(SoleRequestUpdate soleRequestUpdate) {
         Optional<Sole> soleOptional = soleRepository.findById(soleRequestUpdate.getId());
         if (soleOptional.isPresent()){
-            Sole soleExits = soleOptional.get();
-            soleExits.setId(soleExits.getId());
-            soleExits.setName(soleRequestUpdate.getName());
-            soleExits.setCreatedAt(soleExits.getCreatedAt());
+            if(soleRequestUpdate.getName() == null || (soleRequestUpdate.getName() != null && soleRequestUpdate.getName().trim().isEmpty())){
+                return new ServiceResult<>(AppConstant.BAD_REQUEST,"The name of sole not valid!", null);
+            }else {
+                Sole soleExits = soleOptional.get();
+                soleExits.setId(soleExits.getId());
+                soleExits.setName(soleRequestUpdate.getName());
+                soleExits.setCreatedAt(soleExits.getCreatedAt());
 
-            Calendar calendar = Calendar.getInstance();
-            soleExits.setUpdatedAt(calendar.getTime());
+                Calendar calendar = Calendar.getInstance();
+                soleExits.setUpdatedAt(calendar.getTime());
 
-            soleExits.setStatus(soleRequestUpdate.getStatus());
-            Sole soleUpdate = soleRepository.save(soleExits);
-            return new ServiceResult<>(AppConstant.SUCCESS,"The sole update succesfully!", soleUpdate);
+                soleExits.setStatus(soleRequestUpdate.getStatus());
+                Sole soleUpdate = soleRepository.save(soleExits);
+                return new ServiceResult<>(AppConstant.SUCCESS,"The sole update succesfully!", soleUpdate);
+            }
         }else {
             return new ServiceResult<>(AppConstant.BAD_REQUEST,"The sole not found!", null);
         }

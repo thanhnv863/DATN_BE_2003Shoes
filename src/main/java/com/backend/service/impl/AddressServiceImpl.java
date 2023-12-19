@@ -48,10 +48,10 @@ public class AddressServiceImpl implements IAddressService {
                if (account.isPresent()){
                    Account account1 = account.get();
                    address.setAccount(account1);
-                   address.setName(addressRequest.getName());
-                   address.setPhoneNumber(addressRequest.getPhoneNumber());
-                   address.setSpecificAddress(addressRequest.getSpecificAddress());
-                   address.setWard(addressRequest.getWard());
+                   address.setName(addressRequest.getName().trim());
+                   address.setPhoneNumber(addressRequest.getPhoneNumber().trim());
+                   address.setSpecificAddress(addressRequest.getSpecificAddress().trim());
+                   address.setWard(addressRequest.getWard().trim());
                    address.setDistrict(addressRequest.getDistrict());
                    address.setProvince(addressRequest.getProvince());
                    address.setNote(addressRequest.getNote());
@@ -247,16 +247,16 @@ public class AddressServiceImpl implements IAddressService {
         if (addressRequest.getAccountId() == null && addressRequest.getDefaultAddress().isBlank()){
             errorMessages.add("id_account không được để trông");
         }
-        if (addressRequest.getName() == null){
+        if (addressRequest.getName() != null && addressRequest.getName().trim().isEmpty()){
             errorMessages.add("tên không được để trống");
         }
-        if (addressRequest.getPhoneNumber() == null){
+        if (addressRequest.getPhoneNumber() != null && addressRequest.getPhoneNumber().trim().isEmpty()){
             errorMessages.add("Không được để trống phone number");
         }
-        if(addressRequest.getSpecificAddress() == null){
+        if(addressRequest.getSpecificAddress() != null && addressRequest.getSpecificAddress().trim().isEmpty()){
             errorMessages.add("Không được để trống địa chỉ cụ thể");
         }
-        if(addressRequest.getWard() == null){
+        if(addressRequest.getWard() != null && addressRequest.getWard().trim().isEmpty()){
             errorMessages.add("không được để trống ward");
         }
         if(addressRequest.getDistrict() == null){
