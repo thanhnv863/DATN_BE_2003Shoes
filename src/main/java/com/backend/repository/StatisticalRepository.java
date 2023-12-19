@@ -44,16 +44,15 @@ public interface StatisticalRepository extends JpaRepository<Order,Long> {
             "            group by month(mo.pay_date)",nativeQuery = true)
     List<Object[]> findByHangHoaBanChayTrongNam(Integer nam);
 
-    @Query(value = "SELECT s.name ,count(s.name) as soLuong\n" +
-            " FROM db_datn.my_order mo\n" +
-            "\tleft join order_detail od on mo.id = od.order_id\n" +
-            "    left join shoe_detail sd on sd.id = od.shoe_detail_id\n" +
-            "    left join shoe s on s.id = sd.shoe_id\n" +
-            "    where mo.pay_date between :ngayBatDau and :ngayKetThuc\n" +
-            "    group by s.name\n" +
-            "    order by soLuong desc\n" +
-            "    limit 5;",nativeQuery = true)
-    List<Object[]> sanPhamBanChayTheoThangNam(Date ngayBatDau,Date ngayKetThuc);
+    @Query(value = "SELECT s.name, COUNT(s.name) as soLuong\n" +
+            "FROM db_datn.my_order mo\n" +
+            "JOIN order_detail od ON mo.id = od.order_id\n" +
+            "JOIN shoe_detail sd ON sd.id = od.shoe_detail_id\n" +
+            "JOIN shoe s ON s.id = sd.shoe_id\n" +
+            "GROUP BY s.name\n" +
+            "ORDER BY soLuong DESC\n" +
+            "LIMIT 5;",nativeQuery = true)
+    List<Object[]> sanPhamBanChayTheoThangNam();
 
     // thống kê doanh thu theo năm
     @Query(value = "SELECT \n" +

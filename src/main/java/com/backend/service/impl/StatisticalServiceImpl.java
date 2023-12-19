@@ -501,8 +501,8 @@ public class StatisticalServiceImpl implements IStatistical {
 
 
     @Override
-    public ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>> sanPhamBanChay(Date ngayBatDau,Date ngayKetThuc) {
-        List<Object[]> topSanPhamBanChay = statisticalRepository.sanPhamBanChayTheoThangNam(ngayBatDau, ngayKetThuc);
+    public ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>> sanPhamBanChay() {
+        List<Object[]> topSanPhamBanChay = statisticalRepository.sanPhamBanChayTheoThangNam();
         List<Top5SanPhamBanChayTrongThangVaNam> result = new ArrayList<>();
 
         for (Object[] record: topSanPhamBanChay){

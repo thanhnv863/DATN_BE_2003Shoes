@@ -15,7 +15,7 @@ import java.util.List;
 public interface IStatistical {
     ServiceResult<List<DataItem>> findHoaDon(Date ngayBatDau,Date ngayKetThuc);
     ServiceResult<List<DataItem>> thongKeSanPhamBanChayTrongNam(Integer nam);
-    ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>>  sanPhamBanChay(Date ngayBatDau,Date ngayKetThuc);
+    ServiceResult<List<Top5SanPhamBanChayTrongThangVaNam>>  sanPhamBanChay();
     ServiceResult<List<DataItemDoanhThu>> thongKeDoanhThu(Date ngayBatDau, Date ngayKetThuc, Integer typeBanHang);
     ServiceResult<List<DoanhThuTheoNgay>> doanhThuTheoNgay( Integer typeBanHang);
     ServiceResult<List<DataItemDoanhThuThang>> doanhThuTheoThang(Integer nam, Integer typeBanHang);
