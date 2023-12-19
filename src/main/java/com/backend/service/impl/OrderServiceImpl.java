@@ -258,6 +258,21 @@ public class OrderServiceImpl implements IOrderService {
             orderGet.setCreatedBy(orderGet.getCreatedBy());
             orderGet.setUpdatedBy(orderRequetUpdate.getUpdatedBy());
             orderGet.setNote(orderRequetUpdate.getNote());
+            //
+            if(orderGet.getStatus() == 0){
+                List<OrderDetail> orderDetailList = orderDetailRepository.getAllOrderDetail(orderGet.getId());
+                for (OrderDetail orderDetail :orderDetailList){
+                    ShoeDetail shoeDetail = shoeDetailRepository.findById(orderDetail.getShoeDetail().getId()).get();
+                    Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
+                    shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+                    if(quantityNew == 0){
+                        ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
+                        shoeDetail2.setStatus(0);
+                        shoeDetail2.setQuantity(0);
+                        shoeDetailRepository.save(shoeDetail2);
+                    }
+                }
+            }
             orderGet.setStatus(orderRequetUpdate.getStatus());
             Order orderUpdate = orderRepository.save(orderGet);
             //
@@ -268,19 +283,7 @@ public class OrderServiceImpl implements IOrderService {
             orderHistory.setNote(orderRequetUpdate.getNote());
             orderHistory.setType("Updated");
             orderHistoryRepository.save(orderHistory);
-            //
-            List<OrderDetail> orderDetailList = orderDetailRepository.getAllOrderDetail(orderGet.getId());
-            for (OrderDetail orderDetail :orderDetailList){
-                ShoeDetail shoeDetail = shoeDetailRepository.findById(orderDetail.getShoeDetail().getId()).get();
-                Integer quantityNew = shoeDetail.getQuantity() - orderDetail.getQuantity();
-                shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
-                if(quantityNew == 0){
-                    ShoeDetail shoeDetail2 = shoeDetailRepository.findById(shoeDetail.getId()).get();
-                    shoeDetail2.setStatus(0);
-                    shoeDetail2.setQuantity(0);
-                    shoeDetailRepository.save(shoeDetail2);
-                }
-            }
+
             // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
             if (orderUpdate.getAccount() != null) {
                 List<Address> listCheckAddress = addressRepository.findAddressesByAccount_Id(orderUpdate.getAccount().getId());
