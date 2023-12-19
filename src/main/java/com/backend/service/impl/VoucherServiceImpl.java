@@ -93,7 +93,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         } else {
             try {
                 voucherHoaDon.setCode("Voucher" + cutRandomString);
-                voucherHoaDon.setName(voucherOrderRequest.getName());
+                voucherHoaDon.setName(voucherOrderRequest.getName().trim());
                 voucherHoaDon.setQuantity(voucherOrderRequest.getQuantity());
 
                 if (voucherOrderRequest.getReduceForm() == 0) {
@@ -113,7 +113,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     }
 
                     if (voucherOrderRequest.getMaximumReductionValue().compareTo(BigDecimal.ZERO) <= 0) {
-                        return new ServiceResult<>(AppConstant.BAD_REQUEST,"Maximum Reduction Value phải lớn hơn 0",null);
+                        return new ServiceResult<>(AppConstant.BAD_REQUEST,"Giá trị giảm tối đa phải lớn hơn 0",null);
                     }
 
                     // Kiểm tra xem maximumReductionValue có lớn hơn minBillValue không
@@ -144,7 +144,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 }
 
                 voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
-                return new ServiceResult<>(AppConstant.SUCCESS, "Add thành công", voucherHoaDon);
+                return new ServiceResult<>(AppConstant.SUCCESS, "Thêm thành công", voucherHoaDon);
             } catch (Exception e) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return new ServiceResult<>(AppConstant.BAD_REQUEST, e.getMessage(), null); // hoặc xử lý lỗi một cách thích hợp dựa trên nhu cầu của bạn
@@ -164,7 +164,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                 return result(result);
             } else {
                 try {
-                    voucherHoaDon.setName(voucherOrderRequest.getName());
+                    voucherHoaDon.setName(voucherOrderRequest.getName().trim());
                     voucherHoaDon.setQuantity(voucherOrderRequest.getQuantity());
 
                     if (voucherOrderRequest.getReduceForm() == 0) {
@@ -185,7 +185,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                         }
 
                         if (voucherOrderRequest.getMaximumReductionValue().compareTo(BigDecimal.ZERO) <= 0) {
-                            return new ServiceResult<>(AppConstant.BAD_REQUEST,"Maximum Reduction Value phải lớn hơn 0",null);
+                            return new ServiceResult<>(AppConstant.BAD_REQUEST,"Giá trị giảm tối đa phải lớn hơn 0",null);
                         }
 
                         // Kiểm tra xem maximumReductionValue có lớn hơn minBillValue không
@@ -216,7 +216,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
 
                     voucherHoaDon = voucherOrderRepository.save(voucherHoaDon);
                     //VoucherOrderResponse convertVoucherOrderResponse = convertToResponse(voucherHoaDon);
-                    return new ServiceResult<>(AppConstant.SUCCESS, "Update thành công", voucherHoaDon);
+                    return new ServiceResult<>(AppConstant.SUCCESS, "Sửa thành công", voucherHoaDon);
                 } catch (Exception e) {
                     // Xảy ra lỗi, gọi rollback để hoàn tác các thay đổi
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -283,15 +283,6 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     }
                 }
             }
-//            if (voucher.getStatus() != 3) { //status=3: khi xoá đổi trạng thái thành ẩn
-//                // Chỉ cập nhật status nếu status hiện tại không phải là 3
-//                if (currentDateTime.isAfter(voucher.getStartDate()) && currentDateTime.isBefore(voucher.getEndDate())) {
-//                    voucher.setStatus(1); // Cập nhật thành "đã kích hoạt"
-//                } else if (currentDateTime.isAfter(voucher.getEndDate())) {
-//                    voucher.setStatus(2); // Cập nhật thành "hết hạn"
-//                } else {
-//                    voucher.setStatus(0); // Cập nhật thành chờ kích hoạt
-//                }
             voucherOrderRepository.save(voucher);
         }
     }
@@ -375,55 +366,55 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         List<String> errorMessages = new ArrayList<>();
 
         //Validate trống
-        if (voucherOrderRequest.getCode() == null) {
+        if (voucherOrderRequest.getCode() == null || (voucherOrderRequest.getCode() != null && voucherOrderRequest.getCode().trim().isEmpty())) {
             errorMessages.add("Code không được để trống");
         }
-        if (voucherOrderRequest.getName() == null) {
-            errorMessages.add("Name không được để trống");
+        if (voucherOrderRequest.getName() == null || (voucherOrderRequest.getName() != null && voucherOrderRequest.getName().trim().isEmpty())){
+            errorMessages.add("Tên voucher không được để trống");
         }
         if (voucherOrderRequest.getName() != null && voucherOrderRequest.getName().length() > 255) {
-            errorMessages.add("Name không được quá 255 ký tự");
+            errorMessages.add("Tên voucher không được quá 255 ký tự");
         }
         if (voucherOrderRequest.getQuantity() == null) {
-            errorMessages.add("Quantity không được để trống");
+            errorMessages.add("Số lượng không được để trống");
         }
         if (voucherOrderRequest.getDiscountAmount() == null) {
-            errorMessages.add("Discount amount không được để trống");
+            errorMessages.add("Giá trị giảm không được để trống");
         }
         if (voucherOrderRequest.getMinBillValue() == null) {
-            errorMessages.add("Min bill value không được để trống");
+            errorMessages.add("Giá trị hoá đơn tối thiểu không được để trống");
         }
         if (voucherOrderRequest.getStartDate() == null) {
-            errorMessages.add("Start date không được để trống");
+            errorMessages.add("Ngày bắt đầu không được để trống");
         }
         if (voucherOrderRequest.getEndDate() == null) {
-            errorMessages.add("End date không được để trống");
+            errorMessages.add("Ngày kết thúc không được để trống");
         }
         if (voucherOrderRequest.getReduceForm() == null) {
-            errorMessages.add("Reduce form không được để trống");
+            errorMessages.add("Hình thức giảm không được để trống");
         }
 
         // Kiểm tra số lượng
         if (voucherOrderRequest.getQuantity() != null && voucherOrderRequest.getQuantity() <= 0) {
-            errorMessages.add("Quantity phải lớn hơn 0");
+            errorMessages.add("Số lượng phải lớn hơn 0");
         }
 
 //        if (voucherOrderRequest.getQuantity() != null && (voucherOrderRequest.getQuantity() < 1 || voucherOrderRequest.getQuantity() > 100)) {
 //            errorMessages.add("Quantity phải nằm trong khoảng từ 1 đến 100");
 //        }
         if (voucherOrderRequest.getDiscountAmount() != null && voucherOrderRequest.getDiscountAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            errorMessages.add("Discount amount phải lớn hơn 0");
+            errorMessages.add("Giá trị giảm phải lớn hơn 0");
         }
         if (voucherOrderRequest.getMinBillValue() != null && voucherOrderRequest.getMinBillValue().compareTo(BigDecimal.ZERO) <= 0) {
-            errorMessages.add("Min bill value phải lớn hơn 0");
+            errorMessages.add("Giá trị hoá đơn tối thiểu phải lớn hơn 0");
         }
 
         //Kiểm tra trạng thái và hình thức giảm
         if (voucherOrderRequest.getReduceForm() != null && (voucherOrderRequest.getReduceForm() < 0 || voucherOrderRequest.getReduceForm() > 1)) {
-            errorMessages.add("Reduce form phải nằm trong khoảng 0 và 1");
+            errorMessages.add("Hình thức giảm phải là phần trăm hoặc tiền");
         }
         if (voucherOrderRequest.getStatus() != null && (voucherOrderRequest.getStatus() < 0 || voucherOrderRequest.getStatus() > 2)) {
-            errorMessages.add("Status phải nằm trong khoảng từ 0 đến 2");
+            errorMessages.add("Trạng thái phải nằm trong khoảng từ 0 đến 2");
         }
 
 //        if (voucherOrderRequest.getMaximumReductionValue().compareTo(voucherOrderRequest.getMinBillValue()) > 0) {
@@ -434,12 +425,12 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         // Kiểm tra ngày kết thúc phải sau ngày bắt đầu
         if (voucherOrderRequest.getStartDate() != null && voucherOrderRequest.getEndDate() != null) {
             if (voucherOrderRequest.getEndDate().isBefore(voucherOrderRequest.getStartDate())) {
-                errorMessages.add("End date phải sau Start date");
+                errorMessages.add("Ngày kết thúc phải sau ngày bắt đầu");
             }
         }
         if (voucherOrderRequest.getCreateDate() != null && voucherOrderRequest.getUpdateAt() != null) {
             if (voucherOrderRequest.getStartDate().isBefore(voucherOrderRequest.getCreateDate())) {
-                errorMessages.add("Start date phải sau Create date");
+                errorMessages.add("Ngày bắt đầu phải sau ngày kết thúc");
             }
         }
 
