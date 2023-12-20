@@ -20,17 +20,18 @@ public class OrderHistoryServiceImpl implements IOrderHistoryService {
 
     @Override
     public ServiceResult<?> listOrderHistoryByOrderCode(Long id) {
-        List<OrderHistory> listOrderHistory = orderHistoryRepository.getListOrderHistoryByOrder(id);
-        List<OrderHistoryReponse> listOrderHistoryReponse = listOrderHistory.stream()
-                .map(this::convertOrderHistory)
-                .collect(Collectors.toList());
+//        List<OrderHistory> listOrderHistory = orderHistoryRepository.getListOrderHistoryByOrder(id);
+//        List<OrderHistoryReponse> listOrderHistoryReponse = listOrderHistory.stream()
+//                .map(this::convertOrderHistory)
+//                .collect(Collectors.toList());
+        List<OrderHistoryReponse> listOrderHistoryReponse = orderHistoryRepository.getListOrderHistoryByOrder(id);
         return new ServiceResult<>(AppConstant.SUCCESS, "Lấy danh sách thành công ", listOrderHistoryReponse);
 
     }
 
     public OrderHistoryReponse convertOrderHistory(OrderHistory orderHistory) {
         return OrderHistoryReponse.builder()
-                .id(orderHistory.getId())
+//                .id(orderHistory.getId())
                 .code(orderHistory.getOrder().getCode())
                 .createdTime(orderHistory.getCreatedTime())
                 .createdBy(orderHistory.getCreatedBy())

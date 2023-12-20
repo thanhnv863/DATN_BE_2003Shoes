@@ -17,7 +17,7 @@ import java.util.Date;
 @Builder
 public class OrderHistoryReponse {
 
-    private Long id;
+//    private Long id;
 
     private String code;
 
