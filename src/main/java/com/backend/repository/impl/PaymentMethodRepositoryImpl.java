@@ -42,7 +42,7 @@ public class PaymentMethodRepositoryImpl implements PaymentMethodCustomRepositor
         if (status != null) {
             sql.append(" AND (a.status = :status) ");
         }
-        sql.append(" GROUP BY a.id, b.code, a.method, a.total, a.payment_time, a.note, a.status FROM payment_method");
+//        sql.append(" GROUP BY a.id, b.code, a.method, a.total, a.payment_time, a.note, a.status FROM payment_method");
         sql.append(" ORDER BY a.payment_time desc");
 
         Query query = entityManager.createNativeQuery(sql.toString());
