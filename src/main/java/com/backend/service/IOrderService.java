@@ -24,6 +24,10 @@ public interface IOrderService {
 
     ServiceResultReponse<Order> update(OrderRequetUpdate orderRequetUpdate);
 
+    ServiceResultReponse<Order> updateInformation(OrderRequetUpdate orderRequetUpdate);
+
+    ServiceResultReponse<Order> updateTien(OrderRequetUpdate orderRequetUpdate);
+
     ServiceResultReponse<Order> delete(OrderRequetUpdate orderRequetUpdate);
 
     ServiceResultReponse<?> getOrderByStatus(Integer status);

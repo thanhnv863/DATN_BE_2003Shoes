@@ -215,6 +215,18 @@ public class OrderServiceImpl implements IOrderService {
         }
     }
 
+    //
+    private static BigDecimal previousTotalTongTien = BigDecimal.ZERO;
+
+    public static BigDecimal getPreviousTotalTongTien() {
+        return previousTotalTongTien;
+    }
+
+    public static void setPreviousTotalTongTien(BigDecimal totalTongTien) {
+        previousTotalTongTien = totalTongTien;
+    }
+
+    //
     @Override
     @Transactional
     public ServiceResultReponse<Order> update(OrderRequetUpdate orderRequetUpdate) {
@@ -224,6 +236,11 @@ public class OrderServiceImpl implements IOrderService {
         List<String> tenGiayListStatus5 = new ArrayList<>();
         if (order.isPresent()) {
             Order orderGet = order.get();
+            //
+            BigDecimal tongTien = BigDecimal.ZERO;
+            BigDecimal totalTongTien = BigDecimal.ZERO;
+            BigDecimal oldTotalTongTien = BigDecimal.ZERO;
+            //
             int check = 0;
             List<String> tenGiayList = new ArrayList<>();
             List<OrderDetail> orderDetailList = orderDetailRepository.getAllOrderDetail(orderGet.getId());
@@ -263,19 +280,19 @@ public class OrderServiceImpl implements IOrderService {
                 orderGet.setId(orderGet.getId());
                 orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
                 orderGet.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
-//            orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
                 orderGet.setAddress(orderRequetUpdate.getAddress());
                 orderGet.setShipFee(orderRequetUpdate.getShipFee());
                 orderGet.setMoneyReduce(orderRequetUpdate.getMoneyReduce());
-                if(orderRequetUpdate.getTotalMoney() != orderGet.getTotalMoney()) {
-                    OrderHistory orderHistory = new OrderHistory();
-                    orderHistory.setOrder(orderGet);
-                    orderHistory.setCreatedTime(date);
-                    orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
-                    orderHistory.setNote(orderRequetUpdate.getNote());
-                    orderHistory.setType("Updated");
-                    orderHistoryRepository.save(orderHistory);
-                }
+                //
+//                if (tongTien.compareTo(limit) > 0) {
+//                    OrderHistory orderHistory = new OrderHistory();
+//                    orderHistory.setOrder(orderGet);
+//                    orderHistory.setCreatedTime(date);
+//                    orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
+//                    orderHistory.setNote(orderRequetUpdate.getNote());
+//                    orderHistory.setType("Updated");
+//                    orderHistoryRepository.save(orderHistory);
+//                }
                 orderGet.setTotalMoney(orderRequetUpdate.getTotalMoney());
                 orderGet.setCreatedDate(orderGet.getCreatedDate());
                 orderGet.setPayDate(orderRequetUpdate.getPayDate());
@@ -299,6 +316,7 @@ public class OrderServiceImpl implements IOrderService {
                         }
                     }
                 }
+                //
                 orderGet.setStatus(orderRequetUpdate.getStatus());
 //                Order orderUpdate = orderRepository.save(orderGet);
                 if (orderGet.getStatus() == 5) {
@@ -319,35 +337,165 @@ public class OrderServiceImpl implements IOrderService {
                         }
                     }
                 }
-                if (checkStatus5 > 0) {
-                    orderGet.setStatus(4);
-                    orderRepository.save(orderGet);
-                    String errorMessage = "Số lượng sản phẩm tồn của giày ";
-                    errorMessage += String.join(", ", tenGiayList);
-                    errorMessage += " không đủ vui lòng chọn lại số lượng !";
-                    return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, errorMessage);
-                } else {
-                    Order orderUpdate = orderRepository.save(orderGet);
-                    // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
-                    if (orderUpdate.getAccount() != null) {
-                        List<Address> listCheckAddress = addressRepository.findAddressesByAccount_Id(orderUpdate.getAccount().getId());
-                        if (listCheckAddress.isEmpty()) {
-                            Address address = new Address();
-                            address.setAccount(orderUpdate.getAccount());
-                            address.setName(orderRequetUpdate.getCustomerName());
-                            address.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
-                            address.setSpecificAddress(orderRequetUpdate.getSpecificAddress());
-                            address.setWard(orderRequetUpdate.getWard());
-                            address.setDistrict(orderRequetUpdate.getDistrict());
-                            address.setProvince(orderRequetUpdate.getProvince());
-                            address.setDefaultAddress("1");
-                            addressRepository.save(address);
-                        }
-                    }
-                    return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
-                }
-            }
+                if (orderGet.getStatus() != 5 && orderGet.getStatus() != 0) {
+                    BigDecimal tempTotalTongTien = BigDecimal.ZERO;
 
+                    for (OrderDetail orderDetail : orderDetailList) {
+                        tongTien = orderDetail.getPrice().multiply(BigDecimal.valueOf(orderDetail.getQuantity()));
+                        tempTotalTongTien = tempTotalTongTien.add(tongTien);
+                    }
+
+                    BigDecimal previousTotalTongTien = this.getPreviousTotalTongTien();
+                    if (!previousTotalTongTien.equals(tempTotalTongTien)) {
+                        OrderHistory orderHistory = new OrderHistory();
+                        orderHistory.setOrder(orderGet);
+                        orderHistory.setCreatedTime(date);
+                        orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
+                        orderHistory.setNote(orderRequetUpdate.getNote());
+                        orderHistory.setType("Updated");
+                        orderHistoryRepository.save(orderHistory);
+                    }
+
+                    this.setPreviousTotalTongTien(tempTotalTongTien);
+                }
+
+            }
+            if (checkStatus5 > 0) {
+                orderGet.setStatus(4);
+                orderRepository.save(orderGet);
+                String errorMessage = "Số lượng sản phẩm tồn của giày ";
+                errorMessage += String.join(", ", tenGiayList);
+                errorMessage += " không đủ vui lòng chọn lại số lượng !";
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, errorMessage);
+            } else {
+                Order orderUpdate = orderRepository.save(orderGet);
+                // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
+                if (orderUpdate.getAccount() != null) {
+                    List<Address> listCheckAddress = addressRepository.findAddressesByAccount_Id(orderUpdate.getAccount().getId());
+                    if (listCheckAddress.isEmpty()) {
+                        Address address = new Address();
+                        address.setAccount(orderUpdate.getAccount());
+                        address.setName(orderRequetUpdate.getCustomerName());
+                        address.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
+                        address.setSpecificAddress(orderRequetUpdate.getSpecificAddress());
+                        address.setWard(orderRequetUpdate.getWard());
+                        address.setDistrict(orderRequetUpdate.getDistrict());
+                        address.setProvince(orderRequetUpdate.getProvince());
+                        address.setDefaultAddress("1");
+                        addressRepository.save(address);
+                    }
+                }
+                return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
+            }
+        } else {
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã hóa đơn không tồn tại!");
+        }
+    }
+
+
+    //
+    @Override
+    @Transactional
+    public ServiceResultReponse<Order> updateInformation(OrderRequetUpdate orderRequetUpdate) {
+        Optional<Order> order = orderRepository.findOrderByCode(orderRequetUpdate.getCode());
+        Date date = new Date();
+        if (order.isPresent()) {
+            Order orderGet = order.get();
+            orderGet.setId(orderGet.getId());
+            orderGet.setCode(orderGet.getCode());
+            // voucher
+            if (orderRequetUpdate.getIdVoucher() != null) {
+                VoucherOrder voucherOrder = voucherOrderRepository.findById(orderRequetUpdate.getIdVoucher()).get();
+                orderGet.setVoucherOrder(voucherOrder);
+                voucherOrder.setQuantity(voucherOrder.getQuantity() - 1);
+                voucherOrderRepository.save(voucherOrder);
+            } else {
+                orderGet.setVoucherOrder(null);
+            }
+            //
+            if (orderRequetUpdate.getIdAccount() != null) {
+                Account account = accountRepository.findById(orderRequetUpdate.getIdAccount()).get();
+                orderGet.setAccount(account);
+            } else {
+                orderGet.setAccount(null);
+            }
+            //
+            orderGet.setType(orderRequetUpdate.getType());
+            orderGet.setId(orderGet.getId());
+            orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
+            orderGet.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
+            orderGet.setAddress(orderRequetUpdate.getAddress());
+            orderGet.setShipFee(orderRequetUpdate.getShipFee());
+            orderGet.setMoneyReduce(orderRequetUpdate.getMoneyReduce());
+            orderGet.setTotalMoney(orderRequetUpdate.getTotalMoney());
+            orderGet.setCreatedDate(orderGet.getCreatedDate());
+            orderGet.setPayDate(orderRequetUpdate.getPayDate());
+            orderGet.setShipDate(orderRequetUpdate.getShipDate());
+            orderGet.setDesiredDate(orderRequetUpdate.getDesiredDate());
+            orderGet.setReceiveDate(orderRequetUpdate.getReceiveDate());
+            orderGet.setCreatedBy(orderGet.getCreatedBy());
+            orderGet.setUpdatedBy(orderRequetUpdate.getUpdatedBy());
+            orderGet.setNote(orderRequetUpdate.getNote());
+            orderGet.setStatus(orderRequetUpdate.getStatus());
+            Order orderUpdate = orderRepository.save(orderGet);
+            OrderHistory orderHistory = new OrderHistory();
+            orderHistory.setOrder(orderGet);
+            orderHistory.setCreatedTime(date);
+            orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
+            orderHistory.setNote(orderRequetUpdate.getNote());
+            orderHistory.setType("Updated");
+            orderHistoryRepository.save(orderHistory);
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
+        } else {
+            return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã hóa đơn không tồn tại!");
+        }
+    }
+
+    @Override
+    @Transactional
+    public ServiceResultReponse<Order> updateTien(OrderRequetUpdate orderRequetUpdate) {
+        Optional<Order> order = orderRepository.findOrderByCode(orderRequetUpdate.getCode());
+        Date date = new Date();
+        if (order.isPresent()) {
+            Order orderGet = order.get();
+            orderGet.setId(orderGet.getId());
+            orderGet.setCode(orderGet.getCode());
+            // voucher
+            if (orderRequetUpdate.getIdVoucher() != null) {
+                VoucherOrder voucherOrder = voucherOrderRepository.findById(orderRequetUpdate.getIdVoucher()).get();
+                orderGet.setVoucherOrder(voucherOrder);
+                voucherOrder.setQuantity(voucherOrder.getQuantity() - 1);
+                voucherOrderRepository.save(voucherOrder);
+            } else {
+                orderGet.setVoucherOrder(null);
+            }
+            //
+            if (orderRequetUpdate.getIdAccount() != null) {
+                Account account = accountRepository.findById(orderRequetUpdate.getIdAccount()).get();
+                orderGet.setAccount(account);
+            } else {
+                orderGet.setAccount(null);
+            }
+            //
+            orderGet.setType(orderRequetUpdate.getType());
+            orderGet.setId(orderGet.getId());
+            orderGet.setCustomerName(orderRequetUpdate.getCustomerName());
+            orderGet.setPhoneNumber(orderRequetUpdate.getPhoneNumber());
+            orderGet.setAddress(orderRequetUpdate.getAddress());
+            orderGet.setShipFee(orderRequetUpdate.getShipFee());
+            orderGet.setMoneyReduce(orderRequetUpdate.getMoneyReduce());
+            orderGet.setTotalMoney(orderRequetUpdate.getTotalMoney());
+            orderGet.setCreatedDate(orderGet.getCreatedDate());
+            orderGet.setPayDate(orderRequetUpdate.getPayDate());
+            orderGet.setShipDate(orderRequetUpdate.getShipDate());
+            orderGet.setDesiredDate(orderRequetUpdate.getDesiredDate());
+            orderGet.setReceiveDate(orderRequetUpdate.getReceiveDate());
+            orderGet.setCreatedBy(orderGet.getCreatedBy());
+            orderGet.setUpdatedBy(orderRequetUpdate.getUpdatedBy());
+            orderGet.setNote(orderRequetUpdate.getNote());
+            orderGet.setStatus(orderRequetUpdate.getStatus());
+            Order orderUpdate = orderRepository.save(orderGet);
+            return new ServiceResultReponse<>(AppConstant.SUCCESS, 1L, orderUpdate, "Cập nhật hóa đơn thành công");
         } else {
             return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Mã hóa đơn không tồn tại!");
         }
@@ -431,7 +579,7 @@ public class OrderServiceImpl implements IOrderService {
             Cart cart = cartRepository.findByAccount_Id(order.getAccount().getId());
             List<CartDetail> cartDetailList = cartDetailRepository.listCartDetailByStatus(cart.getId());
             if (cartDetailList.isEmpty()) {
-                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Tạo đơn hàng thất bại, vui lòng chọn sản phẩm mua!");
+                return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Không đủ số lượng!");
             } else {
                 int check = 0;
                 List<String> tenGiayList = new ArrayList<>();

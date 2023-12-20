@@ -6,8 +6,10 @@ import com.backend.dto.request.OrderDetailRequest;
 import com.backend.dto.response.OrderDetailReponse;
 import com.backend.entity.Order;
 import com.backend.entity.OrderDetail;
+import com.backend.entity.OrderHistory;
 import com.backend.entity.ShoeDetail;
 import com.backend.repository.OrderDetailRepository;
+import com.backend.repository.OrderHistoryRepository;
 import com.backend.repository.OrderRepository;
 import com.backend.repository.ShoeDetailRepository;
 import com.backend.service.IOrderDetailSerivice;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -30,6 +33,9 @@ public class OrderDetailServiceImpl implements IOrderDetailSerivice {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderHistoryRepository orderHistoryRepository;
 
     public OrderDetailReponse convertToOrderDetail(OrderDetail orderDetail) {
         return OrderDetailReponse.builder()
@@ -119,8 +125,20 @@ public class OrderDetailServiceImpl implements IOrderDetailSerivice {
     public ServiceResultReponse<?> deleteOrderDetail(OrderDetailRequest orderDetailRequest) {
         Optional<OrderDetail> orderDetail = orderDetailRepository.findById(orderDetailRequest.getId());
         if (orderDetail.isPresent()) {
+            Date date = new Date();
             OrderDetail orderDetail1 = orderDetail.get();
+            Order order = orderRepository.findById(orderDetailRequest.getIdOrder()).get();
+            if(order.getStatus() == 4){
+                OrderHistory orderHistory = new OrderHistory();
+                    orderHistory.setOrder(order);
+                    orderHistory.setCreatedTime(date);
+                    orderHistory.setCreatedBy(order.getUpdatedBy());
+                    orderHistory.setNote(order.getNote());
+                    orderHistory.setType("Updated");
+                    orderHistoryRepository.save(orderHistory);
+            }
             orderDetailRepository.deleteById(orderDetail1.getId());
+
             return new ServiceResultReponse<>(AppConstant.SUCCESS, 0L, null, "Xóa orderDetail thành công");
         }
         return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, "Xóa orderDetail thất bại");
