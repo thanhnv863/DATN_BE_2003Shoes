@@ -320,14 +320,15 @@ public class OrderServiceImpl implements IOrderService {
                 } else {
                     Order orderUpdate = orderRepository.save(orderGet);
                     //
-                    OrderHistory orderHistory = new OrderHistory();
-                    orderHistory.setOrder(orderUpdate);
-                    orderHistory.setCreatedTime(date);
-                    orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
-                    orderHistory.setNote(orderRequetUpdate.getNote());
-                    orderHistory.setType("Updated");
-                    orderHistoryRepository.save(orderHistory);
-
+                    if(orderRequetUpdate.getTotalMoney() != orderUpdate.getTotalMoney()) {
+                        OrderHistory orderHistory = new OrderHistory();
+                        orderHistory.setOrder(orderUpdate);
+                        orderHistory.setCreatedTime(date);
+                        orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
+                        orderHistory.setNote(orderRequetUpdate.getNote());
+                        orderHistory.setType("Updated");
+                        orderHistoryRepository.save(orderHistory);
+                    }
                     // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
                     if (orderUpdate.getAccount() != null) {
                         List<Address> listCheckAddress = addressRepository.findAddressesByAccount_Id(orderUpdate.getAccount().getId());
