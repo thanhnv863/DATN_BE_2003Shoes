@@ -51,7 +51,7 @@ public class SoleServiceImpl implements ISoleService {
                 Calendar calendar = Calendar.getInstance();
                 Date date = calendar.getTime();
                 sole.setName(soleRequest.getName());
-                sole.setStatus(0);
+                sole.setStatus(1);
                 sole.setCreatedAt(date);
                 sole.setUpdatedAt(date);
                 return new ServiceResult(AppConstant.SUCCESS,"Category",soleRepository.save(sole));

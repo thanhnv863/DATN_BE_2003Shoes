@@ -50,7 +50,7 @@ public class BrandServiceImpl implements IBrandService {
                 Calendar calendar = Calendar.getInstance();
                 Date date = calendar.getTime();
                 brand.setName(brandRequest.getName());
-                brand.setStatus(0);
+                brand.setStatus(1);
                 brand.setCreatedAt(date);
                 brand.setUpdatedAt(date);
                 return new ServiceResult(AppConstant.SUCCESS, "Brand created succesfully!", brandRepository.save(brand));

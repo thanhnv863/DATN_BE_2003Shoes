@@ -20,8 +20,12 @@ public interface CartDetailRepository extends JpaRepository<CartDetail,Long> {
 
     List<CartDetail> findByCart(Cart cart);
 
-    @Query(value = "Select * from cart_detail where cart_detail.cart_id = ?1 and cart_detail.status = 1", nativeQuery = true)
+    @Query(value = "Select * from cart_detail where cart_detail.cart_id = ?1 and cart_detail.status = 1 or cart_detail.status = 2", nativeQuery = true)
     List<CartDetail> listCartDetailByStatus(Long idCart);
+
+
+    @Query(value = "Select * from cart_detail where cart_detail.cart_id = ?1", nativeQuery = true)
+    List<CartDetail> listCartDetailAll(Long idCart);
 
     @Transactional
     @Modifying

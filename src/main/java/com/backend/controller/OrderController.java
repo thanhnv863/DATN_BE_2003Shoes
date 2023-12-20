@@ -57,6 +57,16 @@ public class OrderController {
         return ResponseEntity.ok().body(iOrderService.update(orderRequetUpdate));
     }
 
+    @PostMapping("/updateInformation")
+    public ResponseEntity<?> updtateInformation(@RequestBody OrderRequetUpdate orderRequetUpdate) {
+        return ResponseEntity.ok().body(iOrderService.updateInformation(orderRequetUpdate));
+    }
+
+    @PostMapping("/updateTien")
+    public ResponseEntity<?> updtateTien(@RequestBody OrderRequetUpdate orderRequetUpdate) {
+        return ResponseEntity.ok().body(iOrderService.updateTien(orderRequetUpdate));
+    }
+
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody OrderRequetUpdate orderRequetUpdate) {
         return ResponseEntity.ok().body(iOrderService.delete(orderRequetUpdate));
