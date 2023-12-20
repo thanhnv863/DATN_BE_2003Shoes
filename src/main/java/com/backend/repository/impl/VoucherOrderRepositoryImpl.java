@@ -45,6 +45,7 @@ public class VoucherOrderRepositoryImpl implements VoucherOrderCustomRepository 
             sql.append(" AND (v.end_date <= :endDate)");
         }
 
+        sql.append(" ORDER BY v.updated_time DESC");
         Query query = entityManager.createNativeQuery(sql.toString());
 
         if (voucher != null) {
