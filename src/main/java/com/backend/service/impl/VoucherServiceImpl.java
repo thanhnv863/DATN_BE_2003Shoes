@@ -120,7 +120,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                     if (maximumReductionValue != null) {
                         BigDecimal minBillValue = voucherOrderRequest.getMinBillValue();
                         if (maximumReductionValue.compareTo(minBillValue) >= 0) {
-                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá tối đa phải nhỏ hơn giá trị hóa đơn tối thiểu", null);
+                            return new ServiceResult<>(AppConstant.BAD_REQUEST, "Gía trị giảm tối đa phải nhỏ hơn giá trị hóa đơn tối thiểu", null);
                         }
                     }
 
@@ -192,7 +192,7 @@ public class VoucherServiceImpl implements IVoucherOrderService {
                         if (maximumReductionValue != null) {
                             BigDecimal minBillValue = voucherOrderRequest.getMinBillValue();
                             if (maximumReductionValue.compareTo(minBillValue) >= 0) {
-                                return new ServiceResult<>(AppConstant.BAD_REQUEST, "Phần trăm giảm giá tối đa phải nhỏ hơn giá trị hóa đơn tối thiểu", null);
+                                return new ServiceResult<>(AppConstant.BAD_REQUEST, "Gía trị giảm tối đa phải nhỏ hơn giá trị hóa đơn tối thiểu", null);
                             }
                         }
 
@@ -366,9 +366,9 @@ public class VoucherServiceImpl implements IVoucherOrderService {
         List<String> errorMessages = new ArrayList<>();
 
         //Validate trống
-        if (voucherOrderRequest.getCode() == null || (voucherOrderRequest.getCode() != null && voucherOrderRequest.getCode().trim().isEmpty())) {
-            errorMessages.add("Code không được để trống");
-        }
+//        if (voucherOrderRequest.getCode() == null || (voucherOrderRequest.getCode() != null && voucherOrderRequest.getCode().trim().isEmpty())) {
+//            errorMessages.add("Code không được để trống");
+//        }
         if (voucherOrderRequest.getName() == null || (voucherOrderRequest.getName() != null && voucherOrderRequest.getName().trim().isEmpty())){
             errorMessages.add("Tên voucher không được để trống");
         }
@@ -427,10 +427,16 @@ public class VoucherServiceImpl implements IVoucherOrderService {
             if (voucherOrderRequest.getEndDate().isBefore(voucherOrderRequest.getStartDate())) {
                 errorMessages.add("Ngày kết thúc phải sau ngày bắt đầu");
             }
+            if (voucherOrderRequest.getStartDate().toLocalDate().isBefore(LocalDate.now())) {
+                errorMessages.add("Ngày bắt đầu phải sau ngày hiện tại");
+            }
+            if (voucherOrderRequest.getEndDate().toLocalDate().isBefore(LocalDate.now())) {
+                errorMessages.add("Ngày kết thúc phải sau ngày hiện tại");
+            }
         }
         if (voucherOrderRequest.getCreateDate() != null && voucherOrderRequest.getUpdateAt() != null) {
             if (voucherOrderRequest.getStartDate().isBefore(voucherOrderRequest.getCreateDate())) {
-                errorMessages.add("Ngày bắt đầu phải sau ngày kết thúc");
+                errorMessages.add("Ngày bắt đầu phải trước ngày kết thúc");
             }
         }
 
