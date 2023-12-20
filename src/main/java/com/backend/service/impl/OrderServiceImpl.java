@@ -363,6 +363,13 @@ public class OrderServiceImpl implements IOrderService {
             orderGet.setNote(orderRequetUpdate.getNote());
             orderGet.setStatus(orderRequetUpdate.getStatus());
             Order orderUpdate = orderRepository.save(orderGet);
+            // Cập nhật lại số lượng giày
+//            List<OrderDetail> orderDetailList = orderDetailRepository.getAllOrderDetail(orderGet.getId());
+//            for (OrderDetail orderDetail : orderDetailList) {
+//                ShoeDetail shoeDetail = shoeDetailRepository.findById(orderDetail.getShoeDetail().getId()).get();
+//                Integer quantityNew = shoeDetail.getQuantity() + orderDetail.getQuantity();
+//                shoeDetailRepository.updateSoLuong(quantityNew, shoeDetail.getId());
+//            }
             //
             OrderHistory orderHistory = new OrderHistory();
             orderHistory.setOrder(orderUpdate);
