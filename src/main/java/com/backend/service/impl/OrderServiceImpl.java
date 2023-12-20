@@ -320,7 +320,7 @@ public class OrderServiceImpl implements IOrderService {
                 } else {
                     Order orderUpdate = orderRepository.save(orderGet);
                     //
-                    if(orderRequetUpdate.getTotalMoney() != orderUpdate.getTotalMoney()) {
+                    if(orderRequetUpdate.getTotalMoney() != orderGet.getTotalMoney()) {
                         OrderHistory orderHistory = new OrderHistory();
                         orderHistory.setOrder(orderUpdate);
                         orderHistory.setCreatedTime(date);
