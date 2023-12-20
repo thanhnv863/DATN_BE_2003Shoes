@@ -267,6 +267,15 @@ public class OrderServiceImpl implements IOrderService {
                 orderGet.setAddress(orderRequetUpdate.getAddress());
                 orderGet.setShipFee(orderRequetUpdate.getShipFee());
                 orderGet.setMoneyReduce(orderRequetUpdate.getMoneyReduce());
+                if(orderRequetUpdate.getTotalMoney() != orderGet.getTotalMoney()) {
+                    OrderHistory orderHistory = new OrderHistory();
+                    orderHistory.setOrder(orderGet);
+                    orderHistory.setCreatedTime(date);
+                    orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
+                    orderHistory.setNote(orderRequetUpdate.getNote());
+                    orderHistory.setType("Updated");
+                    orderHistoryRepository.save(orderHistory);
+                }
                 orderGet.setTotalMoney(orderRequetUpdate.getTotalMoney());
                 orderGet.setCreatedDate(orderGet.getCreatedDate());
                 orderGet.setPayDate(orderRequetUpdate.getPayDate());
@@ -319,16 +328,6 @@ public class OrderServiceImpl implements IOrderService {
                     return new ServiceResultReponse<>(AppConstant.FAIL, 0L, null, errorMessage);
                 } else {
                     Order orderUpdate = orderRepository.save(orderGet);
-                    //
-                    if(orderRequetUpdate.getTotalMoney() != orderGet.getTotalMoney()) {
-                        OrderHistory orderHistory = new OrderHistory();
-                        orderHistory.setOrder(orderUpdate);
-                        orderHistory.setCreatedTime(date);
-                        orderHistory.setCreatedBy(orderRequetUpdate.getUpdatedBy());
-                        orderHistory.setNote(orderRequetUpdate.getNote());
-                        orderHistory.setType("Updated");
-                        orderHistoryRepository.save(orderHistory);
-                    }
                     // kiểm tra xem có địa chỉ chưa, nếu chưa tạo địa chỉ mặc định cho khách hàng
                     if (orderUpdate.getAccount() != null) {
                         List<Address> listCheckAddress = addressRepository.findAddressesByAccount_Id(orderUpdate.getAccount().getId());
